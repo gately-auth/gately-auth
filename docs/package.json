@@ -51,11 +51,13 @@
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.5.0",
     "remark-gfm": "^4.0.0",
+    "shiki": "3.21.0",
     "tailwind-merge": "^2.6.1",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.6.2",
-    "webfontloader": "^1.6.28"
+    "webfontloader": "^1.6.28",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@iconify-json/hugeicons": "^1.2.1",
