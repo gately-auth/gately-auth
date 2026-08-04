@@ -1,0 +1,29 @@
+---
+export const prerender = false;
+
+import { getArticles, getCategories, getHelpCenterConfig, getFolders } from '../lib/localData';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NotFoundPage from '../components/NotFoundPage';
+
+const [articles, categories, config, folders] = await Promise.all([
+  getArticles(), getCategories(), getHelpCenterConfig(), getFolders(),
+]);
+const projectId = 'local';
+---
+
+<BaseLayout
+  title={`Page Not Found - ${config.portal_name}`}
+  description="The page you're looking for doesn't exist."
+  config={config}
+  projectId={projectId}
+  folders={folders}
+>
+  <NotFoundPage
+    client:only="react"
+    config={config}
+    articles={articles}
+    categories={categories}
+    folders={folders}
+    projectId={projectId}
+  />
+</BaseLayout>

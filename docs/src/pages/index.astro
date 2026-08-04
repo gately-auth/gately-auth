@@ -1,0 +1,45 @@
+---
+// Force server-side rendering for dynamic subdomain support
+export const prerender = false;
+
+// Custom domains use this page directly
+// Subdomains get redirected to /help by middleware
+import { getArticles, getCategories, getHelpCenterConfig, getFaqs, getFolders } from '../lib/localData';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HelpCenterHome from '../components/HelpCenterHome';
+
+const [articles, categories, faqs, config, folders] = await Promise.all([
+  getArticles(),
+  getCategories(),
+  getFaqs(),
+  getHelpCenterConfig(),
+  getFolders(),
+]);
+
+const projectId = 'local';
+
+// The default folder is the one marked is_default — its categories show on the root page
+const defaultFolder = folders.find((f: any) => f.is_default) || folders[0] || null;
+---
+
+<BaseLayout 
+  title={`${config.portal_name} | ${config.meta_title || 'Help Center'}`}
+  description={config.meta_description || config.welcome_subtitle}
+  config={config}
+  projectId={projectId}
+  folders={folders}
+  ogImage={config.og_image_url ?? undefined}
+  ogType="website"
+>
+  <HelpCenterHome
+    client:only="react"
+    transition:persist="help-center-home"
+    config={config}
+    articles={articles}
+    categories={categories}
+    folders={folders}
+    faqs={faqs}
+    projectId={projectId}
+    initialFolderId={defaultFolder?.id}
+  />
+</BaseLayout>

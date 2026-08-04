@@ -1,0 +1,123 @@
+---
+// Force server-side rendering for dynamic subdomain support
+export const prerender = false;
+
+import { getArticles, getCategories, getHelpCenterConfig, getFolders } from '../../lib/localData';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticlePageWrapper from '../../components/ArticlePageWrapper';
+
+const projectId = 'local';
+let allArticles: any[] = [];
+let categories: any[] = [];
+let folders: any[] = [];
+let config: any = null;
+let apiSpecUrl: string | null = null;
+
+[allArticles, categories, config, folders] = await Promise.all([
+  getArticles(),
+  getCategories(),
+  getHelpCenterConfig(),
+  getFolders(),
+]);
+
+const { slug } = Astro.params;
+
+// Find the article by slug
+const article = allArticles.find(a => a.slug === slug);
+
+// Handle case where article is not found
+if (!article) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not found'
+  });
+}
+
+const helpCenterConfig = config;
+
+const getCategoryName = (categoryId: string | null) => {
+  if (!categoryId) return 'General';
+  return categories.find(c => c.id === categoryId)?.name || 'General';
+};
+
+const formattedDate = article?.created_at 
+  ? new Date(article.created_at).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    })
+  : new Date().toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
+// Extract article excerpt for SEO
+const getArticleExcerpt = () => {
+  if (article.excerpt) return article.excerpt;
+  
+  // Extract text from HTML content and truncate
+  const tempDiv = typeof document !== 'undefined' ? document.createElement('div') : null;
+  if (tempDiv) {
+    tempDiv.innerHTML = article.content || '';
+    const textContent = tempDiv.textContent || tempDiv.innerText || '';
+    return textContent.slice(0, 160).trim() + (textContent.length > 160 ? '...' : '');
+  }
+  return article.title;
+};
+
+const articleExcerpt = getArticleExcerpt();
+const categoryName = getCategoryName(article.category_id);
+
+// Extract BlockNote JSON blocks server-side to avoid <script> tag nesting issues
+// when Astro serializes props into the hydration script tag.
+function extractBlocksFromContent(content: string): any[] | null {
+  if (!content) return null;
+  const m = content.match(/<script data-bn type="application\/json">([\s\S]*?)<\/script>/);
+  if (!m) return null;
+  try { return JSON.parse(m[1]); } catch { return null; }
+}
+
+const articleBlocks = extractBlocksFromContent(article.content);
+// Pass a sanitized article — replace content with empty string if it has blocks
+// (blocks are passed separately to avoid nested <script> tag corruption)
+const safeArticle = articleBlocks
+  ? { ...article, content: '' }
+  : article;
+
+// Generate LLM copy links
+const articleUrl = `${Astro.url.origin}${Astro.url.pathname}`;
+---
+
+<BaseLayout 
+  title={article.title}
+  description={articleExcerpt}
+  config={helpCenterConfig}
+  projectId={projectId}
+  folders={folders}
+  ogImage={helpCenterConfig.og_image_url}
+  ogType="article"
+  article={{
+    publishedTime: article.created_at,
+    modifiedTime: article.updated_at,
+    author: helpCenterConfig.portal_name,
+    section: categoryName !== 'General' ? categoryName : undefined
+  }}
+>
+  <!-- Article content -->
+  <ArticlePageWrapper
+    client:only="react"
+    transition:persist="article-page-wrapper"
+    config={helpCenterConfig}
+    article={safeArticle}
+    articleBlocks={articleBlocks}
+    categories={categories}
+    allArticles={allArticles}
+    categoryName={categoryName}
+    articleUrl={articleUrl}
+    formattedDate={formattedDate}
+    projectId={projectId}
+    folders={folders}
+    apiSpecUrl={apiSpecUrl}
+  />
+</BaseLayout>

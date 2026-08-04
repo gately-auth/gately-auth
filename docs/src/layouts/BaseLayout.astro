@@ -1,0 +1,588 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/globals.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  config: any;
+  projectId: string;
+  ogImage?: string;
+  ogType?: string;
+  article?: {
+    publishedTime?: string;
+    modifiedTime?: string;
+    author?: string;
+    section?: string;
+  };
+  folders?: any[];
+}
+
+const { title, description, config, projectId, ogImage, ogType = 'website', article, folders = [] } = Astro.props;
+
+// Extract theme variables
+const primaryColor = config.primary_color || '#3b82f6';
+const secondaryColor = config.secondary_color || '#6366f1';
+const headingFont = config.heading_font || 'system-ui, sans-serif';
+const bodyFont = config.body_font || 'system-ui, sans-serif';
+const isDark = config.theme_mode === 'dark';
+
+// Get the original domain from headers (for proxied custom domains)
+const forwardedHost = Astro.request.headers.get('X-Forwarded-Host') || Astro.request.headers.get('X-Original-Host');
+const actualOrigin = forwardedHost ? `${Astro.url.protocol}//${forwardedHost}` : Astro.url.origin;
+
+// If the user has configured a sub-path deployment (e.g. yourdomain.com/docs),
+// reconstruct the canonical URL using sub_path_domain + sub_path + current path.
+// The worker strips the sub-path before proxying, so Astro.url.pathname is already
+// the stripped path (e.g. /getting-started, not /docs/getting-started).
+// Also read X-Gately-Sub-Path header sent by the worker as a reliable fallback.
+const subPathDomain = config.sub_path_domain || null;
+const subPath = config.sub_path || '';
+const publicOrigin = subPathDomain
+  ? `${Astro.url.protocol}//${subPathDomain}`
+  : actualOrigin;
+const publicPathPrefix = subPathDomain && subPath ? subPath : '';
+const actualUrl = `${publicOrigin}${publicPathPrefix}${Astro.url.pathname}${Astro.url.search}`;
+
+// SEO metadata
+const metaTitle = config.meta_title || title;
+const metaDescription = description || config.meta_description || config.welcome_subtitle;
+const ogImageUrl = ogImage || config.og_image_url || config.logo_url;
+const ogLogoUrl = config.logo_url;
+const faviconUrl = config.favicon_url;
+const canonicalUrl = actualUrl;
+const baseUrl = subPathDomain ? `${publicOrigin}${publicPathPrefix}` : (config.subdomain_url || actualOrigin);
+---
+
+<!DOCTYPE html>
+<html lang="en" class={isDark ? 'dark' : ''}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {/* Astro Client Router for SPA-like navigation */}
+    <ClientRouter />
+    
+    <meta name="view-transition" content="same-origin" />
+    
+    {/* Preconnect to Google Fonts */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {/* Preload Onest */}
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap"
+    />
+    
+    {/* Prevent white flash during transitions */}
+    <style is:inline>
+      /* Force background colors at all times - CRITICAL for preventing FOUC */
+      html {
+        background-color: #ffffff !important;
+        color-scheme: light !important;
+      }
+      
+      html.dark {
+        background-color: #000000 !important;
+        color-scheme: dark !important;
+      }
+      
+      body {
+        background-color: transparent !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+      
+      /* Prevent white background during view transitions */
+      ::view-transition-group(root) {
+        animation-duration: 0.2s;
+      }
+      
+      /* Smooth transition during navigation */
+      ::view-transition-old(root) {
+        animation: fadeOut 0.2s ease-out forwards;
+      }
+      
+      ::view-transition-new(root) {
+        animation: fadeIn 0.2s ease-in forwards;
+      }
+      
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
+    
+    {/* Theme initialization script - BLOCKING, runs before page renders to prevent FOUC */}
+    <script is:inline>
+      // Suppress React DevTools warning in development
+      if (typeof window !== 'undefined') {
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = window.__REACT_DEVTOOLS_GLOBAL_HOOK__ || {};
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__.isDisabled = true;
+      }
+      
+      (function() {
+        // Get theme synchronously BEFORE any rendering
+        const savedTheme = localStorage.getItem('help-center-theme');
+        const themeMode = '{config.theme_mode}';
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // Determine if dark mode
+        const isDark = savedTheme === 'dark' || 
+                      (themeMode === 'dark' && !savedTheme) ||
+                      (themeMode === 'auto' && !savedTheme && prefersDark);
+        
+        // Apply theme class immediately to html element
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.backgroundColor = '#000000';
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.style.backgroundColor = '#ffffff';
+        }
+        
+        // Store in sessionStorage for navigation
+        sessionStorage.setItem('theme-is-dark', isDark ? '1' : '0');
+      })();
+    </script>
+    
+    {/* Navigation theme persistence - handles View Transitions */}
+    <script is:inline>
+      // Function to apply theme
+      function applyTheme() {
+        const isDark = sessionStorage.getItem('theme-is-dark') === '1';
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.backgroundColor = '#000000';
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.style.backgroundColor = '#ffffff';
+        }
+      }
+      
+      // Save theme state before navigation
+      document.addEventListener('astro:before-preparation', () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        sessionStorage.setItem('theme-is-dark', isDark ? '1' : '0');
+      });
+      
+      // Apply theme to new document BEFORE swap - CRITICAL
+      document.addEventListener('astro:before-swap', (e) => {
+        const isDark = sessionStorage.getItem('theme-is-dark') === '1';
+        // Apply to both html and body immediately
+        if (isDark) {
+          e.newDocument.documentElement.classList.add('dark');
+          e.newDocument.documentElement.style.backgroundColor = '#000000';
+          e.newDocument.documentElement.style.colorScheme = 'dark';
+          if (e.newDocument.body) {
+            e.newDocument.body.style.backgroundColor = '#000000';
+          }
+        } else {
+          e.newDocument.documentElement.classList.remove('dark');
+          e.newDocument.documentElement.style.backgroundColor = '#ffffff';
+          e.newDocument.documentElement.style.colorScheme = 'light';
+          if (e.newDocument.body) {
+            e.newDocument.body.style.backgroundColor = '#ffffff';
+          }
+        }
+      });
+      
+      // Ensure theme is applied after page load
+      document.addEventListener('astro:page-load', () => {
+        applyTheme();
+        
+        // Also ensure persisted elements have correct theme
+        const persistedElements = document.querySelectorAll('[data-astro-transition-persist]');
+        persistedElements.forEach(el => {
+          const isDark = sessionStorage.getItem('theme-is-dark') === '1';
+          if (isDark) {
+            el.closest('html')?.classList.add('dark');
+          } else {
+            el.closest('html')?.classList.remove('dark');
+          }
+        });
+      });
+    </script>
+    
+    {/* Primary Meta Tags */}
+    <title>{metaTitle}</title>
+    <meta name="title" content={metaTitle} />
+    {metaDescription && <meta name="description" content={metaDescription} />}
+    <link rel="canonical" href={canonicalUrl} />
+    
+    {/* Favicon */}
+    {faviconUrl && <link rel="icon" type="image/png" href={faviconUrl} />}
+    
+    {/* Open Graph / Facebook */}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={metaTitle} />
+    {metaDescription && <meta property="og:description" content={metaDescription} />}
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    {ogImageUrl && <meta property="og:image:alt" content={metaTitle} />}
+    {ogImageUrl && <meta property="og:image:width" content="1200" />}
+    {ogImageUrl && <meta property="og:image:height" content="630" />}
+    {ogLogoUrl && <meta property="og:logo" content={ogLogoUrl} />}
+    <meta property="og:site_name" content={config.portal_name || 'Helio'} />
+    
+    {/* Article-specific Open Graph tags */}
+    {article && (
+      <>
+        {article.publishedTime && <meta property="article:published_time" content={article.publishedTime} />}
+        {article.modifiedTime && <meta property="article:modified_time" content={article.modifiedTime} />}
+        {article.author && <meta property="article:author" content={article.author} />}
+        {article.section && <meta property="article:section" content={article.section} />}
+      </>
+    )}
+    
+    {/* Twitter */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalUrl} />
+    <meta name="twitter:title" content={metaTitle} />
+    {metaDescription && <meta name="twitter:description" content={metaDescription} />}
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+    
+    {/* Robots */}
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    
+    {/* Geo-targeting */}
+    {config.geo_region && <meta name="geo.region" content={config.geo_region} />}
+    {config.geo_placename && <meta name="geo.placename" content={config.geo_placename} />}
+    {config.geo_position && <meta name="geo.position" content={config.geo_position} />}
+    {config.icbm && <meta name="ICBM" content={config.icbm} />}
+    
+    {/* Language and locale */}
+    <meta property="og:locale" content="en_US" />
+    <meta name="language" content="English" />
+    
+    {/* Additional SEO */}
+    <meta name="author" content={config.portal_name || 'Help Center'} />
+    <meta name="publisher" content={config.portal_name || 'Help Center'} />
+    <meta name="copyright" content={`© ${new Date().getFullYear()} ${config.portal_name || 'Help Center'}`} />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="distribution" content="global" />
+    <meta name="rating" content="general" />
+    
+    {/* Mobile optimization */}
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content={config.portal_name || 'Help Center'} />
+    
+    {/* Theme color */}
+    <meta name="theme-color" content={primaryColor} />
+    <meta name="msapplication-TileColor" content={primaryColor} />
+    
+    {/* DNS prefetch */}
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    
+    {/* Alternate languages (if configured) */}
+    {config.alternate_languages && config.alternate_languages.map((lang: any) => (
+      <link rel="alternate" hreflang={lang.code} href={`${baseUrl}${lang.path || '/'}`} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+    
+    {/* Structured Data - Organization/Website */}
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": ogType === 'article' ? 'Article' : 'WebSite',
+      "name": config.portal_name || 'Help Center',
+      "url": canonicalUrl,
+      ...(metaDescription && { "description": metaDescription }),
+      ...(config.logo_url && {
+        "logo": {
+          "@type": "ImageObject",
+          "url": config.logo_url
+        }
+      }),
+      ...(ogType === 'article' && article && {
+        "headline": metaTitle,
+        "datePublished": article.publishedTime,
+        "dateModified": article.modifiedTime || article.publishedTime,
+        "author": {
+          "@type": "Organization",
+          "name": config.portal_name || 'Help Center'
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": config.portal_name || 'Help Center',
+          ...(config.logo_url && {
+            "logo": {
+              "@type": "ImageObject",
+              "url": config.logo_url
+            }
+          })
+        },
+        ...(ogImageUrl && {
+          "image": {
+            "@type": "ImageObject",
+            "url": ogImageUrl,
+            "width": 1200,
+            "height": 630
+          }
+        }),
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": canonicalUrl
+        },
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        ...(article.section && { "articleSection": article.section })
+      })
+    })} />
+    
+    {/* Breadcrumb Schema for Articles */}
+    {ogType === 'article' && article && article.section && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": baseUrl
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": article.section,
+            "item": `${baseUrl}/category/${article.section.toLowerCase().replace(/\s+/g, '-')}`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": metaTitle,
+            "item": canonicalUrl
+          }
+        ]
+      })} />
+    )}
+    
+    {/* Organization Schema */}
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": config.portal_name || 'Help Center',
+      "url": baseUrl,
+      ...(config.logo_url && {
+        "logo": config.logo_url
+      }),
+      ...(metaDescription && {
+        "description": metaDescription
+      }),
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "url": baseUrl
+      }
+    })} />
+    
+    {/* Inject theme CSS variables directly into HTML */}
+    <style define:vars={{ primaryColor, secondaryColor, headingFont, bodyFont }}>
+      :root {
+        --primary-color: var(--primaryColor);
+        --secondary-color: var(--secondaryColor);
+        --heading-font: var(--headingFont);
+        --body-font: var(--bodyFont);
+      }
+    </style>
+    
+    {/* Custom head HTML from config */}
+    {config.custom_head_html && <Fragment set:html={config.custom_head_html} />}
+    
+    {/* Persistent dynamic styles - will be updated by script */}
+    <style id="dynamic-config-styles" transition:persist="config-styles">
+      /* Styles will be injected by script */
+    </style>
+    
+    {/* Global styles */}
+    <style is:global>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      /* Apply fonts after Tailwind base to ensure they take precedence */
+      html {
+        font-family: var(--body-font);
+      }
+      
+      body {
+        font-family: var(--body-font);
+      }
+      
+      * {
+        font-family: var(--body-font);
+      }
+      
+      h1, h2, h3, h4, h5, h6 {
+        font-family: var(--heading-font);
+      }
+      
+      /* Apply fonts to all text elements */
+      p, span, div, a, button, input, textarea, select, label {
+        font-family: var(--body-font);
+      }
+    </style>
+  </head>
+  <body class={isDark ? 'dark' : ''} style="background-color: transparent;">
+    
+    <div class="flex flex-col min-h-screen">
+      <slot />
+    </div>
+    
+    {/* Custom body HTML from config */}
+    {config.custom_body_html && <Fragment set:html={config.custom_body_html} />}
+    
+    {/* Make body visible after styles are loaded */}
+    <script is:inline>
+      // Ensure body is visible
+      document.body.style.visibility = 'visible';
+      document.body.style.opacity = '1';
+      
+      // Patch console.error to suppress BlockNote cleanup errors
+      (function() {
+        const originalError = console.error;
+        console.error = function(...args) {
+          // Check if this is a BlockNote/TipTap DOM cleanup error
+          const errorMsg = args[0]?.message || args[0] || '';
+          if (
+            typeof errorMsg === 'string' && (
+              errorMsg.includes('removeChild') ||
+              errorMsg.includes('The node to be removed is not a child') ||
+              errorMsg.includes('NotFoundError')
+            )
+          ) {
+            // Silently ignore these harmless cleanup errors
+            return;
+          }
+          
+          // Also check nested error objects
+          if (args[0]?.error?.message) {
+            const nestedMsg = args[0].error.message;
+            if (
+              nestedMsg.includes('removeChild') ||
+              nestedMsg.includes('The node to be removed is not a child')
+            ) {
+              return;
+            }
+          }
+          
+          // Pass through all other errors
+          originalError.apply(console, args);
+        };
+      })();
+      
+      // Suppress BlockNote/TipTap DOM cleanup errors during navigation
+      window.addEventListener('error', function(event) {
+        if (event.error && 
+            event.error.message && 
+            (event.error.message.includes('removeChild') || 
+             event.error.message.includes('The node to be removed is not a child'))) {
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        }
+      }, true);
+      
+      // Also catch unhandled promise rejections
+      window.addEventListener('unhandledrejection', function(event) {
+        if (event.reason && 
+            event.reason.message && 
+            (event.reason.message.includes('removeChild') || 
+             event.reason.message.includes('The node to be removed is not a child'))) {
+          event.preventDefault();
+          return false;
+        }
+      });
+    </script>
+    
+    {/* Project config persistence script */}
+    <script is:inline define:vars={{ config, projectId, subPath, subPathDomain }}>
+      // Apply styles function
+      function applyStyles() {
+        const primaryColor = config.primary_color || '#3b82f6';
+        const secondaryColor = config.secondary_color || '#6366f1';
+        const headingFont = config.heading_font || 'system-ui, sans-serif';
+        const bodyFont = config.body_font || 'system-ui, sans-serif';
+        
+        // Find or create the style tag
+        let styleTag = document.getElementById('dynamic-config-styles');
+        if (!styleTag) {
+          styleTag = document.createElement('style');
+          styleTag.id = 'dynamic-config-styles';
+          document.head.appendChild(styleTag);
+        }
+        
+        // Update style content
+        styleTag.textContent = `
+          :root {
+            --primary-color: ${primaryColor} !important;
+            --secondary-color: ${secondaryColor} !important;
+            --heading-font: ${headingFont} !important;
+            --body-font: ${bodyFont} !important;
+          }
+          
+          html {
+            font-family: ${bodyFont} !important;
+          }
+          
+          body {
+            font-family: ${bodyFont} !important;
+          }
+          
+          * {
+            font-family: ${bodyFont} !important;
+          }
+          
+          h1, h2, h3, h4, h5, h6 {
+            font-family: ${headingFont} !important;
+          }
+          
+          p, span, div:not([class*="ProseMirror"]), a, button, input, textarea, select, label {
+            font-family: ${bodyFont} !important;
+          }
+        `;
+      }
+      
+      // Store config globally
+      window.__projectContext = {
+        config: config,
+        projectId: projectId,
+        subPath: subPath,
+        subPathDomain: subPathDomain
+      };
+      
+      // Apply on initial load and every navigation
+      document.addEventListener('astro:page-load', () => {
+        applyStyles();
+      });
+      
+      // Apply immediately on first load
+      applyStyles();
+    </script>
+  </body>
+</html>

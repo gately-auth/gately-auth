@@ -1,0 +1,244 @@
+---
+// Force server-side rendering for dynamic subdomain support
+export const prerender = false;
+
+import { getArticles, getCategories, getHelpCenterConfig, getFaqs, getFolders } from '../lib/localData';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HelpCenterHome from '../components/HelpCenterHome.tsx';
+import ArticlePageWrapper from '../components/ArticlePageWrapper.tsx';
+import CategoryPageWrapper from '../components/CategoryPageWrapper.tsx';
+
+const projectId = 'local';
+const [allArticles, categories, faqs, config, folders] = await Promise.all([
+  getArticles(), getCategories(), getFaqs(), getHelpCenterConfig(), getFolders(),
+]);
+const apiSpecUrl: string | null = null;
+
+const { slug } = Astro.params;
+const slugParts = slug ? slug.split('/') : [];
+
+const helpCenterConfig = config;
+
+// Determine what type of page this is based on slug structure
+let pageType: 'folder' | 'article' | 'category' | 'not-found' = 'not-found';
+let folder: any = null;
+let article: any = null;
+let category: any = null;
+
+// Helper: match a category by any slug variant
+const findCategory = (slugPart: string, folderId?: string) => {
+  return categories.find(c => {
+    const nameSlug = c.name.toLowerCase().replace(/\s+/g, '-');
+    const nameSlugStrict = c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const matches = c.id === slugPart || nameSlug === slugPart || nameSlugStrict === slugPart;
+    if (folderId) return matches && c.folder_id === folderId;
+    return matches;
+  });
+};
+
+if (slugParts.length === 1) {
+  // Could be: folder or category
+  const slugPart = slugParts[0];
+  
+  // Check if it's a folder first
+  folder = folders.find(f => f.slug === slugPart);
+  if (folder) {
+    pageType = 'folder';
+  } else {
+    // Check if it's a category (by any slug variant)
+    category = findCategory(slugPart);
+    if (category) {
+      pageType = 'category';
+    }
+  }
+} else if (slugParts.length === 2) {
+  const firstPart = slugParts[0];
+  const secondPart = slugParts[1];
+  
+  // Check if it's /article/slug format
+  if (firstPart === 'article') {
+    article = allArticles.find(a => a.slug === secondPart);
+    if (article) {
+      pageType = 'article';
+    }
+  } else {
+    // Format: folder-slug/category-slug
+    folder = folders.find(f => f.slug === firstPart);
+    
+    if (folder) {
+      // Try category scoped to folder first, then any category with that slug
+      category = findCategory(secondPart, folder.id) || findCategory(secondPart);
+      if (category) {
+        pageType = 'category';
+      } else {
+        // Maybe it's folder-slug/article-slug (no "article" prefix)
+        article = allArticles.find(a => {
+          const articleCategory = categories.find(c => c.id === a.category_id);
+          return a.slug === secondPart && articleCategory?.folder_id === folder!.id;
+        }) || allArticles.find(a => a.slug === secondPart);
+        if (article) pageType = 'article';
+      }
+    } else {
+      // No folder match — try category/article-slug format
+      category = findCategory(firstPart);
+      if (category) {
+        article = allArticles.find(a => a.slug === secondPart && a.category_id === category!.id);
+        if (article) {
+          pageType = 'article';
+        } else {
+          pageType = 'category';
+        }
+      }
+    }
+  }
+} else if (slugParts.length === 3) {
+  // Format: folder-slug/article/article-slug  OR  folder-slug/category-slug/article-slug
+  const folderSlug = slugParts[0];
+  const middlePart = slugParts[1];
+  const articleSlug = slugParts[2];
+  
+  folder = folders.find(f => f.slug === folderSlug);
+  
+  if (middlePart === 'article') {
+    if (folder) {
+      article = allArticles.find(a => {
+        const articleCategory = categories.find(c => c.id === a.category_id);
+        return a.slug === articleSlug && articleCategory?.folder_id === folder!.id;
+      });
+      if (article) pageType = 'article';
+    } else {
+      // /article/category/slug fallback
+      article = allArticles.find(a => a.slug === articleSlug);
+      if (article) pageType = 'article';
+    }
+  } else {
+    // folder/category/article-slug
+    const cat = folder ? findCategory(middlePart, folder.id) : findCategory(middlePart);
+    if (cat) {
+      article = allArticles.find(a => a.slug === articleSlug && a.category_id === cat.id);
+      if (article) {
+        category = cat;
+        pageType = 'article';
+      }
+    }
+  }
+}
+
+// Handle 404
+if (pageType === 'not-found') {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not found'
+  });
+}
+
+// Helper functions
+const getCategoryName = (categoryId: string | null) => {
+  if (!categoryId) return 'General';
+  return categories.find(c => c.id === categoryId)?.name || 'General';
+};
+
+const formattedDate = article?.created_at 
+  ? new Date(article.created_at).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    })
+  : '';
+
+const getArticleExcerpt = () => {
+  if (!article) return '';
+  if (article.excerpt) return article.excerpt;
+  
+  const tempDiv = typeof document !== 'undefined' ? document.createElement('div') : null;
+  if (tempDiv) {
+    tempDiv.innerHTML = article.content || '';
+    const textContent = tempDiv.textContent || tempDiv.innerText || '';
+    return textContent.slice(0, 160).trim() + (textContent.length > 160 ? '...' : '');
+  }
+  return article.title;
+};
+
+const articleExcerpt = article ? getArticleExcerpt() : '';
+const categoryName = article ? getCategoryName(article.category_id) : '';
+const articleUrl = article ? `${Astro.url.origin}${Astro.url.pathname}` : '';
+---
+
+{pageType === 'folder' && folder && (
+  <BaseLayout 
+    title={`${folder.name} - ${helpCenterConfig.portal_name}`}
+    description={folder.description || `Browse ${folder.name} articles`}
+    config={helpCenterConfig}
+    projectId={projectId}
+    folders={folders}
+    ogImage={helpCenterConfig.og_image_url ?? undefined}
+    ogType="website"
+  >
+    <HelpCenterHome
+      client:only="react"
+      transition:persist="help-center-home"
+      config={helpCenterConfig}
+      articles={allArticles}
+      categories={categories}
+      folders={folders}
+      faqs={faqs}
+      projectId={projectId}
+      initialFolderId={folder.id}
+    />
+  </BaseLayout>
+)}
+
+{pageType === 'article' && article && (
+  <BaseLayout 
+    title={article.title}
+    description={articleExcerpt}
+    config={helpCenterConfig}
+    projectId={projectId}
+    folders={folders}
+    ogImage={helpCenterConfig.og_image_url ?? undefined}
+    ogType="article"
+    article={{
+      publishedTime: article.created_at,
+      modifiedTime: article.updated_at,
+      author: helpCenterConfig.portal_name,
+      section: categoryName !== 'General' ? categoryName : undefined
+    }}
+  >
+    <ArticlePageWrapper
+      client:only="react"
+      transition:persist="article-page-wrapper"
+      config={helpCenterConfig}
+      article={article}
+      categories={categories}
+      allArticles={allArticles}
+      categoryName={categoryName}
+      articleUrl={articleUrl}
+      formattedDate={formattedDate}
+      projectId={projectId}
+      folders={folders}
+      apiSpecUrl={apiSpecUrl}
+    />
+  </BaseLayout>
+)}
+
+{pageType === 'category' && category && (
+  <BaseLayout 
+    title={`${category.name} - ${helpCenterConfig.portal_name}`}
+    description={category.description || `Browse ${category.name} articles`}
+    config={helpCenterConfig}
+    projectId={projectId}
+    folders={folders}
+  >
+    <CategoryPageWrapper
+      client:only="react"
+      transition:persist="category-page-wrapper"
+      config={helpCenterConfig}
+      category={category}
+      articles={allArticles.filter(a => a.category_id === category.id)}
+      allCategories={categories}
+      allArticles={allArticles}
+      projectId={projectId}
+      folders={folders}
+    />
+  </BaseLayout>
+)}

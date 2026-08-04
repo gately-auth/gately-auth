@@ -1,0 +1,60 @@
+/* Custom styles to match your current help center design */
+
+:root {
+  /* Override Starlight's default colors with your brand colors */
+  --sl-color-accent-low: #fef3f2;
+  --sl-color-accent: #f04438;
+  --sl-color-accent-high: #7a271a;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #f9fafb;
+  --sl-color-gray-2: #f3f4f6;
+  --sl-color-gray-3: #e5e7eb;
+  --sl-color-gray-4: #d1d5db;
+  --sl-color-gray-5: #9ca3af;
+  --sl-color-gray-6: #6b7280;
+  --sl-color-black: #111827;
+}
+
+/* Dark mode colors */
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #2d1a1a;
+  --sl-color-accent: #f97066;
+  --sl-color-accent-high: #fecdca;
+  --sl-color-white: #111827;
+  --sl-color-gray-1: #1f2937;
+  --sl-color-gray-2: #374151;
+  --sl-color-gray-3: #4b5563;
+  --sl-color-gray-4: #6b7280;
+  --sl-color-gray-5: #9ca3af;
+  --sl-color-gray-6: #d1d5db;
+  --sl-color-black: #f9fafb;
+}
+
+/* Custom font families to match your design */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sl-color-gray-2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sl-color-gray-4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sl-color-gray-5);
+}

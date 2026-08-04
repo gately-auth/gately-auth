@@ -1,0 +1,62 @@
+---
+// Force server-side rendering for dynamic subdomain support
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryPageWrapper from '../../components/CategoryPageWrapper';
+import { getArticles, getCategories, getHelpCenterConfig, getFolders } from '../../lib/localData';
+
+const projectId = 'local';
+
+const [articles, categories, configData, folders] = await Promise.all([
+  getArticles(),
+  getCategories(),
+  getHelpCenterConfig(),
+  getFolders(),
+]);
+
+const { slug } = Astro.params;
+
+// Find category by slug, id, or name-derived slug (backward compatible)
+const category = categories.find(c => 
+  c.id === slug ||
+  c.name.toLowerCase().replace(/\s+/g, '-') === slug ||
+  c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') === slug
+);
+
+// Handle case where category is not found
+if (!category) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not found'
+  });
+}
+
+// Get articles for this category
+const categoryArticles = articles.filter(a => a.category_id === category.id);
+
+const config = configData;
+
+// Get category name for breadcrumb
+const categoryName = category.name;
+---
+
+<BaseLayout 
+  title={`${categoryName} - ${config.portal_name}`}
+  description={category.description || `Browse ${categoryName} articles`}
+  config={config}
+  projectId={projectId}
+  folders={folders}
+>
+  <CategoryPageWrapper
+    client:only="react"
+    transition:persist="category-page-wrapper"
+    config={config}
+    category={category}
+    articles={categoryArticles}
+    allCategories={categories}
+    allArticles={articles}
+    projectId={projectId}
+    folders={folders}
+  />
+</BaseLayout>
