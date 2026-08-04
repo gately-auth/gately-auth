@@ -98,36 +98,14 @@ const baseUrl = subPathDomain ? `${publicOrigin}${publicPathPrefix}` : (config.s
         opacity: 1 !important;
       }
       
-      /* Prevent white background during view transitions */
-      ::view-transition-group(root) {
-        animation-duration: 0.2s;
-      }
-      
-      /* Smooth transition during navigation */
-      ::view-transition-old(root) {
-        animation: fadeOut 0.2s ease-out forwards;
-      }
-      
+      /* Disable view transitions completely — prevents ghost content and shake */
+      ::view-transition-old(root),
       ::view-transition-new(root) {
-        animation: fadeIn 0.2s ease-in forwards;
+        animation: none !important;
       }
       
-      @keyframes fadeOut {
-        from {
-          opacity: 1;
-        }
-        to {
-          opacity: 0;
-        }
-      }
-      
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
+      ::view-transition-group(root) {
+        animation-duration: 0s !important;
       }
     </style>
     
@@ -425,26 +403,23 @@ const baseUrl = subPathDomain ? `${publicOrigin}${publicPathPrefix}` : (config.s
         box-sizing: border-box;
       }
       
-      /* Apply fonts after Tailwind base to ensure they take precedence */
-      html {
-        font-family: var(--body-font);
-      }
-      
-      body {
-        font-family: var(--body-font);
-      }
-      
-      * {
+      html, body {
         font-family: var(--body-font);
       }
       
       h1, h2, h3, h4, h5, h6 {
         font-family: var(--heading-font);
       }
-      
-      /* Apply fonts to all text elements */
-      p, span, div, a, button, input, textarea, select, label {
-        font-family: var(--body-font);
+
+      /* Mono font — must NOT be overridden by body font */
+      .code-block-mono,
+      .code-block-mono *,
+      pre, pre *,
+      code,
+      kbd,
+      samp {
+        font-family: 'Geist Mono', ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace !important;
       }
     </style>
   </head>
@@ -546,24 +521,12 @@ const baseUrl = subPathDomain ? `${publicOrigin}${publicPathPrefix}` : (config.s
             --body-font: ${bodyFont} !important;
           }
           
-          html {
-            font-family: ${bodyFont} !important;
-          }
-          
-          body {
-            font-family: ${bodyFont} !important;
-          }
-          
-          * {
+          html, body {
             font-family: ${bodyFont} !important;
           }
           
           h1, h2, h3, h4, h5, h6 {
             font-family: ${headingFont} !important;
-          }
-          
-          p, span, div:not([class*="ProseMirror"]), a, button, input, textarea, select, label {
-            font-family: ${bodyFont} !important;
           }
         `;
       }
