@@ -268,8 +268,8 @@ export default function ArticlePageWrapper({
                 (l as HTMLElement).style.color = '';
               });
               link.classList.add('font-medium');
-              (link as HTMLElement).style.borderColor = config.primary_color;
-              (link as HTMLElement).style.color = config.primary_color;
+              (link as HTMLElement).style.borderColor = isDark ? '#ffffff' : '#000000';
+              (link as HTMLElement).style.color = isDark ? '#ffffff' : '#000000';
             }
           });
         });
@@ -300,8 +300,8 @@ export default function ArticlePageWrapper({
                 const isActive = link.getAttribute('data-toc-id') === currentId;
                 if (isActive) {
                   link.classList.add('font-medium');
-                  (link as HTMLElement).style.borderColor = config.primary_color;
-                  (link as HTMLElement).style.color = config.primary_color;
+                  (link as HTMLElement).style.borderColor = isDark ? '#ffffff' : '#000000';
+                  (link as HTMLElement).style.color = isDark ? '#ffffff' : '#000000';
                 } else {
                   link.classList.remove('font-medium');
                   (link as HTMLElement).style.borderColor = '';
@@ -354,7 +354,7 @@ export default function ArticlePageWrapper({
         style={{ fontFamily: config.body_font || 'system-ui, sans-serif' }}
       >
       {/* Navigation Loading Bar */}
-      <NavigationLoadingBar primaryColor={config.primary_color} />
+      <NavigationLoadingBar primaryColor={isDark ? '#ffffff' : '#000000'} />
 
       {/* Header - persists across navigation */}
       <div data-astro-transition-persist="header" style={{ backgroundColor: 'transparent' }}>
@@ -410,8 +410,8 @@ export default function ArticlePageWrapper({
               {/* Category Badge and Title */}
               <div className="flex-1 min-w-0">
                 <span
-                  className="inline-block text-xs font-medium px-2.5 py-1 rounded-full mb-3"
-                  style={{ backgroundColor: `${config.primary_color}15`, color: config.primary_color }}
+                  className="inline-block text-xs font-medium px-2.5 py-1 rounded-none mb-3"
+                  style={{ backgroundColor: `${isDark ? '#ffffff' : '#000000'}15`, color: isDark ? '#ffffff' : '#000000' }}
                 >
                   {categoryName}
                 </span>
@@ -437,7 +437,7 @@ export default function ArticlePageWrapper({
                     chatgptLink={chatgptLink}
                     claudeLink={claudeLink}
                     isDark={isDark}
-                    primaryColor={config.primary_color}
+                    primaryColor={isDark ? '#ffffff' : '#000000'}
                     projectId={projectId}
                     allArticles={allArticles}
                     categories={sortedCategories}
@@ -456,7 +456,7 @@ export default function ArticlePageWrapper({
                 </p>
                 {hasEndpoint && (
                   <div className={cn(
-                    'flex items-center justify-between gap-3 px-4 py-3 rounded-xl font-mono text-sm',
+                    'flex items-center justify-between gap-3 px-4 py-3 rounded-none font-mono text-sm',
                     isDark ? 'bg-zinc-800/60 border border-zinc-700' : 'bg-zinc-100 border border-zinc-200'
                   )}>
                     <div className="flex items-center gap-2.5">
@@ -476,8 +476,8 @@ export default function ArticlePageWrapper({
                     </div>
                     <button
                       onClick={() => setTryItModalOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition-all hover:opacity-90 active:scale-95"
-                      style={{ backgroundColor: config.primary_color }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-none text-xs font-medium text-white transition-all hover:opacity-90 active:scale-95"
+                      style={{ backgroundColor: isDark ? '#ffffff' : '#000000' }}
                     >
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
                         <path d="M1 1l10 5-10 5V1z"/>
@@ -497,7 +497,7 @@ export default function ArticlePageWrapper({
                   content={article.content}
                   initialBlocks={articleBlocks}
                   isDark={isDark}
-                  primaryColor={config.primary_color}
+                  primaryColor={isDark ? '#ffffff' : '#000000'}
                   showToc={!isApiRefArticle}
                   articleId={article.id}
                   projectId={projectId}
@@ -513,7 +513,7 @@ export default function ArticlePageWrapper({
             </div>
 
             {/* Feedback Section */}
-            <div className="mt-8 pt-6 pb-8 border-b border-border/50">
+            <div className="mt-8 pt-6 pb-4 border-b border-border/50">
               <ArticleFeedback
                 articleId={article.id}
                 projectId={projectId}
@@ -521,6 +521,30 @@ export default function ArticlePageWrapper({
                 compact={true}
                 horizontal={true}
               />
+            </div>
+
+            {/* Edit this page */}
+            <div className="pt-4 pb-6 border-b border-border/50">
+              <a
+                href={`${config.github_repo ?? 'https://github.com/gately-auth/gately-auth'}/edit/main/docs/src/data/articles/${
+                  (() => {
+                    const cat = categories.find(c => c.id === article.category_id);
+                    const catSlug = cat?.name?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') ?? 'general';
+                    return `${catSlug}/${article.slug}.ts`;
+                  })()
+                }`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  'inline-flex items-center gap-1.5 text-xs font-medium transition-colors',
+                  isDark
+                    ? 'text-zinc-500 hover:text-zinc-300'
+                    : 'text-zinc-400 hover:text-zinc-700'
+                )}
+              >
+                <Icon icon="hugeicons:pencil-edit-01" className="h-3.5 w-3.5" />
+                Edit this page on GitHub
+              </a>
             </div>
 
             {/* Pagination - Previous/Next Articles */}
@@ -540,7 +564,7 @@ export default function ArticlePageWrapper({
                           : `${getBasePath()}/article/${previousArticle.slug}`;
                       })()}
                       className={cn(
-                        "flex flex-col gap-2 p-4 rounded-xl border group transition-colors bg-card border-border/50"
+                        "flex flex-col gap-2 p-4 rounded-none border group transition-colors bg-card border-border/50"
                       )}
                     >
                       <div className="flex items-center gap-2">
@@ -575,7 +599,7 @@ export default function ArticlePageWrapper({
                           : `${getBasePath()}/article/${nextArticle.slug}`;
                       })()}
                       className={cn(
-                        "flex flex-col gap-2 p-4 rounded-xl border group transition-colors text-right bg-card border-border/50"
+                        "flex flex-col gap-2 p-4 rounded-none border group transition-colors text-right bg-card border-border/50"
                       )}
                     >
                       <div className="flex items-center justify-end gap-2">
@@ -611,7 +635,7 @@ export default function ArticlePageWrapper({
                 isDark 
                   ? "[&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:hover:bg-zinc-700" 
                   : "[&::-webkit-scrollbar-thumb]:bg-zinc-300 [&::-webkit-scrollbar-thumb]:hover:bg-zinc-400",
-                "[&::-webkit-scrollbar-thumb]:rounded-full"
+                "[&::-webkit-scrollbar-thumb]:rounded-none"
               )}
               style={{ 
                 minWidth: '16rem', 
@@ -634,7 +658,7 @@ export default function ArticlePageWrapper({
                 isDark 
                   ? "[&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:hover:bg-zinc-700" 
                   : "[&::-webkit-scrollbar-thumb]:bg-zinc-300 [&::-webkit-scrollbar-thumb]:hover:bg-zinc-400",
-                "[&::-webkit-scrollbar-thumb]:rounded-full"
+                "[&::-webkit-scrollbar-thumb]:rounded-none"
               )}
               style={{ 
                 minWidth: '360px', 
@@ -648,7 +672,7 @@ export default function ArticlePageWrapper({
                 key={article.id}
                 content={article.content}
                 isDark={isDark}
-                primaryColor={config.primary_color}
+                primaryColor={isDark ? '#ffffff' : '#000000'}
               />
             </aside>
           )}
@@ -662,7 +686,7 @@ export default function ArticlePageWrapper({
         articles={allArticles}
         categories={categories}
         isDark={isDark}
-        primaryColor={config.primary_color}
+        primaryColor={isDark ? '#ffffff' : '#000000'}
         aiEnabled={config.ai_answer_enabled}
       />
 
@@ -674,7 +698,7 @@ export default function ArticlePageWrapper({
           method={method}
           path={path}
           baseUrl={config.api_base_url || 'https://api.usegately.com/api/v1'}
-          primaryColor={config.primary_color}
+          primaryColor={isDark ? '#ffffff' : '#000000'}
           isDark={isDark}
           description={article.excerpt}
           headingFont={config.heading_font}

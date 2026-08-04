@@ -21,7 +21,7 @@ export function ArticleSkeletonLoader({ isDark = false }: ArticleSkeletonLoaderP
           isDark ? "border-zinc-800" : "border-zinc-100"
         )}>
           <div className={cn(
-            "h-7 w-32 rounded animate-pulse",
+            "h-7 w-32 rounded-none animate-pulse",
             isDark ? "bg-zinc-800" : "bg-zinc-200"
           )} />
         </div>
@@ -31,16 +31,16 @@ export function ArticleSkeletonLoader({ isDark = false }: ArticleSkeletonLoaderP
           {[1, 2, 3].map((i) => (
             <div key={i} className="space-y-1">
               <div className={cn(
-                "h-8 rounded-lg animate-pulse",
+                "h-8 rounded-none animate-pulse",
                 isDark ? "bg-zinc-800" : "bg-zinc-200"
               )} />
               <div className="ml-6 pl-3 space-y-1">
                 <div className={cn(
-                  "h-6 rounded animate-pulse",
+                  "h-6 rounded-none animate-pulse",
                   isDark ? "bg-zinc-800/50" : "bg-zinc-100"
                 )} />
                 <div className={cn(
-                  "h-6 rounded animate-pulse",
+                  "h-6 rounded-none animate-pulse",
                   isDark ? "bg-zinc-800/50" : "bg-zinc-100"
                 )} />
               </div>
@@ -54,7 +54,7 @@ export function ArticleSkeletonLoader({ isDark = false }: ArticleSkeletonLoaderP
           isDark ? "border-zinc-800" : "border-zinc-100"
         )}>
           <div className={cn(
-            "h-6 w-32 mx-auto rounded animate-pulse",
+            "h-6 w-32 mx-auto rounded-none animate-pulse",
             isDark ? "bg-zinc-800" : "bg-zinc-200"
           )} />
         </div>
@@ -68,16 +68,16 @@ export function ArticleSkeletonLoader({ isDark = false }: ArticleSkeletonLoaderP
           isDark ? "border-zinc-800 bg-[#121212]" : "border-zinc-100 bg-white"
         )}>
           <div className={cn(
-            "h-8 w-20 rounded-xl animate-pulse",
+            "h-8 w-20 rounded-none animate-pulse",
             isDark ? "bg-zinc-800" : "bg-zinc-200"
           )} />
           <div className="flex items-center gap-2">
             <div className={cn(
-              "h-8 w-20 rounded-xl animate-pulse",
+              "h-8 w-20 rounded-none animate-pulse",
               isDark ? "bg-zinc-800" : "bg-zinc-200"
             )} />
             <div className={cn(
-              "h-8 w-8 rounded-xl animate-pulse",
+              "h-8 w-8 rounded-none animate-pulse",
               isDark ? "bg-zinc-800" : "bg-zinc-200"
             )} />
           </div>
@@ -90,25 +90,25 @@ export function ArticleSkeletonLoader({ isDark = false }: ArticleSkeletonLoaderP
             <div className="flex-1 min-w-0 max-w-[720px] space-y-4">
               {/* Breadcrumb */}
               <div className={cn(
-                "h-4 w-64 rounded animate-pulse",
+                "h-4 w-64 rounded-none animate-pulse",
                 isDark ? "bg-zinc-800" : "bg-zinc-200"
               )} />
 
               {/* Category badge */}
               <div className={cn(
-                "h-6 w-24 rounded-full animate-pulse",
+                "h-6 w-24 rounded-none animate-pulse",
                 isDark ? "bg-zinc-800" : "bg-zinc-200"
               )} />
 
               {/* Title */}
               <div className={cn(
-                "h-10 w-full rounded animate-pulse",
+                "h-10 w-full rounded-none animate-pulse",
                 isDark ? "bg-zinc-800" : "bg-zinc-200"
               )} />
 
               {/* Date */}
               <div className={cn(
-                "h-4 w-32 rounded animate-pulse",
+                "h-4 w-32 rounded-none animate-pulse",
                 isDark ? "bg-zinc-800" : "bg-zinc-200"
               )} />
 
@@ -118,7 +118,7 @@ export function ArticleSkeletonLoader({ isDark = false }: ArticleSkeletonLoaderP
                   <div
                     key={i}
                     className={cn(
-                      "h-4 rounded animate-pulse",
+                      "h-4 rounded-none animate-pulse",
                       i % 3 === 0 ? "w-3/4" : "w-full",
                       isDark ? "bg-zinc-800" : "bg-zinc-200"
                     )}
@@ -130,14 +130,14 @@ export function ArticleSkeletonLoader({ isDark = false }: ArticleSkeletonLoaderP
             {/* TOC Sidebar */}
             <aside className="hidden lg:block w-64 flex-shrink-0 space-y-2">
               <div className={cn(
-                "h-4 w-24 rounded animate-pulse",
+                "h-4 w-24 rounded-none animate-pulse",
                 isDark ? "bg-zinc-800" : "bg-zinc-200"
               )} />
               {[1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={i}
                   className={cn(
-                    "h-3 rounded animate-pulse",
+                    "h-3 rounded-none animate-pulse",
                     i % 2 === 0 ? "w-3/4" : "w-full",
                     isDark ? "bg-zinc-800" : "bg-zinc-200"
                   )}

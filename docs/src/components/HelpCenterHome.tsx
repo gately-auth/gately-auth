@@ -258,7 +258,7 @@ export default function HelpCenterHome({
 
   const renderCategoryIcon = (iconName?: string | null) => {
     const icon = iconName || "hugeicons:folder-01";
-    return <Icon icon={icon} className="h-8 w-8" style={{ color: config.primary_color }} />;
+    return <Icon icon={icon} className="h-8 w-8" style={{ color: isDark ? '#ffffff' : '#000000' }} />;
   };
 
   const sidebarStyle = config.sidebar_style || 'default';
@@ -294,7 +294,7 @@ export default function HelpCenterHome({
         style={{ fontFamily: config.body_font || 'system-ui, sans-serif' }}
       >
       {/* Navigation Loading Bar */}
-      <NavigationLoadingBar primaryColor={config.primary_color} />
+      <NavigationLoadingBar primaryColor={isDark ? '#ffffff' : '#000000'} />
 
       {/* Header - persists across navigation */}
       <div data-astro-transition-persist="header">
@@ -375,7 +375,7 @@ export default function HelpCenterHome({
                             key={article.id}
                             onClick={() => handleArticleClick(article)}
                             className={cn(
-                              "w-full flex items-center gap-4 p-4 rounded-xl border text-left group transition-all",
+                              "w-full flex items-center gap-4 p-4 rounded-none border text-left group transition-all",
                               isDark
                                 ? "bg-transparent backdrop-blur-sm border-zinc-800 hover:border-zinc-700 hover:shadow-sm"
                                 : "bg-transparent backdrop-blur-sm border-zinc-100 hover:border-zinc-200 hover:shadow-sm"
@@ -412,7 +412,7 @@ export default function HelpCenterHome({
                       <button
                         onClick={() => setSearchModalOpen(true)}
                         className={cn(
-                          "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border text-left group transition-all",
+                          "w-full flex items-center gap-3 px-4 py-3.5 rounded-none border text-left group transition-all",
                           isDark
                             ? "bg-transparent backdrop-blur-sm border-zinc-800 hover:border-zinc-700"
                             : "bg-transparent backdrop-blur-sm border-zinc-200 hover:border-zinc-300 hover:shadow-sm"
@@ -451,7 +451,7 @@ export default function HelpCenterHome({
                             key={category.id}
                             href={`${base}${categoryUrl}`}
                             className={cn(
-                              "group flex flex-col items-start gap-4 p-5 rounded-2xl border text-left min-h-[160px] transition-all",
+                              "group flex flex-col items-start gap-4 p-5 rounded-none border text-left min-h-[160px] transition-all",
                               isDark
                                 ? "bg-transparent backdrop-blur-sm border-zinc-800 hover:border-zinc-700 hover:shadow-md"
                                 : "bg-transparent backdrop-blur-sm border-zinc-100 hover:border-zinc-200 hover:shadow-md"
@@ -490,7 +490,7 @@ export default function HelpCenterHome({
                           key={faq.id}
                           value={faq.id}
                           className={cn(
-                            "rounded-xl border px-4 transition-all",
+                            "rounded-none border px-4 transition-all",
                             isDark ? "bg-transparent backdrop-blur-sm border-zinc-800" : "bg-transparent backdrop-blur-sm border-zinc-100"
                           )}
                         >
@@ -533,7 +533,7 @@ export default function HelpCenterHome({
         articles={clientArticles}
         categories={clientCategories}
         isDark={isDark}
-        primaryColor={config.primary_color}
+        primaryColor={isDark ? '#ffffff' : '#000000'}
         aiEnabled={config.ai_answer_enabled}
         onAskAI={(query) => {
           // Add query to URL for AI to pick up

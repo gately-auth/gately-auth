@@ -21,7 +21,7 @@ export function SkeletonLoader({ isDark = false }: SkeletonLoaderProps) {
           isDark ? "border-zinc-800" : "border-zinc-100"
         )}>
           <div className={cn(
-            "h-7 w-32 rounded animate-pulse",
+            "h-7 w-32 rounded-none animate-pulse",
             isDark ? "bg-zinc-800" : "bg-zinc-200"
           )} />
         </div>
@@ -31,7 +31,7 @@ export function SkeletonLoader({ isDark = false }: SkeletonLoaderProps) {
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="space-y-1">
               <div className={cn(
-                "h-10 rounded-xl animate-pulse",
+                "h-10 rounded-none animate-pulse",
                 isDark ? "bg-zinc-800" : "bg-zinc-200"
               )} />
             </div>
@@ -44,7 +44,7 @@ export function SkeletonLoader({ isDark = false }: SkeletonLoaderProps) {
           isDark ? "border-zinc-800" : "border-zinc-100"
         )}>
           <div className={cn(
-            "h-6 w-32 mx-auto rounded animate-pulse",
+            "h-6 w-32 mx-auto rounded-none animate-pulse",
             isDark ? "bg-zinc-800" : "bg-zinc-200"
           )} />
         </div>
@@ -58,16 +58,16 @@ export function SkeletonLoader({ isDark = false }: SkeletonLoaderProps) {
           isDark ? "border-zinc-800 bg-[#121212]" : "border-zinc-100 bg-white"
         )}>
           <div className={cn(
-            "h-8 w-64 rounded-xl animate-pulse",
+            "h-8 w-64 rounded-none animate-pulse",
             isDark ? "bg-zinc-800" : "bg-zinc-200"
           )} />
           <div className="flex items-center gap-2">
             <div className={cn(
-              "h-8 w-20 rounded-xl animate-pulse",
+              "h-8 w-20 rounded-none animate-pulse",
               isDark ? "bg-zinc-800" : "bg-zinc-200"
             )} />
             <div className={cn(
-              "h-8 w-8 rounded-xl animate-pulse",
+              "h-8 w-8 rounded-none animate-pulse",
               isDark ? "bg-zinc-800" : "bg-zinc-200"
             )} />
           </div>
@@ -79,11 +79,11 @@ export function SkeletonLoader({ isDark = false }: SkeletonLoaderProps) {
             {/* Hero skeleton */}
             <div className="space-y-3">
               <div className={cn(
-                "h-10 w-3/4 rounded animate-pulse",
+                "h-10 w-3/4 rounded-none animate-pulse",
                 isDark ? "bg-zinc-800" : "bg-zinc-200"
               )} />
               <div className={cn(
-                "h-6 w-1/2 rounded animate-pulse",
+                "h-6 w-1/2 rounded-none animate-pulse",
                 isDark ? "bg-zinc-800" : "bg-zinc-200"
               )} />
             </div>
@@ -94,7 +94,7 @@ export function SkeletonLoader({ isDark = false }: SkeletonLoaderProps) {
                 <div
                   key={i}
                   className={cn(
-                    "h-24 rounded-xl border animate-pulse",
+                    "h-24 rounded-none border animate-pulse",
                     isDark ? "bg-zinc-800/30 border-zinc-800" : "bg-white border-zinc-100"
                   )}
                 />

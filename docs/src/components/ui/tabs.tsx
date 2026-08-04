@@ -86,13 +86,13 @@ function TabsList({
       ref={listRef}
       data-slot="tabs-list"
       className={cn(
-        "bg-muted text-muted-foreground inline-flex h-fit w-fit items-center justify-center rounded-lg p-1 relative",
+        "bg-muted text-muted-foreground inline-flex h-fit w-fit items-center justify-center rounded-none p-1 relative",
         className
       )}
       {...props}
     >
       <div
-        className="absolute bg-white dark:bg-white/10 rounded-md shadow pointer-events-none left-0 top-0"
+        className="absolute bg-white dark:bg-white/10 rounded-none shadow pointer-events-none left-0 top-0"
         style={indicatorStyle}
       />
       {props.children}
@@ -108,7 +108,7 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "inline-flex h-fit flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-all duration-200 ease-in-out relative z-10",
+        "inline-flex h-fit flex-1 items-center justify-center gap-1.5 rounded-none px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-all duration-200 ease-in-out relative z-10",
         "text-muted-foreground/60",
         "data-[state=active]:text-foreground",
         "hover:text-foreground/80",

@@ -58,7 +58,7 @@ export function AiTextArea({
 
   return (
     <div className={cn(
-      "rounded-2xl shadow-sm overflow-hidden border border-border bg-card",
+      "rounded-none shadow-sm overflow-hidden border border-border bg-card",
       className
     )}>
       <div className={cn(
@@ -76,7 +76,7 @@ export function AiTextArea({
         )}>{title}</span>
       </div>
       
-      <div className="relative border-t border-border rounded-t-xl -mx-px -mb-px bg-card">
+      <div className="relative border-t border-border rounded-none -mx-px -mb-px bg-card">
         <textarea
           ref={textareaRef}
           value={value}
@@ -98,12 +98,15 @@ export function AiTextArea({
             onClick={onSubmit}
             disabled={disabled}
             className={cn(
-              "absolute right-3 rounded-full transition-all flex items-center justify-center px-3 py-1.5",
-              "hover:scale-105 active:scale-95 text-white text-xs font-medium",
+              "absolute right-3 rounded-none transition-all flex items-center justify-center px-3 py-1.5",
+              "hover:scale-105 active:scale-95 text-xs font-medium",
               compact ? "bottom-2" : "bottom-3",
               disabled && "opacity-50 cursor-not-allowed"
             )}
-            style={{ backgroundColor: primaryColor }}
+            style={{
+              backgroundColor: isDark ? '#ffffff' : '#000000',
+              color: isDark ? '#000000' : '#ffffff',
+            }}
           >
             Send
           </button>

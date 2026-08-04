@@ -34,13 +34,17 @@
     --border: 0 0% 93%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
-    --radius: 0.5rem;
+    --radius: 0rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    
+
+    /* Brand accent — black in light mode, white in dark mode */
+    --brand: #000000;
+    --brand-fg: #ffffff;
+
     /* Code block colors */
     --code-block-bg: hsl(0 0% 97%);
     --code-block-header-bg: hsl(0 0% 100%);
@@ -72,7 +76,11 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    
+
+    /* Brand accent — white in dark mode */
+    --brand: #ffffff;
+    --brand-fg: #000000;
+
     /* Code block colors - darker for better contrast */
     --code-block-bg: hsl(0 0% 9%);
     --code-block-header-bg: hsl(0 0% 7%);
@@ -133,7 +141,7 @@
   
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: rgb(212 212 216);
-    border-radius: 3px;
+    border-radius: 0px;
   }
   
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -164,7 +172,7 @@
   
   .custom-scrollbar-always::-webkit-scrollbar-thumb {
     background: rgb(212 212 216);
-    border-radius: 4px;
+    border-radius: 0px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
@@ -226,3 +234,11 @@
     background-color: transparent !important;
   }
 }
+
+/* ── Brand accent utilities ───────────────────────────────────────────────── */
+/* Use these classes instead of inline style={{ color: primaryColor }} */
+.text-brand   { color: var(--brand); }
+.bg-brand     { background-color: var(--brand); }
+.border-brand { border-color: var(--brand); }
+.text-brand-fg { color: var(--brand-fg); }
+.ring-brand   { --tw-ring-color: var(--brand); }

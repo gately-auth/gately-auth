@@ -86,7 +86,7 @@ export function HelpCenterHeader({
                 <button
                   onClick={() => setMobileMenuOpen(true)}
                   className={cn(
-                    "lg:hidden p-2 rounded-lg -ml-1",
+                    "lg:hidden p-2 rounded-none -ml-1",
                     isDark ? "text-zinc-400 hover:bg-zinc-800" : "text-zinc-600 hover:bg-zinc-100"
                   )}
                   aria-label="Open navigation"
@@ -112,8 +112,8 @@ export function HelpCenterHeader({
               {config.logo_url ? (
                 <img src={config.logo_url} alt="Logo" className="h-6 w-auto object-contain max-w-[120px]" />
               ) : (
-                <div className="h-7 w-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${config.primary_color}15` }}>
-                  <Icon icon="hugeicons:book-open-01" className="h-4 w-4" style={{ color: config.primary_color }} />
+                <div className="h-7 w-7 rounded-none flex items-center justify-center" style={{ backgroundColor: `${isDark ? '#ffffff' : '#000000'}15` }}>
+                  <Icon icon="hugeicons:book-open-01" className="h-4 w-4" style={{ color: isDark ? '#ffffff' : '#000000' }} />
                 </div>
               )}
               <span className="font-semibold text-sm hidden sm:block" style={{ fontFamily: config.heading_font || 'system-ui, sans-serif' }}>
@@ -134,17 +134,17 @@ export function HelpCenterHeader({
                 <button
                   onClick={onSearchOpen}
                   className={cn(
-                    "flex items-center gap-2 px-2 rounded-xl text-sm w-full max-w-sm border h-[38px] bg-transparent",
+                    "flex items-center gap-2 px-2 rounded-none text-sm w-full max-w-sm border h-[38px] bg-transparent",
                     isDark ? "border-zinc-800/50 text-zinc-400 hover:border-zinc-700/50" : "border-zinc-200 text-zinc-400 hover:border-zinc-300"
                   )}
                 >
                   <Icon icon="hugeicons:search-01" className="h-4 w-4" />
                   <span className="flex-1 text-left">Search...</span>
                   <div className="flex items-center gap-1">
-                    <kbd className={cn("h-6 w-6 rounded-lg flex items-center justify-center border bg-transparent", isDark ? "border-zinc-700 text-zinc-500" : "border-zinc-300 text-zinc-400")}>
+                    <kbd className={cn("h-6 w-6 rounded-none flex items-center justify-center border bg-transparent", isDark ? "border-zinc-700 text-zinc-500" : "border-zinc-300 text-zinc-400")}>
                       <Icon icon="hugeicons:command" className="h-3.5 w-3.5" />
                     </kbd>
-                    <kbd className={cn("h-6 w-6 rounded-lg flex items-center justify-center text-xs font-semibold border bg-transparent", isDark ? "border-zinc-700 text-zinc-500" : "border-zinc-300 text-zinc-400")}>
+                    <kbd className={cn("h-6 w-6 rounded-none flex items-center justify-center text-xs font-semibold border bg-transparent", isDark ? "border-zinc-700 text-zinc-500" : "border-zinc-300 text-zinc-400")}>
                       K
                     </kbd>
                   </div>
@@ -153,11 +153,11 @@ export function HelpCenterHeader({
                   <button
                     onClick={onAIOpen}
                     className={cn(
-                      "hidden lg:flex items-center gap-1.5 px-3 rounded-xl text-sm font-medium border flex-shrink-0 h-[38px] transition-colors",
+                      "hidden lg:flex items-center gap-1.5 px-3 rounded-none text-sm font-medium border flex-shrink-0 h-[38px] transition-colors",
                       isDark ? "border-zinc-800/50 text-zinc-300 hover:border-zinc-700/50 hover:bg-zinc-800/50" : "border-zinc-200 text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
                     )}
                   >
-                    <Icon icon="hugeicons:ai-brain-01" className="h-4 w-4" style={{ color: config.primary_color }} />
+                    <Icon icon="hugeicons:ai-brain-01" className="h-4 w-4" style={{ color: isDark ? '#ffffff' : '#000000' }} />
                     <span>Ask AI</span>
                   </button>
                 )}
@@ -172,7 +172,7 @@ export function HelpCenterHeader({
               <button
                 onClick={onSearchOpen}
                 className={cn(
-                  "md:hidden p-2 rounded-lg",
+                  "md:hidden p-2 rounded-none",
                   isDark ? "text-zinc-400 hover:bg-zinc-800" : "text-zinc-600 hover:bg-zinc-100"
                 )}
                 aria-label="Search"
@@ -190,7 +190,7 @@ export function HelpCenterHeader({
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={cn("px-3 py-1.5 rounded-xl text-sm", isDark ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800" : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100")}
+                    className={cn("px-3 py-1.5 rounded-none text-sm", isDark ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800" : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100")}
                   >
                     {link.label}
                   </a>
@@ -204,8 +204,8 @@ export function HelpCenterHeader({
                 href={config.primary_button_url || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium text-white"
-                style={{ backgroundColor: config.primary_color }}
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-none text-sm font-medium"
+                style={{ backgroundColor: isDark ? '#ffffff' : '#000000', color: isDark ? '#000000' : '#ffffff' }}
               >
                 {config.primary_button_label}
               </a>
@@ -214,7 +214,7 @@ export function HelpCenterHeader({
             {/* Theme toggle */}
             <button
               onClick={onThemeToggle}
-              className={cn("p-2 rounded-full h-[32px] w-[32px] flex items-center justify-center", isDark ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800" : "text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100")}
+              className={cn("p-2 rounded-none h-[32px] w-[32px] flex items-center justify-center", isDark ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800" : "text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100")}
             >
               {isDark ? <Icon icon="hugeicons:sun-03" className="h-4 w-4" /> : <Icon icon="hugeicons:moon-02" className="h-4 w-4" />}
             </button>
@@ -247,7 +247,7 @@ export function HelpCenterHeader({
                     "flex items-center gap-1.5 px-2 md:px-0 text-xs md:text-sm font-medium whitespace-nowrap flex-shrink-0 h-full relative transition-colors",
                     isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   )}
-                  style={{ borderBottom: isActive ? `2px solid ${config.primary_color}` : '2px solid transparent' }}
+                  style={{ borderBottom: isActive ? `2px solid ${isDark ? '#ffffff' : '#000000'}` : '2px solid transparent' }}
                 >
                   <Icon icon={folder.icon || "hugeicons:folder-library"} className="h-3.5 w-3.5 md:h-4 md:w-4" />
                   {folder.name}

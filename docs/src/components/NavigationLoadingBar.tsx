@@ -1,14 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface NavigationLoadingBarProps {
   primaryColor?: string;
 }
 
-export function NavigationLoadingBar({ primaryColor = '#3b82f6' }: NavigationLoadingBarProps) {
+export function NavigationLoadingBar({ primaryColor }: NavigationLoadingBarProps) {
   const barRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number>();
   const isNavigatingRef = useRef(false);
+
+  // Read the CSS variable at runtime so it respects dark/light mode
+  const getColor = () =>
+    typeof window !== 'undefined'
+      ? getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() ||
+        (document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000')
+      : '#000000';
 
   useEffect(() => {
     let rightEdge = 0;
@@ -113,8 +120,8 @@ export function NavigationLoadingBar({ primaryColor = '#3b82f6' }: NavigationLoa
         style={{
           width: '0%',
           height: '100%',
-          backgroundColor: primaryColor,
-          boxShadow: `0 0 10px ${primaryColor}`,
+          backgroundColor: getColor(),
+          boxShadow: `0 0 10px ${getColor()}`,
           transition: 'width 0.05s linear',
         }}
       />

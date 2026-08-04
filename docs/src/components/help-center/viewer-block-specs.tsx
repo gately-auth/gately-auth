@@ -59,7 +59,7 @@ export const calloutBlockSpec = createReactBlockSpec(
           data-callout-type={type}
           style={{
             display: 'flex', gap: '0.75rem', padding: '1rem',
-            borderRadius: '1rem', border: `1px solid ${s.border}`,
+            borderRadius: '0px', border: `1px solid ${s.border}`,
             background: s.bg, margin: '0.5rem 0', width: '100%',
           }}
         >
@@ -115,10 +115,10 @@ export const cardBlockSpec = createReactBlockSpec(
           </div>
         </div>
       );
-      const cls = "relative w-full rounded-2xl border border-border bg-card flex flex-col overflow-hidden transition-shadow hover:shadow-md h-full";
+      const cls = "relative w-full rounded-none border border-border bg-card flex flex-col overflow-hidden transition-shadow hover:shadow-md h-full";
       return href
-        ? <a href={String(href)} target="_blank" rel="noopener noreferrer" className={cls} data-card="" style={{ borderRadius: '1rem', height: '100%', textDecoration: 'none' }}>{inner}</a>
-        : <div className={cls} data-card="" style={{ borderRadius: '1rem', height: '100%' }}>{inner}</div>;
+        ? <a href={String(href)} target="_blank" rel="noopener noreferrer" className={cls} data-card="" style={{ borderRadius: '0px', height: '100%', textDecoration: 'none' }}>{inner}</a>
+        : <div className={cls} data-card="" style={{ borderRadius: '0px', height: '100%' }}>{inner}</div>;
     },
   }
 )();
@@ -140,7 +140,7 @@ export const accordionBlockSpec = createReactBlockSpec(
       const { accordionTitle, accordionBody } = block.props;
       const [open, setOpen] = useState(false);
       return (
-        <div className="w-full border border-border rounded-2xl overflow-hidden my-2">
+        <div className="w-full border border-border rounded-none overflow-hidden my-2">
           <button
             type="button"
             onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((o) => !o); }}
@@ -205,7 +205,7 @@ export const stepsBlockSpec = createReactBlockSpec(
           {/* Left — number + connector line */}
           <div className="flex flex-col items-center flex-shrink-0">
             <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+              className="w-7 h-7 rounded-none flex items-center justify-center text-xs font-bold flex-shrink-0"
               style={{
                 backgroundColor: 'var(--viewer-primary, #ea4e1e)',
                 color: '#fff',
@@ -232,7 +232,7 @@ export const stepsBlockSpec = createReactBlockSpec(
 
             {/* Optional image */}
             {imageUrl && (
-              <div className="mt-3 rounded-xl overflow-hidden border border-border">
+              <div className="mt-3 rounded-none overflow-hidden border border-border">
                 <img
                   src={String(imageUrl)}
                   alt={String(title) || ''}
@@ -244,7 +244,7 @@ export const stepsBlockSpec = createReactBlockSpec(
             {/* Optional code block */}
             {codeContent && (
               <div 
-                className="mt-3 rounded-xl overflow-hidden code-block-wrapper" 
+                className="mt-3 rounded-none overflow-hidden code-block-wrapper" 
                 data-blocknote-codeblock="true"
                 style={{ border: '1px solid var(--code-block-border, hsl(0 0% 15%))' }}
               >
@@ -262,7 +262,7 @@ export const stepsBlockSpec = createReactBlockSpec(
                       background: 'transparent',
                       border: '1px solid hsl(var(--border))',
                       color: 'hsl(var(--muted-foreground))',
-                      borderRadius: '0.25rem',
+                      borderRadius: '0px',
                       padding: '0.125rem 0.5rem',
                       fontSize: '0.6875rem',
                       cursor: 'pointer',
@@ -307,7 +307,7 @@ export const stepsBlockSpec = createReactBlockSpec(
                   display: 'flex',
                   gap: '0.625rem',
                   padding: '0.75rem 1rem',
-                  borderRadius: '0.75rem',
+                  borderRadius: '0px',
                   border: `1px solid ${calloutStyle.border}`,
                   background: calloutStyle.bg,
                 }}
@@ -356,7 +356,7 @@ export const tabsBlockSpec = createReactBlockSpec(
       const label = (i: number) => String(p[`tab${i}label`] || `Tab ${i + 1}`);
       const body  = (i: number) => String(p[`tab${i}body`]  || '');
       return (
-        <div className="w-full border border-border rounded-2xl overflow-hidden my-2">
+        <div className="w-full border border-border rounded-none overflow-hidden my-2">
           <div className="flex items-center border-b border-border bg-muted/30 overflow-x-auto">
             {Array.from({ length: count }, (_, i) => (
               <button
@@ -429,26 +429,29 @@ export const codeBlockSpec = createReactBlockSpec(
   {
     render: ({ block, contentRef }) => {
       const language = (block.props.language as string) || '';
+
+      // Extract plain text from block.content data model — the single source of truth
+      const rawCode = (block.content as any[])
+        ?.map((item: any) => {
+          if (typeof item === 'string') return item;
+          if (item?.type === 'text') return item.text ?? '';
+          if (item?.text) return item.text;
+          return '';
+        })
+        .join('') ?? '';
+
       const [copied, setCopied] = useState(false);
-      const codeRef = useRef<HTMLElement | null>(null);
 
       const handleCopy = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        const code = codeRef.current?.textContent || '';
         try {
-          await navigator.clipboard.writeText(code);
+          await navigator.clipboard.writeText(rawCode);
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
         } catch (err) {
           console.error('Failed to copy code:', err);
         }
-      };
-
-      // Combine refs
-      const setRefs = (node: HTMLElement | null) => {
-        codeRef.current = node;
-        contentRef(node);
       };
 
       return (
@@ -472,7 +475,7 @@ export const codeBlockSpec = createReactBlockSpec(
               position: 'relative',
               margin: '1.25rem 0',
               width: '100%',
-              borderRadius: '0.75rem',
+              borderRadius: '0px',
               overflow: 'hidden',
               border: '1px solid var(--code-block-border, hsl(0 0% 15%))',
             }}
@@ -508,7 +511,7 @@ export const codeBlockSpec = createReactBlockSpec(
                   padding: '0.25rem 0.625rem',
                   background: 'transparent',
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '0.375rem',
+                  borderRadius: '0px',
                   cursor: 'pointer',
                   fontSize: '0.6875rem',
                   fontWeight: 500,
@@ -530,7 +533,7 @@ export const codeBlockSpec = createReactBlockSpec(
               </button>
             </div>
 
-            {/* Code content */}
+            {/* Code content — rendered from data model, not from contentRef DOM */}
             <pre 
               className="custom-code-block-mono" 
               style={{
@@ -547,8 +550,16 @@ export const codeBlockSpec = createReactBlockSpec(
                 wordBreak: 'normal',
               }}
             >
-              <code ref={setRefs} className={language ? `language-${language}` : ''} style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }} />
+              <code className={language ? `language-${language}` : ''} style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+                {rawCode}
+              </code>
             </pre>
+            {/* Hidden contentRef mount — required by BlockNote internals, kept off-screen */}
+            <code
+              ref={contentRef}
+              aria-hidden="true"
+              style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}
+            />
           </div>
         </>
       );
@@ -601,7 +612,7 @@ export const codeGroupBlockSpec = createReactBlockSpec(
               font-family: 'Geist Mono', ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
             }
           `}</style>
-          <div className="w-full rounded-xl overflow-hidden my-4" data-code-group="" style={{
+          <div className="w-full rounded-none overflow-hidden my-4" data-code-group="" style={{
             border: '1px solid var(--code-block-border, hsl(0 0% 15%))',
           }}>
             {/* Tab bar */}
@@ -635,7 +646,7 @@ export const codeGroupBlockSpec = createReactBlockSpec(
               <button
                 type="button"
                 onClick={() => navigator.clipboard?.writeText(currentTab?.code || '')}
-                className="code-group-mono flex items-center gap-1.5 mr-2 px-2.5 py-1 rounded text-xs font-medium transition-colors"
+                className="code-group-mono flex items-center gap-1.5 mr-2 px-2.5 py-1 rounded-none text-xs font-medium transition-colors"
                 style={{
                   border: '1px solid hsl(var(--border))',
                   color: 'hsl(var(--muted-foreground))',
@@ -740,11 +751,11 @@ export const paramFieldBlockSpec = createReactBlockSpec(
             <code className="text-sm font-mono font-semibold" style={{ color: '#f97316' }}>
               {paramName || 'parameter'}
             </code>
-            <span className="text-[11px] px-2 py-0.5 rounded font-mono font-medium bg-muted text-muted-foreground">
+            <span className="text-[11px] px-2 py-0.5 rounded-none font-mono font-medium bg-muted text-muted-foreground">
               {paramType}
             </span>
             {required && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50">
+              <span className="text-[10px] px-1.5 py-0.5 rounded-none font-semibold bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50">
                 required
               </span>
             )}
@@ -779,11 +790,11 @@ export const responseFieldBlockSpec = createReactBlockSpec(
             <code className="text-sm font-mono font-semibold" style={{ color: '#f97316' }}>
               {fieldName || 'field'}
             </code>
-            <span className="text-[11px] px-2 py-0.5 rounded font-mono font-medium bg-muted text-muted-foreground">
+            <span className="text-[11px] px-2 py-0.5 rounded-none font-mono font-medium bg-muted text-muted-foreground">
               {fieldType}
             </span>
             {required && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50">
+              <span className="text-[10px] px-1.5 py-0.5 rounded-none font-semibold bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50">
                 required
               </span>
             )}
@@ -832,7 +843,7 @@ export const cardGroupBlockSpec = createReactBlockSpec(
                 <CardWrapper
                   key={idx}
                   {...linkProps}
-                  className="rounded-2xl border border-border bg-card hover:shadow-md transition-shadow flex flex-col overflow-hidden"
+                  className="rounded-none border border-border bg-card hover:shadow-md transition-shadow flex flex-col overflow-hidden"
                   style={{ textDecoration: 'none' }}
                 >
                   {card.imageUrl && (

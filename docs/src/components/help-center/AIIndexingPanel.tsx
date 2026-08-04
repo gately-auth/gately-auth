@@ -101,11 +101,11 @@ export function AIIndexingPanel({ projectId, isDark = false, primaryColor = '#3b
   if (isLoading && !status) {
     return (
       <div className={cn(
-        "p-6 rounded-lg border",
+        "p-6 rounded-none border",
         isDark ? "bg-zinc-900 border-zinc-800" : "bg-white border-zinc-200"
       )}>
         <div className="flex items-center gap-2">
-          <Icon icon="hugeicons:loading-03" className="h-5 w-5 animate-spin" style={{ color: primaryColor }} />
+          <Icon icon="hugeicons:loading-03" className="h-5 w-5 animate-spin" style={{ color: isDark ? '#ffffff' : '#000000' }} />
           <span className={cn("text-sm", isDark ? "text-zinc-400" : "text-zinc-600")}>
             Loading indexing status...
           </span>
@@ -116,15 +116,15 @@ export function AIIndexingPanel({ projectId, isDark = false, primaryColor = '#3b
 
   return (
     <div className={cn(
-      "p-6 rounded-lg border",
+      "p-6 rounded-none border",
       isDark ? "bg-zinc-900 border-zinc-800" : "bg-white border-zinc-200"
     )}>
       <div className="flex items-center gap-3 mb-4">
         <div 
-          className="p-2 rounded-lg"
-          style={{ backgroundColor: `${primaryColor}15` }}
+          className="p-2 rounded-none"
+          style={{ backgroundColor: `${isDark ? '#ffffff' : '#000000'}15` }}
         >
-          <Icon icon="hugeicons:artificial-intelligence-04" className="h-5 w-5" style={{ color: primaryColor }} />
+          <Icon icon="hugeicons:artificial-intelligence-04" className="h-5 w-5" style={{ color: isDark ? '#ffffff' : '#000000' }} />
         </div>
         <div>
           <h3 className={cn("font-semibold", isDark ? "text-white" : "text-zinc-900")}>
@@ -140,7 +140,7 @@ export function AIIndexingPanel({ projectId, isDark = false, primaryColor = '#3b
         <div className="space-y-4">
           {/* Status Overview */}
           <div className={cn(
-            "p-4 rounded-lg",
+            "p-4 rounded-none",
             isDark ? "bg-zinc-800" : "bg-zinc-50"
           )}>
             <div className="grid grid-cols-3 gap-4 text-center">
@@ -153,7 +153,7 @@ export function AIIndexingPanel({ projectId, isDark = false, primaryColor = '#3b
                 </div>
               </div>
               <div>
-                <div className="text-2xl font-bold" style={{ color: primaryColor }}>
+                <div className="text-2xl font-bold" style={{ color: isDark ? '#ffffff' : '#000000' }}>
                   {status.indexedArticles}
                 </div>
                 <div className={cn("text-xs", isDark ? "text-zinc-400" : "text-zinc-600")}>
@@ -184,14 +184,14 @@ export function AIIndexingPanel({ projectId, isDark = false, primaryColor = '#3b
                 </span>
               </div>
               <div className={cn(
-                "h-2 rounded-full overflow-hidden",
+                "h-2 rounded-none overflow-hidden",
                 isDark ? "bg-zinc-700" : "bg-zinc-200"
               )}>
                 <div 
-                  className="h-full transition-all duration-500 rounded-full"
+                  className="h-full transition-all duration-500 rounded-none"
                   style={{ 
                     width: `${status.indexingPercentage}%`,
-                    backgroundColor: primaryColor
+                    backgroundColor: isDark ? '#ffffff' : '#000000'
                   }}
                 />
               </div>
@@ -207,7 +207,7 @@ export function AIIndexingPanel({ projectId, isDark = false, primaryColor = '#3b
           {/* Message */}
           {message && (
             <div className={cn(
-              "p-3 rounded-lg text-sm",
+              "p-3 rounded-none text-sm",
               message.type === 'success' 
                 ? "bg-green-500/10 text-green-600 dark:text-green-400"
                 : "bg-red-500/10 text-red-600 dark:text-red-400"
@@ -222,7 +222,7 @@ export function AIIndexingPanel({ projectId, isDark = false, primaryColor = '#3b
               onClick={handleIndex}
               disabled={isIndexing || status.pendingArticles === 0}
               className="flex-1"
-              style={{ backgroundColor: primaryColor }}
+              style={{ backgroundColor: isDark ? '#ffffff' : '#000000' }}
             >
               {isIndexing ? (
                 <>
@@ -265,7 +265,7 @@ export function AIIndexingPanel({ projectId, isDark = false, primaryColor = '#3b
 
           {/* Info */}
           <div className={cn(
-            "p-3 rounded-lg text-xs",
+            "p-3 rounded-none text-xs",
             isDark ? "bg-blue-500/10 text-blue-400" : "bg-blue-50 text-blue-600"
           )}>
             <div className="flex gap-2">

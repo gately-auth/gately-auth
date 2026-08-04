@@ -14,7 +14,7 @@ function MethodBadge({ method, className }: { method: string; className?: string
   const colors = METHOD_COLORS[method.toUpperCase()] || { bg: '#6b72801a', text: '#4b5563', border: '#6b728040' };
   return (
     <span
-      className={cn('inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-bold tracking-wide font-mono shrink-0', className)}
+      className={cn('inline-flex items-center px-1.5 py-0.5 rounded-none text-[9px] font-bold tracking-wide font-mono shrink-0', className)}
       style={{ background: colors.bg, color: colors.text, border: `1px solid ${colors.border}` }}
     >
       {method.toUpperCase()}
@@ -228,7 +228,7 @@ console.log(data);`;
   
   // Input styles with primary color focus
   const inputCls = (focused?: boolean) => cn(
-    'w-full px-3 py-2 rounded-xl border text-sm outline-none transition-all',
+    'w-full px-3 py-2 rounded-none border text-sm outline-none transition-all',
     isDark
       ? 'bg-zinc-900 border-zinc-700 text-zinc-200 placeholder-zinc-600'
       : 'bg-zinc-50 border-zinc-200 text-zinc-800 placeholder-zinc-400',
@@ -250,7 +250,7 @@ console.log(data);`;
 
       {/* Modal */}
       <div className={cn(
-        'relative z-10 w-full sm:max-w-6xl rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden',
+        'relative z-10 w-full sm:max-w-6xl rounded-none sm:rounded-none shadow-2xl flex flex-col overflow-hidden',
         'max-h-[92vh] sm:max-h-[90vh] min-h-[600px]',
         bg, `border ${border}`
       )}
@@ -267,8 +267,8 @@ console.log(data);`;
           <button
             onClick={handleSend}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-60 hover:opacity-90 active:scale-95"
-            style={{ backgroundColor: primaryColor }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-none text-sm font-medium transition-all disabled:opacity-60 hover:opacity-90 active:scale-95 ${isDark ? 'text-black' : 'text-white'}`}
+            style={{ backgroundColor: isDark ? '#ffffff' : '#000000' }}
           >
             {loading ? (
               <>
@@ -295,7 +295,7 @@ console.log(data);`;
           <div className="flex-1 overflow-auto p-5 space-y-4 border-r scrollbar-hide" style={{ borderColor: isDark ? '#27272a' : '#e4e4e7' }}>
             {/* Error banner */}
             {error && (
-              <div className="flex items-start gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+              <div className="flex items-start gap-2 p-3 rounded-none bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5">
                   <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
@@ -305,13 +305,13 @@ console.log(data);`;
 
             {/* Endpoint description */}
             {description && (
-              <div className={cn('p-3 rounded-xl border', border, isDark ? 'bg-zinc-900/50' : 'bg-zinc-50')}>
+              <div className={cn('p-3 rounded-none border', border, isDark ? 'bg-zinc-900/50' : 'bg-zinc-50')}>
                 <p className={cn('text-sm', isDark ? 'text-zinc-300' : 'text-zinc-600')}>{description}</p>
               </div>
             )}
 
             {/* Authorization section - Collapsible */}
-            <details open className={cn('group rounded-xl border', border)}>
+            <details open className={cn('group rounded-none border', border)}>
               <summary className={cn(
                 'flex items-center justify-between px-4 py-3 cursor-pointer list-none',
                 isDark ? 'hover:bg-zinc-900/50' : 'hover:bg-zinc-50'
@@ -320,7 +320,7 @@ console.log(data);`;
                       <span className={cn('text-sm font-semibold', isDark ? 'text-zinc-200' : 'text-zinc-700')}>
                         Authorization
                       </span>
-                      <span className={cn('text-xs px-1.5 py-0.5 rounded', isDark ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600')}>
+                      <span className={cn('text-xs px-1.5 py-0.5 rounded-none', isDark ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600')}>
                         required
                       </span>
                     </div>
@@ -361,7 +361,7 @@ console.log(data);`;
 
             {/* Body section - Collapsible (show if hasBody, even if no params parsed) */}
             {hasBody && (
-              <details open className={cn('group rounded-xl border', border)}>
+              <details open className={cn('group rounded-none border', border)}>
                     <summary className={cn(
                       'flex items-center justify-between px-4 py-3 cursor-pointer list-none',
                       isDark ? 'hover:bg-zinc-900/50' : 'hover:bg-zinc-50'
@@ -387,7 +387,7 @@ console.log(data);`;
                                 </label>
                                 <span className={cn('text-xs', muted)}>{param.type}</span>
                                 {param.required && (
-                                  <span className={cn('text-xs px-1.5 py-0.5 rounded', isDark ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600')}>
+                                  <span className={cn('text-xs px-1.5 py-0.5 rounded-none', isDark ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600')}>
                                     required
                                   </span>
                                 )}
@@ -473,7 +473,7 @@ console.log(data);`;
           {/* Right Panel - Code Examples */}
           <div className="w-[480px] flex-shrink-0 overflow-auto p-5 space-y-4 scrollbar-hide" style={{ backgroundColor: isDark ? '#09090b' : '#fafafa' }}>
             {/* Code Group */}
-            <div className={cn('rounded-xl border overflow-hidden', isDark ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white')}>
+            <div className={cn('rounded-none border overflow-hidden', isDark ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white')}>
               {/* Tabs */}
               <div className={cn('flex items-center border-b', isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-zinc-50')}>
                 <button
@@ -519,7 +519,7 @@ console.log(data);`;
                 <button
                   onClick={() => navigator.clipboard?.writeText(codeTab === 'curl' ? curlLines : jsCode)}
                   className={cn(
-                    'absolute top-2 right-2 p-1.5 rounded-md transition-colors',
+                    'absolute top-2 right-2 p-1.5 rounded-none transition-colors',
                     isDark ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-400' : 'bg-zinc-200 hover:bg-zinc-300 text-zinc-600'
                   )}
                   title="Copy code"
@@ -533,7 +533,7 @@ console.log(data);`;
 
             {/* Response Example (if available) */}
             {response && (
-              <div className={cn('rounded-xl border overflow-hidden', isDark ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white')}>
+              <div className={cn('rounded-none border overflow-hidden', isDark ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white')}>
                 {/* Response Header */}
                 <div className={cn('flex items-center justify-between px-4 py-2.5 border-b', isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-zinc-50')}>
                   <div className="flex items-center gap-2">
@@ -542,7 +542,7 @@ console.log(data);`;
                     </span>
                   </div>
                   <span
-                    className="px-2.5 py-1 rounded-lg text-xs font-bold"
+                    className="px-2.5 py-1 rounded-none text-xs font-bold"
                     style={{ color: statusColor!, background: `${statusColor}20` }}
                   >
                     {response.status} • {response.time}ms
@@ -566,7 +566,7 @@ console.log(data);`;
                       typeof response.data === 'string' ? response.data : JSON.stringify(response.data, null, 2)
                     )}
                     className={cn(
-                      'absolute top-2 right-2 p-1.5 rounded-md transition-colors',
+                      'absolute top-2 right-2 p-1.5 rounded-none transition-colors',
                       isDark ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-400' : 'bg-zinc-200 hover:bg-zinc-300 text-zinc-600'
                     )}
                     title="Copy"

@@ -103,7 +103,7 @@ export function ArticleFeedback({
                 onClick={() => handleFeedback(true)}
                 disabled={isSubmitting}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-none border text-xs",
                   isDark 
                     ? "border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300" 
                     : "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600",
@@ -117,7 +117,7 @@ export function ArticleFeedback({
                 onClick={() => handleFeedback(false)}
                 disabled={isSubmitting}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-none border text-xs",
                   isDark 
                     ? "border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300" 
                     : "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600",
@@ -157,7 +157,7 @@ export function ArticleFeedback({
               onClick={() => handleFeedback(true)}
               disabled={isSubmitting}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-none border text-xs",
                 isDark 
                   ? "border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300" 
                   : "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600",
@@ -171,7 +171,7 @@ export function ArticleFeedback({
               onClick={() => handleFeedback(false)}
               disabled={isSubmitting}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-none border text-xs",
                 isDark 
                   ? "border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300" 
                   : "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600",
@@ -217,7 +217,7 @@ export function ArticleFeedback({
                   onClick={() => handleFeedback(true)}
                   disabled={isSubmitting}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg border",
+                    "flex items-center gap-2 px-4 py-2 rounded-none border",
                     isDark 
                       ? "border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300" 
                       : "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700",
@@ -231,7 +231,7 @@ export function ArticleFeedback({
                   onClick={() => handleFeedback(false)}
                   disabled={isSubmitting}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg border",
+                    "flex items-center gap-2 px-4 py-2 rounded-none border",
                     isDark 
                       ? "border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300" 
                       : "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700",
@@ -278,7 +278,7 @@ export function ArticleFeedback({
                 onClick={() => handleFeedback(true)}
                 disabled={isSubmitting}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg border",
+                  "flex items-center gap-2 px-4 py-2 rounded-none border",
                   isDark 
                     ? "border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300" 
                     : "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700",
@@ -292,7 +292,7 @@ export function ArticleFeedback({
                 onClick={() => handleFeedback(false)}
                 disabled={isSubmitting}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg border",
+                  "flex items-center gap-2 px-4 py-2 rounded-none border",
                   isDark 
                     ? "border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300" 
                     : "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700",

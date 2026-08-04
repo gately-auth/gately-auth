@@ -140,7 +140,7 @@ export default function CategoryPageWrapper({
 
   const renderCategoryIcon = (iconName?: string | null) => {
     const icon = iconName || "hugeicons:folder-01";
-    return <Icon icon={icon} className="h-6 w-6" style={{ color: config.primary_color }} />;
+    return <Icon icon={icon} className="h-6 w-6" style={{ color: isDark ? '#ffffff' : '#000000' }} />;
   };
 
   return (
@@ -159,7 +159,7 @@ export default function CategoryPageWrapper({
         style={{ fontFamily: config.body_font || 'system-ui, sans-serif' }}
       >
       {/* Navigation Loading Bar */}
-      <NavigationLoadingBar primaryColor={config.primary_color} />
+      <NavigationLoadingBar primaryColor={isDark ? '#ffffff' : '#000000'} />
 
       {/* Header - persists across navigation */}
       <div data-astro-transition-persist="header">
@@ -249,7 +249,7 @@ export default function CategoryPageWrapper({
                       key={article.id}
                       href={articleUrl}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-xl border text-left group",
+                      "flex items-center gap-3 px-4 py-3 rounded-none border text-left group",
                       isDark
                         ? "bg-card border-zinc-800 hover:border-zinc-700"
                         : "bg-white border-zinc-100 hover:border-zinc-200 hover:shadow-sm"

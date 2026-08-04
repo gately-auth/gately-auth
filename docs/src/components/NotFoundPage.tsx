@@ -91,7 +91,7 @@ export default function NotFoundPage({
         className={cn('flex flex-col h-screen overflow-hidden bg-background text-foreground')}
         style={{ fontFamily: config.body_font || 'system-ui, sans-serif' }}
       >
-        <NavigationLoadingBar primaryColor={config.primary_color} />
+        <NavigationLoadingBar primaryColor={isDark ? '#ffffff' : '#000000'} />
 
         <div data-astro-transition-persist="header">
           <HelpCenterHeader
@@ -144,7 +144,7 @@ export default function NotFoundPage({
                 </p>
                 <a
                   href={getBasePath()}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border hover:bg-accent text-sm font-medium transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-card border border-border hover:bg-accent text-sm font-medium transition-colors"
                 >
                   <Icon icon="hugeicons:arrow-left-01" className="h-4 w-4" />
                   Go back home

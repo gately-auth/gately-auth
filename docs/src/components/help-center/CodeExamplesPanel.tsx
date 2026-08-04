@@ -104,7 +104,7 @@ export function CodeExamplesPanel({ content, isDark, primaryColor }: CodeExample
     <div className="space-y-4">
       {/* Request Examples */}
       {requestExamples.length > 0 && (
-        <div className={cn('rounded-xl border overflow-hidden', isDark ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white')}>
+        <div className={cn('rounded-none border overflow-hidden', isDark ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white')}>
           {/* Tabs */}
           <div className={cn('flex items-center border-b', isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-zinc-50')}>
             {requestExamples.map((example, idx) => (
@@ -139,7 +139,7 @@ export function CodeExamplesPanel({ content, isDark, primaryColor }: CodeExample
             <button
               onClick={() => navigator.clipboard?.writeText(requestExamples[activeRequestTab]?.code || '')}
               className={cn(
-                'absolute top-2 right-2 p-1.5 rounded-md transition-colors',
+                'absolute top-2 right-2 p-1.5 rounded-none transition-colors',
                 isDark ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-400' : 'bg-zinc-200 hover:bg-zinc-300 text-zinc-600'
               )}
               title="Copy code"
@@ -155,7 +155,7 @@ export function CodeExamplesPanel({ content, isDark, primaryColor }: CodeExample
 
       {/* Response Examples */}
       {responseExamples.length > 0 && (
-        <div className={cn('rounded-xl border overflow-hidden', isDark ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white')}>
+        <div className={cn('rounded-none border overflow-hidden', isDark ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white')}>
           {/* Tabs */}
           <div className={cn('flex items-center border-b', isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-zinc-50')}>
             {responseExamples.map((example, idx) => (
@@ -174,7 +174,7 @@ export function CodeExamplesPanel({ content, isDark, primaryColor }: CodeExample
               >
                 <span className="flex items-center gap-2">
                   <span
-                    className="px-1.5 py-0.5 rounded text-[10px] font-bold"
+                    className="px-1.5 py-0.5 rounded-none text-[10px] font-bold"
                     style={{
                       color: example.status.startsWith('2') ? '#16a34a' : '#dc2626',
                       background: example.status.startsWith('2') ? '#22c55e1a' : '#ef44441a',
@@ -201,7 +201,7 @@ export function CodeExamplesPanel({ content, isDark, primaryColor }: CodeExample
             <button
               onClick={() => navigator.clipboard?.writeText(responseExamples[activeResponseTab]?.code || '')}
               className={cn(
-                'absolute top-2 right-2 p-1.5 rounded-md transition-colors',
+                'absolute top-2 right-2 p-1.5 rounded-none transition-colors',
                 isDark ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-400' : 'bg-zinc-200 hover:bg-zinc-300 text-zinc-600'
               )}
               title="Copy code"

@@ -50,7 +50,7 @@ function MethodBadge({ method }: { method: string }) {
   const colors = METHOD_COLORS[method] || { bg: '#6b72801a', text: '#4b5563' };
   return (
     <span
-      className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md text-[10px] font-bold tracking-wide font-mono shrink-0"
+      className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-none text-[10px] font-bold tracking-wide font-mono shrink-0"
       style={{ background: colors.bg, color: colors.text }}
     >
       {method}
@@ -209,7 +209,7 @@ export function CustomApiReference({
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: primaryColor }} />
+          <div className="animate-spin rounded-none h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: isDark ? '#ffffff' : '#000000' }} />
           <p className={isDark ? 'text-zinc-400' : 'text-zinc-600'}>Loading API Reference...</p>
         </div>
       </div>
@@ -275,7 +275,7 @@ export function CustomApiReference({
                 return (
                   <div
                     key={key}
-                    className={`border rounded-xl overflow-hidden transition-all ${isDark ? 'border-zinc-800 hover:border-zinc-700' : 'border-zinc-200 hover:border-zinc-300'}`}
+                    className={`border rounded-none overflow-hidden transition-all ${isDark ? 'border-zinc-800 hover:border-zinc-700' : 'border-zinc-200 hover:border-zinc-300'}`}
                   >
                     {/* Endpoint header */}
                     <div className={`flex items-center gap-3 p-3.5 ${isDark ? 'bg-zinc-900/30' : 'bg-zinc-50/50'}`}>
@@ -305,8 +305,8 @@ export function CustomApiReference({
                           });
                           setTryItModal({ endpoint, baseUrl: spec?.servers?.[0]?.url || baseUrl });
                         }}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium text-white transition-all hover:opacity-90 shrink-0"
-                        style={{ backgroundColor: primaryColor }}
+                        className={`px-3 py-1.5 rounded-none text-xs font-medium transition-all hover:opacity-90 shrink-0 ${isDark ? 'text-black' : 'text-white'}`}
+                        style={{ backgroundColor: isDark ? '#ffffff' : '#000000' }}
                       >
                         Try It
                       </button>
@@ -329,11 +329,11 @@ export function CustomApiReference({
                               {endpoint.parameters.map((param: any, i: number) => (
                                 <div
                                   key={i}
-                                  className={`p-3 rounded-lg text-sm border ${isDark ? 'bg-zinc-800/50 border-zinc-700/50' : 'bg-zinc-50 border-zinc-200'}`}
+                                  className={`p-3 rounded-none text-sm border ${isDark ? 'bg-zinc-800/50 border-zinc-700/50' : 'bg-zinc-50 border-zinc-200'}`}
                                 >
                                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                                     <code className="text-sm font-mono font-medium">{param.name}</code>
-                                    <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-zinc-200 text-zinc-700'}`}>
+                                    <span className={`text-xs px-2 py-0.5 rounded-none font-medium ${isDark ? 'bg-zinc-700 text-zinc-300' : 'bg-zinc-200 text-zinc-700'}`}>
                                       {param.location}
                                     </span>
                                     <span className={`text-xs font-mono ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>
@@ -362,11 +362,11 @@ export function CustomApiReference({
                               {Object.entries(endpoint.responses).map(([code, response]: [string, any]) => (
                                 <div
                                   key={code}
-                                  className={`p-3 rounded-lg border ${isDark ? 'bg-zinc-800/50 border-zinc-700/50' : 'bg-zinc-50 border-zinc-200'}`}
+                                  className={`p-3 rounded-none border ${isDark ? 'bg-zinc-800/50 border-zinc-700/50' : 'bg-zinc-50 border-zinc-200'}`}
                                 >
                                   <div className="flex items-center gap-2 mb-1">
                                     <span
-                                      className="font-mono font-bold text-sm px-2 py-0.5 rounded-md"
+                                      className="font-mono font-bold text-sm px-2 py-0.5 rounded-none"
                                       style={{
                                         color: code.startsWith('2') ? '#22c55e' : code.startsWith('4') ? '#f59e0b' : '#ef4444',
                                         background: code.startsWith('2') ? '#22c55e1a' : code.startsWith('4') ? '#f59e0b1a' : '#ef44441a'

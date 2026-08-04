@@ -92,7 +92,7 @@ export function CopyDropdown({
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              "flex items-center h-[30px] rounded-xl border text-xs font-semibold shadow-sm hover:bg-accent focus:outline-none",
+              "flex items-center h-[30px] rounded-none border text-xs font-semibold shadow-sm hover:bg-accent focus:outline-none",
               isDark
                 ? 'bg-background border-border/50 text-foreground'
                 : 'bg-card border-border/50 text-foreground'
@@ -100,7 +100,7 @@ export function CopyDropdown({
           >
             {/* Left: direct copy action */}
             <div
-              className="flex items-center gap-2 px-3 h-full hover:bg-accent/60 rounded-l-xl transition-colors"
+              className="flex items-center gap-2 px-3 h-full hover:bg-accent/60 rounded-none transition-colors"
               onClick={(e) => { e.stopPropagation(); copyAsMarkdown(); }}
             >
               {showToast
@@ -110,14 +110,14 @@ export function CopyDropdown({
               <span>{showToast ? 'Copied!' : 'Copy as Markdown'}</span>
             </div>
             {/* Right: open dropdown */}
-            <div className="border-l px-2 h-full flex items-center border-border/50 hover:bg-accent/60 rounded-r-xl transition-colors">
+            <div className="border-l px-2 h-full flex items-center border-border/50 hover:bg-accent/60 rounded-none transition-colors">
               <Icon icon="hugeicons:arrow-down-01" className="h-3 w-3" />
             </div>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-80">
           <DropdownMenuItem onClick={copyAsMarkdown} className="flex items-center gap-2 p-1.5 cursor-pointer">
-            <div className="w-[30px] h-[30px] rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+            <div className="w-[30px] h-[30px] rounded-none bg-muted flex items-center justify-center flex-shrink-0">
               <Icon icon="hugeicons:copy-01" className="h-4 w-4" />
             </div>
             <div className="flex-1 text-left">
@@ -126,7 +126,7 @@ export function CopyDropdown({
           </DropdownMenuItem>
 
           <DropdownMenuItem onClick={viewFullPageMarkdown} className="flex items-center gap-2 p-1.5 cursor-pointer">
-            <div className="w-[30px] h-[30px] rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+            <div className="w-[30px] h-[30px] rounded-none bg-muted flex items-center justify-center flex-shrink-0">
               <Icon icon="hugeicons:file-view" className="h-4 w-4" />
             </div>
             <div className="flex-1 text-left">
@@ -136,7 +136,7 @@ export function CopyDropdown({
 
           {allArticles.length > 0 && (
             <DropdownMenuItem onClick={viewAllArticlesMarkdown} className="flex items-center gap-2 p-1.5 cursor-pointer">
-              <div className="w-[30px] h-[30px] rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+              <div className="w-[30px] h-[30px] rounded-none bg-muted flex items-center justify-center flex-shrink-0">
                 <Icon icon="hugeicons:file-02" className="h-4 w-4" />
               </div>
               <div className="flex-1 text-left">
@@ -152,7 +152,7 @@ export function CopyDropdown({
             }}
             className="flex items-center gap-2 p-1.5 cursor-pointer"
           >
-            <div className="w-[30px] h-[30px] rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+            <div className="w-[30px] h-[30px] rounded-none bg-muted flex items-center justify-center flex-shrink-0">
               <Icon icon="simple-icons:openai" className="h-4 w-4" />
             </div>
             <div className="flex-1 text-left flex items-center justify-between">
@@ -168,7 +168,7 @@ export function CopyDropdown({
             }}
             className="flex items-center gap-2 p-1.5 cursor-pointer"
           >
-            <div className="w-[30px] h-[30px] rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+            <div className="w-[30px] h-[30px] rounded-none bg-muted flex items-center justify-center flex-shrink-0">
               <Icon icon="hugeicons:claude" className="h-4 w-4" />
             </div>
             <div className="flex-1 text-left flex items-center justify-between">
@@ -181,7 +181,7 @@ export function CopyDropdown({
 
       {/* Toast for dropdown-triggered copy */}
       {showToast && (
-        <div className={`fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg text-sm font-medium z-50 ${
+        <div className={`fixed bottom-4 right-4 px-4 py-2 rounded-none shadow-lg text-sm font-medium z-50 ${
           isDark ? 'bg-zinc-800 text-white' : 'bg-white text-zinc-900 border border-zinc-200'
         }`}>
           Copied as Markdown ✓

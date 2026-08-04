@@ -111,7 +111,7 @@ export function SearchModal({
         onClick={onClose}
       />
       <div className={cn(
-        "relative w-full max-w-xl rounded-xl border shadow-2xl overflow-hidden",
+        "relative w-full max-w-xl rounded-none border shadow-2xl overflow-hidden",
         isDark ? "bg-zinc-900 border-zinc-800" : "bg-white border-zinc-200"
       )}>
         {/* Search Input */}
@@ -142,19 +142,19 @@ export function SearchModal({
               onClick={handleAskAI}
               disabled={!query.trim()}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-none text-xs font-medium",
                 query.trim()
-                  ? "text-white"
+                  ? isDark ? "text-black" : "text-white"
                   : isDark ? "bg-zinc-800 text-zinc-500" : "bg-zinc-100 text-zinc-400"
               )}
-              style={query.trim() ? { backgroundColor: primaryColor } : {}}
+              style={query.trim() ? { backgroundColor: isDark ? '#ffffff' : '#000000' } : {}}
             >
               <Icon icon="hugeicons:magic-wand-01" width={14} height={14} />
               Ask AI
             </button>
           )}
           <kbd className={cn(
-            "hidden sm:inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium",
+            "hidden sm:inline-flex items-center gap-1 px-2 py-1 rounded-none text-xs font-medium",
             isDark ? "bg-zinc-800 text-zinc-400" : "bg-zinc-100 text-zinc-500"
           )}>
             ESC
@@ -178,16 +178,16 @@ export function SearchModal({
                 <button
                   onClick={handleAskAI}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left mb-2",
+                    "w-full flex items-center gap-3 px-3 py-3 rounded-none text-left mb-2",
                     "border-2 border-dashed",
                     isDark ? "border-zinc-700 hover:bg-zinc-800 hover:border-zinc-600" : "border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300"
                   )}
                 >
                   <div
-                    className="p-1.5 rounded-lg"
-                    style={{ backgroundColor: `${primaryColor}20` }}
+                    className="p-1.5 rounded-none"
+                    style={{ backgroundColor: `${isDark ? '#ffffff' : '#000000'}20` }}
                   >
-                    <Icon icon="hugeicons:magic-wand-01" width={16} height={16} style={{ color: primaryColor }} />
+                    <Icon icon="hugeicons:magic-wand-01" width={16} height={16} style={{ color: isDark ? '#ffffff' : '#000000' }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className={cn("font-medium", isDark ? "text-white" : "text-zinc-900")}>
@@ -205,7 +205,7 @@ export function SearchModal({
                   key={article.id}
                   href={`${getBasePath()}/article/${article.slug}`}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left",
+                    "w-full flex items-center gap-3 px-3 py-3 rounded-none text-left",
                     isDark ? "hover:bg-zinc-800" : "hover:bg-zinc-50"
                   )}
                 >
@@ -226,8 +226,8 @@ export function SearchModal({
             <div className={cn("px-3 py-8 text-center", isDark ? "text-zinc-500" : "text-zinc-400")}>
               {isRedirectingToAI ? (
                 <>
-                  <div className="animate-spin mx-auto mb-3 w-8 h-8 border-2 border-current border-t-transparent rounded-full" style={{ borderColor: primaryColor, borderTopColor: 'transparent' }} />
-                  <p className="text-sm font-medium" style={{ color: primaryColor }}>
+                  <div className="animate-spin mx-auto mb-3 w-8 h-8 border-2 border-current border-t-transparent rounded-none" style={{ borderColor: isDark ? '#ffffff' : '#000000', borderTopColor: 'transparent' }} />
+                  <p className="text-sm font-medium" style={{ color: isDark ? '#ffffff' : '#000000' }}>
                     Asking AI about "{query}"...
                   </p>
                   <p className="text-xs mt-1">
@@ -242,9 +242,10 @@ export function SearchModal({
                     <button
                       onClick={handleAskAI}
                       className={cn(
-                        "mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white"
+                        "mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-none text-sm font-medium",
+                        isDark ? "text-black" : "text-white"
                       )}
-                      style={{ backgroundColor: primaryColor }}
+                      style={{ backgroundColor: isDark ? '#ffffff' : '#000000' }}
                     >
                       <Icon icon="hugeicons:magic-wand-01" width={16} height={16} />
                       Ask AI instead

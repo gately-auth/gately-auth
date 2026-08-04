@@ -54,7 +54,7 @@ export function CodeBlock({
         <div 
           className="border overflow-hidden dark:border-zinc-800"
           style={{ 
-            borderRadius: '12px',
+            borderRadius: '0px',
             backgroundColor: 'var(--code-block-bg)',
             borderColor: 'var(--code-block-border)'
           }}
@@ -77,7 +77,7 @@ export function CodeBlock({
             {showCopy && (
               <button
                 onClick={handleCopy}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all hover:bg-muted/50"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-none text-xs font-medium transition-all hover:bg-muted/50"
                 style={{ 
                   color: copied ? '#22c55e' : 'hsl(var(--muted-foreground))'
                 }}
@@ -122,7 +122,7 @@ export function InlineCode({ children, className }: InlineCodeProps) {
       <style dangerouslySetInnerHTML={{ __html: monoFontStyle }} />
       <code 
         className={cn(
-          "code-block-mono px-1.5 py-0.5 rounded text-[0.75em] bg-muted border border-border",
+          "code-block-mono px-1.5 py-0.5 rounded-none text-[0.75em] bg-muted border border-border",
           className
         )}
       >

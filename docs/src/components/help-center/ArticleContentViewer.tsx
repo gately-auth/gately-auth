@@ -38,7 +38,7 @@ function MethodBadge({ method, className }: { method: string; className?: string
   const colors = METHOD_COLORS[method.toUpperCase()] || { bg: '#6b72801a', text: '#4b5563', border: '#6b728040' };
   return (
     <span
-      className={cn('inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-bold tracking-wide font-mono shrink-0', className)}
+      className={cn('inline-flex items-center px-1.5 py-0.5 rounded-none text-[9px] font-bold tracking-wide font-mono shrink-0', className)}
       style={{ background: colors.bg, color: colors.text, border: `1px solid ${colors.border}` }}
     >
       {method.toUpperCase()}
@@ -728,16 +728,16 @@ export function ArticleContentViewer({
         .bn-viewer .bn-block-content.ProseMirror-selectednode > * {
           outline: none !important;
           box-shadow: none !important;
-          border-radius: inherit !important;
+          border-radius: 0px;
         }
-        /* Explicitly preserve rounded corners on custom blocks when their container gets selected */
+        /* Explicitly preserve rounded-none corners on custom blocks when their container gets selected */
         .bn-viewer .ProseMirror-selectednode [data-card],
         .bn-viewer .ProseMirror-selectednode [data-callout-type],
         .bn-viewer .ProseMirror-selectednode .callout-block,
         .bn-viewer .ProseMirror-selectednode details,
         .bn-viewer .ProseMirror-selectednode [data-tabs],
         .bn-viewer .ProseMirror-selectednode [data-accordion] {
-          border-radius: 1rem !important;
+          border-radius: 0px;
         }
 
         .bn-viewer [data-content-type="heading"] {
@@ -771,7 +771,7 @@ export function ArticleContentViewer({
           padding: 0.5rem 1.25rem !important;
           margin: 0 !important;
           background: ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'} !important;
-          border-radius: 0 0.75rem 0.75rem 0 !important;
+          border-radius: 0px;
           color: var(--muted-foreground) !important;
           font-style: italic !important;
           display: block !important;
@@ -792,7 +792,7 @@ export function ArticleContentViewer({
           height: 1rem !important;
           min-width: 1rem !important;
           border: 1.5px solid hsl(var(--border)) !important;
-          border-radius: 0.25rem !important;
+          border-radius: 0px;
           margin-top: 0.2rem !important;
           cursor: default !important;
           background: transparent !important;
@@ -822,13 +822,13 @@ export function ArticleContentViewer({
         }
         
         /* ── Code Block ── */
-        .bn-viewer [data-content-type="codeBlock"] { padding: 0 !important; background: transparent !important; border: none !important; border-radius: 0 !important; }
+        .bn-viewer [data-content-type="codeBlock"] { padding: 0 !important; background: transparent !important; border: none !important; border-radius: 0px; }
 
         .bn-viewer .code-block-wrapper {
           position: relative;
           margin: 1.25rem 0 !important;
           width: 100%;
-          border-radius: 0.75rem;
+          border-radius: 0px;
           overflow: hidden;
           border: 1px solid var(--code-block-border, hsl(var(--border)));
         }
@@ -860,7 +860,7 @@ export function ArticleContentViewer({
           padding: 0.25rem 0.625rem;
           background: transparent;
           border: 1px solid hsl(var(--border));
-          border-radius: 0.375rem;
+          border-radius: 0px;
           cursor: pointer;
           font-size: 0.6875rem;
           font-weight: 500;
@@ -884,7 +884,7 @@ export function ArticleContentViewer({
           margin: 0 !important;
           width: 100%;
           border: none !important;
-          border-radius: 0 !important;
+          border-radius: 0px;
         }
 
         .bn-viewer pre {
@@ -899,7 +899,7 @@ export function ArticleContentViewer({
           box-sizing: border-box;
         }
 
-        .bn-viewer code { font-family: ${mono} !important; background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75em; }
+        .bn-viewer code { font-family: ${mono} !important; background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); padding: 0.125rem 0.375rem; border-radius: 0px; font-size: 0.75em; }
         .bn-viewer pre code { background: none !important; border: none !important; padding: 0 !important; font-size: inherit !important; }
         
         /* Table styles - BlockNote renders tables with tbody only, no thead/th */
@@ -913,7 +913,7 @@ export function ArticleContentViewer({
           font-size: 0.8125rem !important; 
           margin: 1.5rem 0 !important; 
           border: 1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} !important;
-          border-radius: 0.5rem !important;
+          border-radius: 0px;
           overflow: hidden !important;
         }
         
@@ -975,7 +975,7 @@ export function ArticleContentViewer({
         .bn-viewer hr { border: none !important; border-top: 1px solid hsl(var(--border) / 0.3) !important; margin: 1.5rem 0 !important; }
         .bn-viewer ul { list-style-type: disc !important; padding-left: 1.5rem !important; margin: 1rem 0 !important; }
         .bn-viewer ol { list-style-type: decimal !important; padding-left: 1.5rem !important; margin: 1rem 0 !important; }
-        .bn-viewer img { border-radius: 0.75rem; border: 1px solid hsl(var(--border)); max-width: 100%; }
+        .bn-viewer img { border-radius: 0px; border: 1px solid hsl(var(--border)); max-width: 100%; }
         
         /* Hide image download button and toolbar in viewer - AGGRESSIVE */
         .bn-viewer [data-content-type="image"] button,
@@ -1010,7 +1010,7 @@ export function ArticleContentViewer({
         
         /* Force image border radius from props */
         .bn-viewer [data-image-block] img {
-          border-radius: inherit !important;
+          border-radius: 0px;
         }
         
         /* Global: Hide all download buttons and file toolbars */

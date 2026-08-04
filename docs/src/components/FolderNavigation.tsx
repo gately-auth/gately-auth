@@ -97,7 +97,7 @@ export function FolderNavigation({
       <button
         onClick={() => onFolderSelect(null)}
         className={cn(
-          "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0",
+          "flex items-center gap-2 px-3 py-2 rounded-none text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0",
           activeFolderId === null
             ? isDark
               ? "bg-zinc-800 text-white"
@@ -117,7 +117,7 @@ export function FolderNavigation({
           key={folder.id}
           onClick={() => handleFolderClick(folder)}
           className={cn(
-            "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0",
+            "flex items-center gap-2 px-3 py-2 rounded-none text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0",
             activeFolderId === folder.id
               ? isDark
                 ? "bg-zinc-800 text-white"

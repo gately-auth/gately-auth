@@ -17,7 +17,7 @@ function SidebarMethodBadge({ method }: { method: string }) {
   const colors = METHOD_COLORS[method] || { bg: '#6b72801a', text: '#4b5563' };
   return (
     <span
-      className="inline-flex items-center justify-center px-1.5 rounded text-[9px] font-bold tracking-wider font-mono shrink-0 h-4"
+      className="inline-flex items-center justify-center px-1.5 rounded-none text-[9px] font-bold tracking-wider font-mono shrink-0 h-4"
       style={{ background: colors.bg, color: colors.text }}
     >
       {method}
@@ -236,7 +236,7 @@ export function HelpCenterSidebar({
                 ? 'text-zinc-200 hover:text-zinc-100'
                 : 'text-zinc-800 hover:text-zinc-900'
             )}
-            style={isSelected && !selectedArticle ? { color: config.primary_color } : {}}
+            style={isSelected && !selectedArticle ? { color: isDark ? '#ffffff' : '#000000' } : {}}
           >
             {renderCategoryIcon(category.icon, 'sm')}
             <span className="truncate">{category.name}</span>
@@ -244,7 +244,7 @@ export function HelpCenterSidebar({
           <motion.button
             onClick={(e) => { e.preventDefault(); toggleCollapse(category.id); }}
             className={cn(
-              'ml-1 p-1 rounded-md w-5 h-5 flex items-center justify-center flex-shrink-0',
+              'ml-1 p-1 rounded-none w-5 h-5 flex items-center justify-center flex-shrink-0',
               isDark ? 'hover:bg-zinc-800 text-zinc-400' : 'hover:bg-zinc-100 text-zinc-500'
             )}
             whileHover={{ scale: 1.1 }}
@@ -299,7 +299,7 @@ export function HelpCenterSidebar({
                           ? 'text-zinc-400 hover:text-zinc-200'
                           : 'text-zinc-500 hover:text-zinc-800'
                       )}
-                      style={isActive ? { color: config.primary_color } : {}}
+                      style={isActive ? { color: isDark ? '#ffffff' : '#000000' } : {}}
                       whileHover={{ x: 2 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -360,7 +360,7 @@ export function HelpCenterSidebar({
                   ? 'text-zinc-400 hover:text-zinc-300'
                   : 'text-zinc-600 hover:text-zinc-700'
               )}
-              style={isSelected && !selectedArticle ? { color: config.primary_color } : {}}
+              style={isSelected && !selectedArticle ? { color: isDark ? '#ffffff' : '#000000' } : {}}
             >
               <span className="truncate">{category.name}</span>
             </button>
@@ -395,7 +395,7 @@ export function HelpCenterSidebar({
                       ? 'text-zinc-400 hover:text-zinc-200'
                       : 'text-zinc-500 hover:text-zinc-800'
                   )}
-                  style={isActive ? { color: config.primary_color } : {}}
+                  style={isActive ? { color: isDark ? '#ffffff' : '#000000' } : {}}
                   whileHover={{ x: 2 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -434,10 +434,10 @@ export function HelpCenterSidebar({
         className={cn(
           'flex items-center gap-2 text-sm font-medium',
           depth > 0 && 'ml-3',
-          sidebarStyle === 'compact' ? 'px-2 py-1.5 rounded-lg' : 'px-3 py-2 rounded-xl',
-          sidebarStyle === 'modern' && 'rounded-full',
-          sidebarStyle === 'cards' && 'rounded-xl shadow-sm border border-border/50',
-          sidebarStyle === 'floating' && 'rounded-xl shadow-md border border-border/50 bg-card',
+          sidebarStyle === 'compact' ? 'px-2 py-1.5 rounded-none' : 'px-3 py-2 rounded-none',
+          sidebarStyle === 'modern' && 'rounded-none',
+          sidebarStyle === 'cards' && 'rounded-none shadow-sm border border-border/50',
+          sidebarStyle === 'floating' && 'rounded-none shadow-md border border-border/50 bg-card',
           sidebarStyle === 'bordered' && 'rounded-none border-l-2 border-transparent',
           sidebarStyle === 'underline' && 'rounded-none border-b-2 border-transparent pb-3',
           isSelected
@@ -508,7 +508,7 @@ export function HelpCenterSidebar({
                     )}
                   >
                     <div className={cn(
-                      'flex items-center justify-center h-8 w-8 rounded-lg border flex-shrink-0',
+                      'flex items-center justify-center h-8 w-8 rounded-none border flex-shrink-0',
                       isDark ? 'border-zinc-700/60 bg-zinc-800/40' : 'border-zinc-200/80 bg-zinc-50/40'
                     )}>
                       <Icon icon={iconToUse} className="h-4 w-4" />
@@ -528,10 +528,10 @@ export function HelpCenterSidebar({
               href="/"
               className={cn(
                 'flex items-center gap-3 text-sm font-medium mb-4',
-                sidebarStyle === 'compact' ? 'px-2 py-1.5 rounded-lg' : 'px-3 py-2 rounded-xl',
-                sidebarStyle === 'modern' && 'rounded-full',
-                sidebarStyle === 'cards' && 'rounded-xl shadow-sm border border-border/50',
-                sidebarStyle === 'floating' && 'rounded-xl shadow-md border border-border/50 bg-card',
+                sidebarStyle === 'compact' ? 'px-2 py-1.5 rounded-none' : 'px-3 py-2 rounded-none',
+                sidebarStyle === 'modern' && 'rounded-none',
+                sidebarStyle === 'cards' && 'rounded-none shadow-sm border border-border/50',
+                sidebarStyle === 'floating' && 'rounded-none shadow-md border border-border/50 bg-card',
                 sidebarStyle === 'bordered' && 'rounded-none border-l-2 border-transparent',
                 sidebarStyle === 'underline' && 'rounded-none border-b-2 border-transparent pb-3',
                 !selectedCategory

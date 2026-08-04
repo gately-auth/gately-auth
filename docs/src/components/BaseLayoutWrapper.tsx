@@ -54,7 +54,7 @@ export function BaseLayoutWrapper({
             isOpen={aiChatOpen}
             onClose={onAiChatToggle}
             projectId={projectId}
-            primaryColor={config.primary_color}
+            primaryColor={isDark ? '#ffffff' : '#000000'}
             isDark={isDark}
             portalName={config.portal_name}
             subdomainUrl={config.subdomain_url}

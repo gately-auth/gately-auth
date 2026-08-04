@@ -15,10 +15,15 @@ interface CustomScalarReferenceProps {
 export function CustomScalarReference({
   projectId,
   isDark = false,
-  primaryColor = '#f04438',
+  primaryColor,
   headingFont,
   bodyFont,
 }: CustomScalarReferenceProps) {
+  // Resolve brand color from CSS variable at render time
+  const brand = typeof window !== 'undefined'
+    ? getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || (isDark ? '#ffffff' : '#000000')
+    : (isDark ? '#ffffff' : '#000000');
+  const resolvedColor = primaryColor || brand;
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,19 +65,19 @@ export function CustomScalarReference({
         customCss: `
         /* Gately Custom Styling */
         :root {
-          --scalar-color-1: ${primaryColor};
-          --scalar-color-2: ${primaryColor};
-          --scalar-color-3: ${primaryColor};
-          --scalar-color-accent: ${primaryColor};
+          --scalar-color-1: ${resolvedColor};
+          --scalar-color-2: ${resolvedColor};
+          --scalar-color-3: ${resolvedColor};
+          --scalar-color-accent: ${resolvedColor};
           
           /* Fonts */
           ${headingFont ? `--scalar-font-heading: ${headingFont}, system-ui, sans-serif;` : ''}
           ${bodyFont ? `--scalar-font: ${bodyFont}, system-ui, sans-serif;` : ''}
           
           /* Border radius */
-          --scalar-radius: 0.75rem;
-          --scalar-radius-lg: 1rem;
-          --scalar-radius-xl: 1.5rem;
+          --scalar-radius: 0px;
+          --scalar-radius: 0px;
+          --scalar-radius: 0px;
         }
         
         ${isDark ? `
@@ -81,7 +86,7 @@ export function CustomScalarReference({
             --scalar-background-1: #09090b;
             --scalar-background-2: #18181b;
             --scalar-background-3: #27272a;
-            --scalar-background-accent: ${primaryColor}15;
+            --scalar-background-accent: ${resolvedColor}15;
             
             --scalar-color-1: #fafafa;
             --scalar-color-2: #e4e4e7;
@@ -96,7 +101,7 @@ export function CustomScalarReference({
             --scalar-background-1: #ffffff;
             --scalar-background-2: #fafafa;
             --scalar-background-3: #f4f4f5;
-            --scalar-background-accent: ${primaryColor}10;
+            --scalar-background-accent: ${resolvedColor}10;
             
             --scalar-color-1: #09090b;
             --scalar-color-2: #18181b;
@@ -124,19 +129,19 @@ export function CustomScalarReference({
           font-weight: 700;
           font-size: 0.75rem;
           padding: 0.25rem 0.5rem;
-          border-radius: 0.375rem;
+          border-radius: 0px;
         }
         
         /* Request/Response panels */
         .scalar-card {
-          border-radius: var(--scalar-radius-lg);
+          border-radius: 0px;
           border: 1px solid var(--scalar-border-color);
         }
         
         /* Code blocks */
         .scalar-code-block,
         pre {
-          border-radius: var(--scalar-radius);
+          border-radius: 0px;
           font-family: 'Geist Mono', 'Monaco', 'Courier New', monospace;
         }
         
@@ -148,8 +153,8 @@ export function CustomScalarReference({
         /* Try it button */
         .scalar-button-primary,
         button[data-variant="solid"] {
-          background: ${primaryColor} !important;
-          border-radius: var(--scalar-radius);
+          background: ${resolvedColor} !important;
+          border-radius: 0px;
           font-weight: 600;
           transition: all 0.2s;
         }
@@ -162,7 +167,7 @@ export function CustomScalarReference({
         
         /* Search */
         .scalar-search-input {
-          border-radius: var(--scalar-radius);
+          border-radius: 0px;
           border: 1px solid var(--scalar-border-color);
         }
         
@@ -173,7 +178,7 @@ export function CustomScalarReference({
         
         /* Links */
         a {
-          color: ${primaryColor};
+          color: ${resolvedColor};
         }
         
         a:hover {
@@ -182,9 +187,9 @@ export function CustomScalarReference({
         
         /* Active sidebar item */
         .scalar-sidebar-item--active {
-          background: ${primaryColor}15;
-          color: ${primaryColor};
-          border-left: 2px solid ${primaryColor};
+          background: ${resolvedColor}15;
+          color: ${resolvedColor};
+          border-left: 2px solid ${resolvedColor};
         }
         
         /* Response status badges */
@@ -310,7 +315,7 @@ export function CustomScalarReference({
             <div className="mb-8">
               <svg
                 className="w-16 h-16 mx-auto mb-4 animate-pulse"
-                style={{ color: primaryColor }}
+                style={{ color: isDark ? '#ffffff' : '#000000' }}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -331,7 +336,7 @@ export function CustomScalarReference({
             </div>
             
             <div className="animate-pulse">
-              <div className={`h-2 rounded-full w-48 mx-auto ${isDark ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
+              <div className={`h-2 rounded-none w-48 mx-auto ${isDark ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
             </div>
           </div>
         </div>
@@ -339,3 +344,4 @@ export function CustomScalarReference({
     </div>
   );
 }
+

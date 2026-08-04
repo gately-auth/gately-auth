@@ -5,13 +5,13 @@
 export const helpCenterConfig = {
   // Branding
   portal_name: 'Gately Auth',
-  primary_color: '#111827',
-  secondary_color: '#374151',
+  primary_color: '#000000',
+  secondary_color: '#000000',
   welcome_title: 'Gately Auth Docs',
   welcome_subtitle: 'Cloudflare-native authentication for Workers. D1 + KV + email in minutes.',
   theme_mode: 'auto' as 'light' | 'dark' | 'auto',
-  logo_url: null as string | null,
-  favicon_url: null as string | null,
+  logo_url: '/Logo-nvc.png' as string | null,
+  favicon_url: '/Logo-nvc.png' as string | null,
 
   // Layout
   show_search: true,
@@ -42,4 +42,5 @@ export const helpCenterConfig = {
 
   // Misc
   sub_path: null as string | null,
+  github_repo: 'https://github.com/gately-auth/gately-auth' as string | null,
 };

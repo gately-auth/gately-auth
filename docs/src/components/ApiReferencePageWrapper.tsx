@@ -139,7 +139,7 @@ export function ApiReferencePageWrapper({
         style={{ fontFamily: config.body_font || 'system-ui, sans-serif' }}
       >
         {/* Navigation Loading Bar */}
-        <NavigationLoadingBar primaryColor={config.primary_color} />
+        <NavigationLoadingBar primaryColor={isDark ? '#ffffff' : '#000000'} />
 
         {/* Header */}
         <div data-astro-transition-persist="header" style={{ backgroundColor: 'transparent' }}>
@@ -198,7 +198,7 @@ export function ApiReferencePageWrapper({
           articles={allArticles}
           categories={categories}
           isDark={isDark}
-          primaryColor={config.primary_color}
+          primaryColor={isDark ? '#ffffff' : '#000000'}
         />
       </div>
     </BaseLayoutWrapper>

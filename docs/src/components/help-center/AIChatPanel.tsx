@@ -416,10 +416,10 @@ export function AIChatPanel({
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-                  className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                  style={{ backgroundColor: `${primaryColor}15` }}
+                  className="w-16 h-16 rounded-none flex items-center justify-center mb-4"
+                  style={{ backgroundColor: `${isDark ? '#ffffff' : '#000000'}15` }}
                 >
-                  <Icon icon="hugeicons:magic-wand-01" className="h-8 w-8" style={{ color: primaryColor }} />
+                  <Icon icon="hugeicons:magic-wand-01" className="h-8 w-8" style={{ color: isDark ? '#ffffff' : '#000000' }} />
                 </motion.div>
                 <motion.h3 
                   initial={{ opacity: 0, y: 10 }}
@@ -451,10 +451,13 @@ export function AIChatPanel({
                   >
                     <div className={cn(
                       message.role === 'user' 
-                        ? "max-w-[85%] rounded-xl px-3 py-2 text-white break-words"
-                        : "w-full max-w-full rounded-xl px-3 py-2 text-foreground overflow-hidden"
+                        ? "max-w-[85%] rounded-none px-3 py-2 break-words"
+                        : "w-full max-w-full rounded-none px-3 py-2 text-foreground overflow-hidden"
                     )}
-                    style={message.role === 'user' ? { backgroundColor: primaryColor } : {}}
+                    style={message.role === 'user' ? {
+                      backgroundColor: isDark ? '#ffffff' : '#000000',
+                      color: isDark ? '#000000' : '#ffffff',
+                    } : {}}
                     >
                       {message.role === 'assistant' ? (
                         <div className="w-full">
@@ -467,7 +470,7 @@ export function AIChatPanel({
                             >
                               <Accordion type="single" collapsible className="w-full">
                                 <AccordionItem value="search-results" className="border-0">
-                                  <AccordionTrigger className="flex items-center gap-2 text-xs text-muted-foreground p-3 w-full hover:bg-muted/50 transition-colors rounded-2xl border border-border/50 bg-card hover:no-underline [&[data-state=open]>svg]:rotate-180">
+                                  <AccordionTrigger className="flex items-center gap-2 text-xs text-muted-foreground p-3 w-full hover:bg-muted/50 transition-colors rounded-none border border-border/50 bg-card hover:no-underline [&[data-state=open]>svg]:rotate-180">
                                     <div className="flex items-center gap-2 flex-1 min-w-0">
                                       <Icon icon="hugeicons:search-01" className="h-4 w-4 text-green-500 flex-shrink-0" />
                                       <Icon icon="hugeicons:checkmark-01" className="h-3 w-3 text-green-500 flex-shrink-0" />
@@ -486,8 +489,8 @@ export function AIChatPanel({
                                         >
                                           <a
                                             href={getArticleUrl(article.slug)}
-                                            className="flex items-start gap-1.5 p-2 text-xs w-full min-w-0 group hover:bg-muted/30 rounded-lg transition-colors"
-                                            style={{ color: primaryColor }}
+                                            className="flex items-start gap-1.5 p-2 text-xs w-full min-w-0 group hover:bg-muted/30 rounded-none transition-colors"
+                                            style={{ color: isDark ? '#ffffff' : '#000000' }}
                                           >
                                             <Icon icon="hugeicons:file-02" className="h-2.5 w-2.5 flex-shrink-0 mt-0.5" />
                                             <span 
@@ -522,7 +525,7 @@ export function AIChatPanel({
                         table({ children }) {
                           return (
                             <div className="overflow-x-auto my-4">
-                              <table className="min-w-full border-collapse border border-border rounded-lg">
+                              <table className="min-w-full border-collapse border border-border rounded-none">
                                 {children}
                               </table>
                             </div>
@@ -552,7 +555,7 @@ export function AIChatPanel({
                         blockquote({ children }) {
                           return (
                             <blockquote 
-                              className="border-l-4 pl-4 py-3 my-4 bg-muted/20 rounded-r-lg"
+                              className="border-l-4 pl-4 py-3 my-4 bg-muted/20 rounded-none"
                               style={{ borderLeftColor: primaryColor }}
                             >
                               <div className="text-foreground/90 italic leading-relaxed">
@@ -619,7 +622,7 @@ export function AIChatPanel({
                               target="_blank" 
                               rel="noopener noreferrer"
                               className="hover:underline inline-flex items-center gap-1 font-medium"
-                              style={{ color: primaryColor }}
+                              style={{ color: isDark ? '#ffffff' : '#000000' }}
                             >
                               {children}
                               <Icon icon="hugeicons:link-square-02" className="h-3 w-3" />
@@ -640,7 +643,7 @@ export function AIChatPanel({
                               <a
                                 href={getArticleUrl(link.slug)}
                                 className="text-sm hover:underline"
-                                style={{ color: primaryColor }}
+                                style={{ color: isDark ? '#ffffff' : '#000000' }}
                               >
                                 {link.title}
                               </a>
@@ -721,7 +724,7 @@ export function AIChatPanel({
           
           {isLoading && (
             <div className="flex w-full">
-              <div className="rounded-xl px-3 py-1.5 bg-card border border-border/50 w-full">
+              <div className="rounded-none px-3 py-1.5 bg-card border border-border/50 w-full">
                 <div className="flex items-center gap-2">
                   <Icon 
                     icon={
@@ -733,7 +736,7 @@ export function AIChatPanel({
                       "h-3.5 w-3.5",
                       (!shouldShowSteps || loadingStage === 'thinking') ? "animate-spin" : "animate-pulse"
                     )} 
-                    style={{ color: primaryColor }} 
+                    style={{ color: isDark ? '#ffffff' : '#000000' }} 
                   />
                   <span className="text-xs text-muted-foreground">
                     {!shouldShowSteps ? 'Responding...' :
