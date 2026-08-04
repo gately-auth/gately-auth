@@ -8,6 +8,10 @@ allowBuilds:
   sharp: true
   workerd: true
   rollup: true
+  '@rollup/rollup-linux-arm64-gnu': true
+  '@rollup/rollup-linux-arm64-musl': true
+  '@rollup/rollup-linux-x64-gnu': true
+  '@rollup/rollup-linux-x64-musl': true
 
 # Tell pnpm to include Linux x64 native binaries in lockfile
 # even when generated on Windows/macOS — needed for CF Pages CI
