@@ -1,0 +1,719 @@
+---
+export const prerender = false;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gately Auth — Auth for Cloudflare Workers</title>
+  <meta name="description" content="D1 + KV + Workers. Production-grade email, magic links, OTP, and OAuth — no Node.js required." />
+  <style>
+    @font-face {
+      font-family: 'Geist Mono';
+      src: url('/Geist_Mono/GeistMono-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background-color: #0a0a0a;
+      color: #ffffff;
+      font-family: 'Geist Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Nav ── */
+    nav {
+      border-bottom: 1px solid #1a1a1a;
+      position: sticky;
+      top: 0;
+      background: #0a0a0a;
+      z-index: 50;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+    }
+
+    .nav-logo {
+      font-family: 'Geist Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-link {
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      color: #a1a1aa;
+      text-transform: uppercase;
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+    }
+
+    .nav-cta {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #ffffff;
+      color: #0a0a0a;
+      padding: 8px 16px;
+      border: none;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .nav-cta:hover {
+      background: #e4e4e7;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 96px 0 80px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #a1a1aa;
+      border: 1px solid #27272a;
+      padding: 5px 12px;
+      margin-bottom: 32px;
+    }
+
+    .hero-badge:hover {
+      border-color: #3f3f46;
+      color: #d4d4d8;
+    }
+
+    h1 {
+      font-family: 'Geist Mono', monospace;
+      font-size: clamp(36px, 6vw, 68px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      line-height: 1.05;
+      color: #ffffff;
+      margin-bottom: 20px;
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: #a1a1aa;
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+
+    .btn-primary {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #ffffff;
+      color: #0a0a0a;
+      padding: 11px 22px;
+      display: inline-block;
+      border: 1px solid #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: #e4e4e7;
+    }
+
+    .btn-secondary {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: transparent;
+      color: #a1a1aa;
+      padding: 11px 22px;
+      display: inline-block;
+      border: 1px solid #27272a;
+    }
+
+    .btn-secondary:hover {
+      border-color: #3f3f46;
+      color: #ffffff;
+    }
+
+    .npm-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #111111;
+      border: 1px solid #1e1e1e;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #71717a;
+    }
+
+    .npm-badge code {
+      color: #e4e4e7;
+      font-family: 'Geist Mono', monospace;
+    }
+
+    .npm-badge .dollar {
+      color: #3f3f46;
+    }
+
+    /* ── Code block ── */
+    .code-section {
+      padding: 64px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #52525b;
+      margin-bottom: 20px;
+    }
+
+    .code-block {
+      background: #0f0f0f;
+      border: 1px solid #1a1a1a;
+      overflow-x: auto;
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid #1a1a1a;
+      background: #0d0d0d;
+    }
+
+    .code-block-filename {
+      font-size: 11px;
+      color: #52525b;
+      letter-spacing: 0.06em;
+    }
+
+    .code-block-lang {
+      font-size: 10px;
+      color: #3f3f46;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    pre {
+      padding: 24px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .tok-import  { color: #71717a; }
+    .tok-from    { color: #71717a; }
+    .tok-func    { color: #e4e4e7; }
+    .tok-kw      { color: #a1a1aa; }
+    .tok-str     { color: #d4d4d8; }
+    .tok-key     { color: #e4e4e7; }
+    .tok-comment { color: #3f3f46; }
+    .tok-type    { color: #a1a1aa; }
+    .tok-punc    { color: #52525b; }
+
+    /* ── Features ── */
+    .features-section {
+      padding: 72px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .section-heading {
+      font-family: 'Geist Mono', monospace;
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .section-sub {
+      font-size: 14px;
+      color: #71717a;
+      margin-bottom: 48px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: #1a1a1a;
+      border: 1px solid #1a1a1a;
+    }
+
+    .feature-card {
+      background: #0a0a0a;
+      padding: 28px 28px 24px;
+    }
+
+    .feature-card:hover {
+      background: #0f0f0f;
+    }
+
+    .feature-num {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: #3f3f46;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .feature-title {
+      font-family: 'Geist Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #e4e4e7;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 13px;
+      color: #52525b;
+      line-height: 1.65;
+    }
+
+    /* ── How it works ── */
+    .how-section {
+      padding: 72px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: #1a1a1a;
+      border: 1px solid #1a1a1a;
+      margin-top: 48px;
+    }
+
+    .step {
+      background: #0a0a0a;
+      padding: 32px 28px;
+    }
+
+    .step-num {
+      font-family: 'Geist Mono', monospace;
+      font-size: 28px;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .step-title {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #e4e4e7;
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: #52525b;
+      line-height: 1.65;
+    }
+
+    /* ── Frameworks ── */
+    .frameworks-section {
+      padding: 56px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .frameworks-label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #3f3f46;
+      margin-bottom: 20px;
+    }
+
+    .frameworks-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .fw-badge {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #71717a;
+      border: 1px solid #1e1e1e;
+      padding: 6px 14px;
+      background: #0d0d0d;
+    }
+
+    /* ── Packages ── */
+    .packages-section {
+      padding: 72px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .packages-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: #1a1a1a;
+      border: 1px solid #1a1a1a;
+      margin-top: 48px;
+    }
+
+    .package-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      background: #0a0a0a;
+      padding: 24px 28px;
+    }
+
+    .package-row:hover {
+      background: #0f0f0f;
+    }
+
+    .package-name {
+      font-family: 'Geist Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: #e4e4e7;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .package-desc {
+      font-size: 13px;
+      color: #52525b;
+      flex: 1;
+      text-align: right;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid #1a1a1a;
+      padding: 40px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: #3f3f46;
+      letter-spacing: 0.04em;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .footer-link {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #3f3f46;
+    }
+
+    .footer-link:hover {
+      color: #71717a;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .nav-links {
+        gap: 16px;
+      }
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      .steps {
+        grid-template-columns: 1fr;
+      }
+      .package-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .package-desc {
+        text-align: left;
+      }
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-link:not(:last-child) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <div class="container">
+      <div class="nav-inner">
+        <a href="/" class="nav-logo">Gately Auth</a>
+        <div class="nav-links">
+          <a href="/article/quick-start" class="nav-link">Docs</a>
+          <a href="https://github.com/gately-auth/gately-auth" class="nav-link" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://www.npmjs.com/package/@gately/auth-core" class="nav-link" target="_blank" rel="noopener">npm</a>
+          <a href="/article/quick-start" class="nav-cta">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="container">
+      <a href="https://www.npmjs.com/package/@gately/auth-core" class="hero-badge" target="_blank" rel="noopener">
+        Now on npm →
+      </a>
+      <h1>Auth for Cloudflare<br />Workers.</h1>
+      <p class="hero-sub">
+        D1 + KV + Workers. Production-grade email, magic links, OTP, and OAuth — no Node.js required.
+      </p>
+      <div class="hero-actions">
+        <a href="/article/quick-start" class="btn-primary">Read the Docs</a>
+        <a href="https://github.com/gately-auth/gately-auth" class="btn-secondary" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+      <div class="npm-badge">
+        <span class="dollar">$</span>
+        <code>npm install @gately/auth-core</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CODE SNIPPET ── -->
+  <section class="code-section">
+    <div class="container">
+      <p class="section-label">Quick start</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-filename">src/auth.ts</span>
+          <span class="code-block-lang">TypeScript</span>
+        </div>
+        <pre><code><span class="tok-import">import</span> <span style="color:#e4e4e7">{ gatelyAuth }</span> <span class="tok-import">from</span> <span class="tok-str">'@gately/auth-core'</span>
+<span class="tok-import">import</span> <span style="color:#e4e4e7">{ createD1Adapter, createKVStore }</span> <span class="tok-import">from</span> <span class="tok-str">'@gately/auth-core/adapters'</span>
+<span class="tok-import">import</span> <span style="color:#e4e4e7">{ gatelyEmail }</span> <span class="tok-import">from</span> <span class="tok-str">'@gately/auth-core/plugins'</span>
+
+<span class="tok-kw">export function</span> <span style="color:#ffffff">createAuth</span><span class="tok-punc">(</span><span style="color:#e4e4e7">env</span><span class="tok-punc">:</span> <span class="tok-type">Env</span><span class="tok-punc">) {</span>
+  <span class="tok-kw">return</span> <span style="color:#ffffff">gatelyAuth</span><span class="tok-punc">({</span>
+    <span class="tok-key">secret</span><span class="tok-punc">:</span> <span style="color:#e4e4e7">env</span><span class="tok-punc">.</span><span style="color:#a1a1aa">AUTH_SECRET</span><span class="tok-punc">,</span>
+    <span class="tok-key">db</span><span class="tok-punc">:</span> <span style="color:#ffffff">createD1Adapter</span><span class="tok-punc">(</span><span style="color:#e4e4e7">env</span><span class="tok-punc">.</span><span style="color:#a1a1aa">AUTH_DB</span><span class="tok-punc">),</span>
+    <span class="tok-key">kv</span><span class="tok-punc">:</span> <span style="color:#ffffff">createKVStore</span><span class="tok-punc">(</span><span style="color:#e4e4e7">env</span><span class="tok-punc">.</span><span style="color:#a1a1aa">AUTH_KV</span><span class="tok-punc">),</span>
+    <span class="tok-key">emailAndPassword</span><span class="tok-punc">:</span> <span class="tok-punc">{</span> <span class="tok-key">enabled</span><span class="tok-punc">:</span> <span class="tok-kw">true</span> <span class="tok-punc">},</span>
+    <span class="tok-key">plugins</span><span class="tok-punc">:</span> <span class="tok-punc">[</span><span style="color:#ffffff">gatelyEmail</span><span class="tok-punc">({</span> <span class="tok-key">apiKey</span><span class="tok-punc">:</span> <span style="color:#e4e4e7">env</span><span class="tok-punc">.</span><span style="color:#a1a1aa">GATELY_API_KEY</span> <span class="tok-punc">})],</span>
+  <span class="tok-punc">})</span>
+<span class="tok-punc">}</span></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ── -->
+  <section class="features-section">
+    <div class="container">
+      <h2 class="section-heading">Everything you need.</h2>
+      <p class="section-sub">All auth primitives built for the Workers runtime.</p>
+      <div class="features-grid">
+
+        <div class="feature-card">
+          <p class="feature-num">01</p>
+          <p class="feature-title">Email + Password</p>
+          <p class="feature-desc">Sign up, sign in, email verification, and password reset — all handled out of the box.</p>
+        </div>
+
+        <div class="feature-card">
+          <p class="feature-num">02</p>
+          <p class="feature-title">Magic Links</p>
+          <p class="feature-desc">Passwordless sign-in via time-limited email links. Zero friction for your users.</p>
+        </div>
+
+        <div class="feature-card">
+          <p class="feature-num">03</p>
+          <p class="feature-title">Email OTP</p>
+          <p class="feature-desc">6-digit codes for sign-in or 2FA flows. Works anywhere email delivery is available.</p>
+        </div>
+
+        <div class="feature-card">
+          <p class="feature-num">04</p>
+          <p class="feature-title">OAuth / Social</p>
+          <p class="feature-desc">Google, GitHub, and any OAuth 2.0 provider with PKCE. Configurable in one object.</p>
+        </div>
+
+        <div class="feature-card">
+          <p class="feature-num">05</p>
+          <p class="feature-title">Plugin System</p>
+          <p class="feature-desc">Extend with custom endpoints, schema fields, and lifecycle hooks. No forks required.</p>
+        </div>
+
+        <div class="feature-card">
+          <p class="feature-num">06</p>
+          <p class="feature-title">Rate Limiting</p>
+          <p class="feature-desc">Built-in per-route rate limiting using Cloudflare KV. Protects every auth endpoint.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section class="how-section">
+    <div class="container">
+      <h2 class="section-heading">How it works.</h2>
+      <p class="section-sub">Three steps from install to production.</p>
+      <div class="steps">
+
+        <div class="step">
+          <p class="step-num">01</p>
+          <p class="step-title">Create your auth instance</p>
+          <p class="step-desc">Pass your D1 database and KV namespace bindings. One function call, fully typed.</p>
+        </div>
+
+        <div class="step">
+          <p class="step-num">02</p>
+          <p class="step-title">Mount the handler</p>
+          <p class="step-desc">Route <code style="color:#a1a1aa;font-size:12px;">/auth/*</code> to Gately in your Worker's fetch handler. Works with Hono, plain Workers, or any router.</p>
+        </div>
+
+        <div class="step">
+          <p class="step-num">03</p>
+          <p class="step-title">Use the client SDK</p>
+          <p class="step-desc">Drop <code style="color:#a1a1aa;font-size:12px;">@gately/auth-client</code> into your frontend for typed hooks and session management.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FRAMEWORKS ── -->
+  <section class="frameworks-section">
+    <div class="container">
+      <p class="frameworks-label">Works with your stack</p>
+      <div class="frameworks-row">
+        <span class="fw-badge">Hono</span>
+        <span class="fw-badge">Next.js</span>
+        <span class="fw-badge">SvelteKit</span>
+        <span class="fw-badge">Remix</span>
+        <span class="fw-badge">Astro</span>
+        <span class="fw-badge">React</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PACKAGES ── -->
+  <section class="packages-section">
+    <div class="container">
+      <h2 class="section-heading">The packages.</h2>
+      <p class="section-sub">A focused set of packages — nothing more, nothing less.</p>
+      <div class="packages-list">
+
+        <div class="package-row">
+          <span class="package-name">@gately/auth-core</span>
+          <span class="package-desc">The Worker handler, D1/KV adapters, all auth providers</span>
+        </div>
+
+        <div class="package-row">
+          <span class="package-name">@gately/auth-client</span>
+          <span class="package-desc">Browser client with React hooks and session management</span>
+        </div>
+
+        <div class="package-row">
+          <span class="package-name">@gately/auth-cli</span>
+          <span class="package-desc">CLI to scaffold, migrate, and deploy your auth setup</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <p class="footer-copy">Built for the Cloudflare Workers platform.</p>
+        <div class="footer-links">
+          <a href="/article/quick-start" class="footer-link">Docs</a>
+          <a href="https://github.com/gately-auth/gately-auth" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://www.npmjs.com/package/@gately/auth-core" class="footer-link" target="_blank" rel="noopener">npm</a>
+          <a href="https://usegately.com" class="footer-link" target="_blank" rel="noopener">usegately.com</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+---
+export const prerender = false;
+
+import { getArticles, getCategories, getHelpCenterConfig, getFaqs, getFolders } from '../lib/localData';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HelpCenterHome from '../components/HelpCenterHome';
+
+const [articles, categories, faqs, config, folders] = await Promise.all([
+  getArticles(), getCategories(), getFaqs(), getHelpCenterConfig(), getFolders(),
+]);
+const projectId = 'local';
+---
+
+<BaseLayout
+  title={`${config.portal_name} | ${config.meta_title || 'Help Center'}`}
+  description={config.meta_description || config.welcome_subtitle}
+  config={config}
+  projectId={projectId}
+  ogImage={config.og_image_url ?? undefined}
+  ogType="website"
+>
+  <HelpCenterHome
+    client:only="react"
+    config={config}
+    articles={articles}
+    categories={categories}
+    faqs={faqs}
+    projectId={projectId}
+  />
+</BaseLayout>

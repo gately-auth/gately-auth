@@ -1,45 +1,876 @@
 ---
-// Force server-side rendering for dynamic subdomain support
 export const prerender = false;
 
-// Custom domains use this page directly
-// Subdomains get redirected to /help by middleware
-import { getArticles, getCategories, getHelpCenterConfig, getFaqs, getFolders } from '../lib/localData';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import HelpCenterHome from '../components/HelpCenterHome';
+const authCode = `<span class="t-dim">import</span> <span class="t-w">&#123; gatelyAuth &#125;</span> <span class="t-dim">from</span> <span class="t-s">'@gately/auth-core'</span>
+<span class="t-dim">import</span> <span class="t-w">&#123; createD1Adapter, createKVStore &#125;</span> <span class="t-dim">from</span> <span class="t-s">'@gately/auth-core/adapters'</span>
+<span class="t-dim">import</span> <span class="t-w">&#123; gatelyEmail &#125;</span> <span class="t-dim">from</span> <span class="t-s">'@gately/auth-core/plugins'</span>
 
-const [articles, categories, faqs, config, folders] = await Promise.all([
-  getArticles(),
-  getCategories(),
-  getFaqs(),
-  getHelpCenterConfig(),
-  getFolders(),
-]);
+<span class="t-dim">export function</span> <span class="t-w">createAuth</span><span class="t-p">(env: Env) &#123;</span>
+  <span class="t-dim">return</span> <span class="t-w">gatelyAuth</span><span class="t-p">(&#123;</span>
+    <span class="t-k">secret</span><span class="t-p">:</span> <span class="t-g">env.AUTH_SECRET,</span>
+    <span class="t-k">db</span><span class="t-p">:</span> <span class="t-w">createD1Adapter</span><span class="t-p">(</span><span class="t-g">env.AUTH_DB</span><span class="t-p">),</span>
+    <span class="t-k">kv</span><span class="t-p">:</span> <span class="t-w">createKVStore</span><span class="t-p">(</span><span class="t-g">env.AUTH_KV</span><span class="t-p">),</span>
+    <span class="t-k">emailAndPassword</span><span class="t-p">: &#123;</span> <span class="t-k">enabled</span><span class="t-p">:</span> <span class="t-dim">true</span> <span class="t-p">&#125;,</span>
+    <span class="t-k">plugins</span><span class="t-p">: [</span><span class="t-w">gatelyEmail</span><span class="t-p">(&#123;</span> <span class="t-k">apiKey</span><span class="t-p">:</span> <span class="t-g">env.GATELY_API_KEY</span> <span class="t-p">&#125;)],</span>
+  <span class="t-p">&#125;)</span>
+<span class="t-p">&#125;</span>`;
 
-const projectId = 'local';
+const workerCode = `<span class="t-dim">import</span> <span class="t-w">&#123; createAuth &#125;</span> <span class="t-dim">from</span> <span class="t-s">'./auth'</span>
 
-// The default folder is the one marked is_default — its categories show on the root page
-const defaultFolder = folders.find((f: any) => f.is_default) || folders[0] || null;
+<span class="t-dim">export default</span> <span class="t-p">&#123;</span>
+  <span class="t-dim">async</span> <span class="t-w">fetch</span><span class="t-p">(req: Request, env: Env) &#123;</span>
+    <span class="t-dim">const</span> <span class="t-w">auth</span> <span class="t-p">=</span> <span class="t-w">createAuth</span><span class="t-p">(env)</span>
+
+    <span class="t-dim">// Mount all /auth/* routes</span>
+    <span class="t-dim">return</span> <span class="t-w">auth</span><span class="t-p">.</span><span class="t-w">handler</span><span class="t-p">(req)</span>
+  <span class="t-p">&#125;,</span>
+<span class="t-p">&#125;</span>
+
+<span class="t-dim">// Protect any route server-side</span>
+<span class="t-dim">const</span> <span class="t-w">session</span> <span class="t-p">=</span> <span class="t-dim">await</span> <span class="t-w">auth</span><span class="t-p">.</span><span class="t-w">api</span><span class="t-p">.</span><span class="t-w">getSession</span><span class="t-p">(req)</span>
+<span class="t-dim">if</span> <span class="t-p">(!</span><span class="t-w">session</span><span class="t-p">)</span> <span class="t-dim">return new</span> <span class="t-w">Response</span><span class="t-p">(</span><span class="t-s">'401'</span><span class="t-p">, &#123;</span> <span class="t-k">status</span><span class="t-p">: 401 &#125;)</span>`;
 ---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gately Auth — Auth for Cloudflare Workers</title>
+  <meta name="description" content="Production-grade auth for Cloudflare Workers. D1 + KV + email/password, magic links, OTP, OAuth." />
+  <link rel="icon" type="image/png" href="/Logo-nvc.png" />
+  <style>
+    @font-face {
+      font-family: 'Geist Mono';
+      src: url('/Geist_Mono/GeistMono-VariableFont_wght.ttf') format('truetype-variations');
+      font-weight: 100 900; font-style: normal; font-display: swap;
+    }
+    @import url('https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700;800;900&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: #000; color: #fff;
+      font-family: 'Onest', system-ui, sans-serif;
+      font-size: 14px; line-height: 1.6;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    /* Geist Mono — nav, buttons, labels, code */
+    .nav-link, .nav-cta, .nav-logo,
+    .btn, .stag, .itab, .copy-btn, .itab.active,
+    .hero-badge, .hero-sub, .ss, .prompt-label, .prompt-tag,
+    .fw-tag, .fwt, .pkgd, .fc, .fl, .ft, .fn, .pt, .cs-soon, .cs-title,
+    pre, code, kbd, samp {
+      font-family: 'Geist Mono', ui-monospace, Menlo, Consolas, monospace;
+    }
+    /* Onest — headings, body descriptions */
+    .sh, .sd, .fi .fd, .pi .pd, .hero-sub-body, h2, h3 {
+      font-family: 'Onest', system-ui, sans-serif;
+    }
+    #noise-canvas {
+      position: fixed; inset: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 0; opacity: 0.04; mix-blend-mode: screen;
+    }
+    nav, section, footer { position: relative; z-index: 1; width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    .c { width: 100%; padding: 0 48px; }
+    .bd { border-bottom: 1px solid #111; }
 
-<BaseLayout 
-  title={`${config.portal_name} | ${config.meta_title || 'Help Center'}`}
-  description={config.meta_description || config.welcome_subtitle}
-  config={config}
-  projectId={projectId}
-  folders={folders}
-  ogImage={config.og_image_url ?? undefined}
-  ogType="website"
->
-  <HelpCenterHome
-    client:only="react"
-    transition:persist="help-center-home"
-    config={config}
-    articles={articles}
-    categories={categories}
-    folders={folders}
-    faqs={faqs}
-    projectId={projectId}
-    initialFolderId={defaultFolder?.id}
-  />
-</BaseLayout>
+    /* LAYOUT WRAPPER — all content constrained with left/right borders */
+    #layout {
+      max-width: 1400px;
+      margin: 0 auto;
+      border-left: 1px solid #111;
+      border-right: 1px solid #111;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+    /* Remove the pseudo-element rail approach */
+    .c::before, .c::after { display: none; }
+    /* NAV */
+    nav { border-bottom: 1px solid #111; position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 100; }
+    .nav-i { display: flex; align-items: center; justify-content: space-between; height: 54px; max-width: 1400px; margin: 0 auto; padding: 0 48px; }
+    .nav-logo { font-weight: 800; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-link { font-size: 11px; letter-spacing: 0.08em; color: #555; text-transform: uppercase; }
+    .nav-link:hover { color: #fff; }
+    .nav-cta { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: #fff; color: #000; padding: 8px 20px; }
+    .nav-cta:hover { background: #ddd; }
+    /* HERO — fixed height, text left, image absolute right */
+    /* HERO — fixed height, bg image, text left */
+    .hero { padding: 0; height: 700px; position: relative; overflow: hidden; background: url('/herobg.png') center center / cover no-repeat; }
+    .hero::before { display: none; }
+    .hero-inner { height: 100%; display: flex; align-items: center; position: relative; z-index: 2; padding-top: 54px; }
+    .hero-text { display: flex; flex-direction: column; max-width: 800px; }
+    .hero-img {
+      position: absolute;
+      right: -60px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 55%;
+      max-width: 800px;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .hero-img img { width: 100%; height: auto; opacity: 0.92; display: block; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #555; border: 1px solid #1a1a1a; padding: 6px 14px; margin-bottom: 40px; width: fit-content; }
+    .hero-badge:hover { border-color: #333; color: #aaa; }
+    .hero-dot { width: 5px; height: 5px; background: #fff; flex-shrink: 0; }
+    .hero-sub { font-family: 'Geist', sans-serif; font-size: 15px; color: #666; max-width: 520px; line-height: 1.7; margin-bottom: 40px; }
+    .ss { font-family: 'Geist', sans-serif; font-size: 13px; color: #444; margin-bottom: 48px; line-height: 1.7; }
+    .install-sec { padding: 64px 0; }
+    .install-tabs { display: flex; gap: 0; border: 1px solid #111; margin-bottom: 0; width: fit-content; }
+    .itab { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 20px; color: #333; background: #000; border-right: 1px solid #111; cursor: pointer; transition: all 0.1s; }
+    .itab:last-child { border-right: none; }
+    .itab.active { color: #fff; background: #0d0d0d; }
+    .itab:hover { color: #aaa; }
+    .install-block { border: 1px solid #111; border-top: none; background: #050505; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .install-block code { font-size: 13px; color: #888; font-family: 'Geist Mono', monospace; }
+    .install-block .dol { color: #222; margin-right: 8px; }
+    .copy-btn { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #333; background: transparent; border: 1px solid #1a1a1a; padding: 5px 12px; cursor: pointer; font-family: 'Geist Mono', monospace; transition: all 0.1s; flex-shrink: 0; }
+    .copy-btn:hover { color: #aaa; border-color: #333; }
+    /* AGENT PROMPT */
+    .prompt-block { border: 1px solid #111; margin-top: 32px; }
+    .prompt-hd { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-bottom: 1px solid #111; background: #050505; }
+    .prompt-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #333; }
+    .prompt-tag { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #222; border: 1px solid #1a1a1a; padding: 2px 8px; }
+    .prompt-body { padding: 20px; font-size: 12px; color: #444; line-height: 1.8; background: #000; }
+    .prompt-body strong { color: #777; font-weight: 600; }
+    /* MCP / SKILLS expanded */
+    .cs-grid-wide { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #111; border: 1px solid #111; margin-top: 48px; }
+    @media (max-width: 1100px) { .hero-img { display: none; } .cs-grid-wide { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .cs-grid-wide { grid-template-columns: 1fr; } .install-tabs { flex-wrap: wrap; width: 100%; } }
+    h1 { font-family: 'Onest', sans-serif; font-size: 76px; font-weight: 800; letter-spacing: -0.03em; text-transform: none; line-height: 1.05; color: #fff; margin-bottom: 28px; white-space: nowrap; }
+    h1 .muted { color: #1e1e1e; }
+    .sh { font-family: 'Onest', sans-serif; font-size: clamp(22px, 3vw, 38px); font-weight: 400; letter-spacing: -0.01em; text-transform: none !important; color: #fff; margin-bottom: 10px; }
+    .nav-logo { font-family: 'Geist Mono', monospace; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+    .nav-link { font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #555; text-transform: uppercase; }
+    .nav-link:hover { color: #fff; }
+    .nav-cta { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: #fff; color: #000; padding: 8px 18px; display: inline-block; }
+    .nav-cta:hover { background: #ddd; }
+    .stag { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #333; margin-bottom: 20px; }
+    .btn { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 11px 24px; display: inline-block; cursor: pointer; border: none; }
+    .itab { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 20px; color: #333; background: #000; border-right: 1px solid #111; cursor: pointer; transition: all 0.1s; }
+    .copy-btn { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: #333; background: transparent; border: 1px solid #1a1a1a; padding: 5px 12px; cursor: pointer; transition: all 0.1s; flex-shrink: 0; }
+    .copy-btn:hover { color: #aaa; border-color: #333; }
+    .hero-sub { font-family: 'Geist Mono', monospace; font-size: 13px; color: #666; max-width: 520px; line-height: 1.8; margin-bottom: 40px; }
+    .ss { font-family: 'Geist Mono', monospace; font-size: 12px; color: #444; margin-bottom: 48px; line-height: 1.8; }
+    .hero-sub { font-size: 14px; color: #555; max-width: 520px; line-height: 1.8; margin-bottom: 44px; }
+    .hero-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 36px; }
+    .btn { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 12px 28px; display: inline-block; cursor: pointer; border: none; }
+    .btn-w { background: #fff; color: #000; }
+    .btn-w:hover { background: #e0e0e0; }
+    .btn-o { background: transparent; color: #555; border: 1px solid #222; }
+    .btn-o:hover { border-color: #444; color: #fff; }
+    .install { display: inline-flex; align-items: center; gap: 10px; background: #080808; border: 1px solid #111; padding: 10px 20px; font-size: 12px; color: #555; }
+    .install code { color: #bbb; }
+    .install .dol { color: #2a2a2a; }
+    /* SHARED */
+    .sec { padding: 88px 0; }
+    .stag { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #333; margin-bottom: 20px; }
+    .ss { font-family: 'Geist Mono', monospace; font-size: 12px; color: #444; margin-bottom: 48px; line-height: 1.8; }
+    /* CODE */
+    .code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #111; border: 1px solid #111; }
+    .cp { background: #000; overflow: hidden; }
+    .cp-hd { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #0d0d0d; background: #050505; }
+    .cp-f { font-size: 11px; color: #2a2a2a; }
+    .cp-l { font-size: 10px; color: #1e1e1e; letter-spacing: 0.08em; text-transform: uppercase; }
+    pre { padding: 22px 20px; font-size: 12px; line-height: 1.8; overflow-x: auto; }
+    .t-dim { color: #444; } .t-w { color: #fff; } .t-g { color: #777; }
+    .t-s { color: #888; } .t-k { color: #bbb; } .t-p { color: #2e2e2e; }
+    /* FEATURE CARDS — Better Auth style */
+    .fc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #111; border: 1px solid #111; margin-top: 48px; }
+    .fc-card { background: #000; padding: 28px 24px 24px; position: relative; min-height: 180px; display: flex; flex-direction: column; transition: background 0.15s; text-decoration: none; color: inherit; }
+    .fc-card:hover { background: #080808; }
+    .fc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .fc-num { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: #222; }
+    .fc-arrow { font-size: 14px; color: #1e1e1e; transition: color 0.15s, transform 0.15s; }
+    .fc-card:hover .fc-arrow { color: #555; transform: translate(2px, -2px); }
+    .fc-title { font-family: 'Onest', sans-serif; font-size: 15px; font-weight: 600; color: #e4e4e7; margin-bottom: 8px; line-height: 1.3; }
+    .fc-desc { font-family: 'Onest', sans-serif; font-size: 12px; color: #444; line-height: 1.65; flex: 1; }
+    .fc-visual { margin-top: 20px; }
+    /* Tag pills for visual elements */
+    .fc-tags { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .fc-tag { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #333; border: 1px solid #1a1a1a; padding: 3px 8px; background: #080808; }
+    .fc-tag.green { color: #4ade80; border-color: #14532d; background: #14532d22; }
+    .fc-tag.blue  { color: #60a5fa; border-color: #1e3a5f; background: #1e3a5f22; }
+    .fc-tag.red   { color: #f87171; border-color: #5f1e1e; background: #5f1e1e22; }
+    /* Provider icons row */
+    .fc-providers { display: flex; align-items: center; gap: 8px; }
+    .fc-prov { width: 24px; height: 24px; background: #0d0d0d; border: 1px solid #111; display: flex; align-items: center; justify-content: center; }
+    .fc-prov svg { width: 12px; height: 12px; fill: #333; }
+    .fc-more { font-family: 'Geist Mono', monospace; font-size: 9px; color: #222; border: 1px solid #1a1a1a; padding: 3px 6px; }
+    /* Code snippet visual */
+    .fc-code { font-family: 'Geist Mono', monospace; font-size: 10px; color: #333; background: #050505; border: 1px solid #0d0d0d; padding: 8px 12px; line-height: 1.6; }
+    .fc-code .kw { color: #555; }
+    .fc-code .val { color: #777; }
+    @media (max-width: 900px) { .fc-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .fc-grid { grid-template-columns: 1fr; } }
+    /* STEPS */
+    .sg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #111; border: 1px solid #111; margin-top: 48px; }
+    .si { background: #000; padding: 36px 28px; }
+    .sn { font-family: 'Onest', sans-serif; font-size: 48px; font-weight: 800; color: #0e0e0e; margin-bottom: 20px; letter-spacing: -0.04em; }
+    .st { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #bbb; margin-bottom: 10px; }
+    .sd { font-family: 'Onest', sans-serif; font-size: 13px; color: #3a3a3a; line-height: 1.7; }
+    .sd code { font-family: 'Geist Mono', monospace; color: #555; font-size: 11px; }
+    /* ROUTES TABLE — 2-column grid */
+    .rt { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #111; border: 1px solid #111; margin-top: 48px; }
+    .rr { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: #000; transition: background 0.1s; }
+    .rr:hover { background: #070707; }
+    .rm { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; padding: 3px 7px; background: #0d0d0d; border: 1px solid #1a1a1a; flex-shrink: 0; min-width: 44px; text-align: center; }
+    .rm.get { color: #4ade80; border-color: #14532d; }
+    .rm.post { color: #60a5fa; border-color: #1e3a5f; }
+    .rm.del { color: #f87171; border-color: #5f1e1e; }
+    .rp { font-size: 11px; color: #666; font-family: 'Geist Mono', monospace; }
+    /* SOCIAL PROVIDERS */
+    .social-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: #111; border: 1px solid #111; margin-top: 48px; }
+    .soc { background: #000; padding: 28px 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; transition: background 0.1s; }
+    .soc:hover { background: #070707; }
+    .soc-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+    .soc-icon svg { width: 28px; height: 28px; fill: #333; transition: fill 0.1s; }
+    .soc:hover .soc-icon svg { fill: #888; }
+    .soc-name { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #2a2a2a; }
+    /* COMING SOON */
+    .cs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #111; border: 1px solid #111; margin-top: 48px; }
+    .cs { background: #000; padding: 32px 28px; position: relative; overflow: hidden; }
+    .cs-soon { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #222; border: 1px solid #1a1a1a; padding: 3px 8px; display: inline-block; margin-bottom: 16px; }
+    .cs-title { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #555; margin-bottom: 10px; }
+    .cs-desc { font-size: 12px; color: #2a2a2a; line-height: 1.7; }
+    .plg { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: #111; border: 1px solid #111; margin-top: 48px; }
+    .pi { background: #000; padding: 28px 24px; transition: background 0.1s; }
+    .pi:hover { background: #070707; }
+    .pt { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #bbb; margin-bottom: 8px; }
+    .pd { font-family: 'Onest', sans-serif; font-size: 13px; color: #3a3a3a; line-height: 1.7; }
+    /* PACKAGES */
+    .pkgl { border: 1px solid #111; margin-top: 48px; }
+    .pkgr { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 24px; border-bottom: 1px solid #080808; transition: background 0.1s; }
+    .pkgr:last-child { border-bottom: none; }
+    .pkgr:hover { background: #060606; }
+    .pkgn { font-size: 13px; font-weight: 700; color: #bbb; }
+    .pkgd { font-size: 11px; color: #3a3a3a; flex: 1; text-align: right; }
+    .pkgv { font-size: 10px; color: #1e1e1e; white-space: nowrap; }
+    /* FW */
+    .fwr { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+    .fwt { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #333; border: 1px solid #0f0f0f; padding: 6px 14px; background: #050505; }
+    /* CTA */
+    .cta { padding: 120px 0; text-align: center; }
+    .cta .sh { margin-bottom: 16px; }
+    .cta p { font-size: 13px; color: #444; margin-bottom: 40px; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.8; }
+    .cta-row { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    /* FOOTER */
+    footer { padding: 44px 0; border-top: 1px solid #0d0d0d; }
+    .fi-r { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+    .fc { font-size: 11px; color: #1e1e1e; }
+    .flinks { display: flex; align-items: center; gap: 24px; }
+    .fl { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #222; }
+    .fl:hover { color: #555; }
+    /* SCROLL ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+    /* Stagger children of grids */
+    .fg .fi, .plg .pi, .sg .si, .cs-grid-wide .cs, .social-grid .soc {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .fg.in .fi, .plg.in .pi, .sg.in .si, .cs-grid-wide.in .cs, .social-grid.in .soc { opacity: 1; transform: translateY(0); }
+    .fg.in .fi:nth-child(1), .plg.in .pi:nth-child(1), .sg.in .si:nth-child(1), .cs-grid-wide.in .cs:nth-child(1), .social-grid.in .soc:nth-child(1) { transition-delay: 0.05s; }
+    .fg.in .fi:nth-child(2), .plg.in .pi:nth-child(2), .sg.in .si:nth-child(2), .cs-grid-wide.in .cs:nth-child(2), .social-grid.in .soc:nth-child(2) { transition-delay: 0.1s; }
+    .fg.in .fi:nth-child(3), .plg.in .pi:nth-child(3), .sg.in .si:nth-child(3), .cs-grid-wide.in .cs:nth-child(3), .social-grid.in .soc:nth-child(3) { transition-delay: 0.15s; }
+    .fg.in .fi:nth-child(4), .plg.in .pi:nth-child(4), .sg.in .si:nth-child(4), .cs-grid-wide.in .cs:nth-child(4), .social-grid.in .soc:nth-child(4) { transition-delay: 0.2s; }
+    .fg.in .fi:nth-child(5), .social-grid.in .soc:nth-child(5) { transition-delay: 0.25s; }
+    .fg.in .fi:nth-child(6), .fg.in .fi:nth-child(7), .fg.in .fi:nth-child(8), .fg.in .fi:nth-child(9) { transition-delay: 0.3s; }
+    @media (max-width: 900px) { .fg { grid-template-columns: 1fr 1fr; } .code-grid { grid-template-columns: 1fr; } .sg { grid-template-columns: 1fr; } .plg { grid-template-columns: 1fr; } .rt { grid-template-columns: 1fr !important; } .social-grid { grid-template-columns: repeat(3, 1fr); } .cs-grid { grid-template-columns: 1fr 1fr; } .fc-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .c { padding: 0 20px; } .fg { grid-template-columns: 1fr; } .fc-grid { grid-template-columns: 1fr; } .nav-links .nav-link { display: none; } h1 { font-size: 48px; white-space: normal; } .pkgr { flex-direction: column; align-items: flex-start; } .pkgd { text-align: left; } .social-grid { grid-template-columns: repeat(2, 1fr); } .cs-grid { grid-template-columns: 1fr; } }
+    /* IDE TERMINAL MOCKUP */
+    .ide { border: 1px solid #111; margin-top: 48px; background: #050505; overflow: hidden; }
+    .ide-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: #0a0a0a; border-bottom: 1px solid #111; }
+    .ide-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .ide-dot.r { background: #3a1a1a; } .ide-dot.y { background: #3a3a1a; } .ide-dot.g { background: #1a3a1a; }
+    .ide-title { font-family: 'Geist Mono', monospace; font-size: 10px; color: #222; margin-left: 8px; letter-spacing: 0.06em; }
+    .ide-body { display: grid; grid-template-columns: 200px 1fr; min-height: 320px; }
+    .ide-tree { border-right: 1px solid #0d0d0d; padding: 12px 0; }
+    .ide-file { font-family: 'Geist Mono', monospace; font-size: 11px; color: #2a2a2a; padding: 3px 16px; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+    .ide-file.active { color: #777; background: #0d0d0d; }
+    .ide-file.folder { color: #1a1a1a; }
+    .ide-right { display: flex; flex-direction: column; }
+    .ide-tabs { display: flex; border-bottom: 1px solid #0d0d0d; }
+    .ide-tab { font-family: 'Geist Mono', monospace; font-size: 10px; color: #2a2a2a; padding: 7px 16px; border-right: 1px solid #0d0d0d; }
+    .ide-tab.active { color: #555; background: #080808; }
+    .ide-editor { flex: 1; padding: 16px 20px; font-family: 'Geist Mono', monospace; font-size: 11px; line-height: 1.9; }
+    .ide-ln { color: #181818; margin-right: 20px; user-select: none; display: inline-block; width: 16px; text-align: right; }
+    .ide-kw { color: #555; } .ide-fn { color: #888; } .ide-str { color: #3a3a3a; } .ide-cm { color: #222; } .ide-val { color: #666; }
+    .ide-terminal { border-top: 1px solid #0d0d0d; padding: 12px 20px; min-height: 100px; background: #030303; font-family: 'Geist Mono', monospace; font-size: 11px; line-height: 1.9; }
+    .ide-term-line { display: flex; align-items: baseline; gap: 8px; }
+    .ide-prompt { color: #1e1e1e; } .ide-cmd { color: #444; }
+    .ide-out { color: #2a2a2a; padding-left: 16px; } .ide-out.ok { color: #14532d; } .ide-out.info { color: #1e3a5f; }
+    .ide-cursor { display: inline-block; width: 7px; height: 12px; background: #333; animation: blink 1.2s step-end infinite; vertical-align: middle; }
+    @keyframes blink { 50% { opacity: 0; } }
+    @media (max-width: 700px) { .ide-body { grid-template-columns: 1fr; } .ide-tree { display: none; } }
+  </style>
+</head>
+<body>
+<canvas id="noise-canvas" aria-hidden="true"></canvas>
+<div id="layout">
+<!-- NAV -->
+<nav><div class="c"><div class="nav-i">
+  <a href="/" class="nav-logo" style="display:flex;align-items:center;gap:10px">
+    <img src="/Logo-nvc.png" alt="" style="height:26px;width:auto;object-fit:contain;display:block" />
+    <span>GATELY-AUTH</span>
+  </a>
+  <div class="nav-links">
+    <a href="/docs" class="nav-link">Docs</a>
+    <a href="https://github.com/gately-auth/gately-auth" class="nav-link" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://www.npmjs.com/package/@gately/auth-core" class="nav-link" target="_blank" rel="noopener">npm</a>
+    <a href="/article/quick-start" class="nav-cta">Get Started</a>
+  </div>
+</div></div></nav>
+
+<!-- HERO -->
+<section class="hero bd"><div class="c" style="position:relative;height:100%">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <a href="https://www.npmjs.com/package/@gately/auth-core" class="hero-badge" target="_blank" rel="noopener">
+        <span class="hero-dot"></span>v0.1.0 — Published on npm
+      </a>
+      <h1>Auth for Cloudflare<br><span class="muted">Workers.</span></h1>
+      <p class="hero-sub">D1 + KV + Workers. Email/password, magic links, OTP, and OAuth — production-grade authentication built entirely for the edge. No Node.js. No external services.</p>
+      <div class="hero-actions">
+        <a href="/article/quick-start" class="btn btn-w">Quick Start →</a>
+        <a href="https://github.com/gately-auth/gately-auth" class="btn btn-o" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- INSTALL -->
+<section class="install-sec bd"><div class="c">
+  <p class="stag reveal">Install</p>
+  <h2 class="sh reveal reveal-delay-1">Get started in seconds.</h2>
+  <p class="ss reveal reveal-delay-2" style="margin-bottom:28px">Pick your package manager or use an AI agent prompt to scaffold everything automatically.</p>
+  <div class="install-tabs">
+    <span class="itab active" data-pm="npm" onclick="showTab('npm')">npm</span>
+    <span class="itab" data-pm="pnpm" onclick="showTab('pnpm')">pnpm</span>
+    <span class="itab" data-pm="yarn" onclick="showTab('yarn')">yarn</span>
+    <span class="itab" data-pm="bun" onclick="showTab('bun')">bun</span>
+  </div>
+  <div class="install-block">
+    <div><span class="dol">$</span><code id="install-cmd">npm install @gately/auth-core @gately/auth-client</code></div>
+    <button class="copy-btn" id="btn-install" onclick="copyInstall()">Copy</button>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-hd">
+      <span class="prompt-label">Agent Prompt</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="prompt-tag">Kiro / Cursor / Copilot</span>
+        <button class="copy-btn" id="btn-prompt" onclick="copyText('agent-prompt','btn-prompt')">Copy</button>
+      </div>
+    </div>
+    <div class="prompt-body" id="agent-prompt">Set up gately-auth in this Cloudflare Worker project. Install @gately/auth-core and @gately/auth-client. Create src/auth.ts using gatelyAuth() with createD1Adapter(env.AUTH_DB), createKVStore(env.AUTH_KV), and the gatelyEmail plugin. Enable emailAndPassword with requireEmailVerification: false. Mount auth.handler(request) on all /auth/* routes in the Worker fetch handler. Add the D1 and KV bindings to wrangler.toml. Run the CLI to generate and apply migrations.</div>
+  </div>
+
+  <div class="prompt-block" style="margin-top:1px">
+    <div class="prompt-hd">
+      <span class="prompt-label">MCP Server</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="prompt-tag">Coming soon</span>
+        <button class="copy-btn" id="btn-mcp" onclick="copyText('mcp-cmd','btn-mcp')">Copy</button>
+      </div>
+    </div>
+    <div class="prompt-body" id="mcp-cmd" style="display:flex;align-items:center;gap:8px"><span style="color:#2a2a2a">$</span><span>npx @gately/auth-mcp start --project my-app</span></div>
+  </div>
+
+  <div class="prompt-block" style="margin-top:1px">
+    <div class="prompt-hd">
+      <span class="prompt-label">Agent Skill</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="prompt-tag">Coming soon</span>
+        <button class="copy-btn" id="btn-skill" onclick="copyText('skill-cmd','btn-skill')">Copy</button>
+      </div>
+    </div>
+    <div class="prompt-body" id="skill-cmd" style="display:flex;align-items:center;gap:8px"><span style="color:#2a2a2a">$</span><span>npx @gately/auth-cli skill add sign-in-with-google --project my-app</span></div>
+  </div>
+</div></section>
+
+<!-- CODE -->
+<section class="sec bd"><div class="c">
+  <p class="stag">Setup in 30 seconds</p>
+  <h2 class="sh">Two files. Done.</h2>
+  <p class="ss">Create your auth instance, mount the handler. Every auth route — sign-up, sign-in, OTP, OAuth — is handled automatically.</p>
+  <div class="code-grid">
+    <div class="cp">
+      <div class="cp-hd"><span class="cp-f">src/auth.ts</span><span class="cp-l">TypeScript</span></div>
+      <pre><code set:html={authCode}></code></pre>
+    </div>
+    <div class="cp">
+      <div class="cp-hd"><span class="cp-f">src/worker.ts</span><span class="cp-l">TypeScript</span></div>
+      <pre><code set:html={workerCode}></code></pre>
+    </div>
+  </div>
+</div></section>
+<!-- FEATURES -->
+<section class="sec bd"><div class="c">
+  <p class="stag reveal">Capabilities</p>
+  <h2 class="sh reveal reveal-delay-1">Everything built in.</h2>
+  <p class="ss reveal reveal-delay-2">All auth primitives designed for the Workers runtime.</p>
+  <div class="fc-grid">
+    <a class="fc-card" href="/article/email-password">
+      <div class="fc-top"><span class="fc-num">01</span><span class="fc-arrow">↗</span></div>
+      <p class="fc-title">Email + Password auth.</p>
+      <p class="fc-desc">Sign up, sign in, email verification, and password reset — all configured in one object.</p>
+      <div class="fc-visual"><div class="fc-code"><span class="kw">emailAndPassword</span>: <span class="val">&#123; enabled: true &#125;</span></div></div>
+    </a>
+    <a class="fc-card" href="/article/magic-links">
+      <div class="fc-top"><span class="fc-num">02</span><span class="fc-arrow">↗</span></div>
+      <p class="fc-title">Magic links & OTP.</p>
+      <p class="fc-desc">Passwordless sign-in via time-limited email links or 6-digit codes stored in KV.</p>
+      <div class="fc-visual fc-tags"><span class="fc-tag green">magic-link</span><span class="fc-tag blue">email-otp</span><span class="fc-tag">15m TTL</span></div>
+    </a>
+    <a class="fc-card" href="/article/oauth-social">
+      <div class="fc-top"><span class="fc-num">03</span><span class="fc-arrow">↗</span></div>
+      <p class="fc-title">Social sign-in.</p>
+      <p class="fc-desc">Google, GitHub, and any OAuth 2.0 provider. PKCE, state validation, profile mapping.</p>
+      <div class="fc-visual fc-providers">
+        <div class="fc-prov"><svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></div>
+        <div class="fc-prov"><svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg></div>
+        <span class="fc-more">+any OAuth 2.0</span>
+      </div>
+    </a>
+    <a class="fc-card" href="/article/how-it-works">
+      <div class="fc-top"><span class="fc-num">04</span><span class="fc-arrow">↗</span></div>
+      <p class="fc-title">D1 + KV native.</p>
+      <p class="fc-desc">Users and sessions in Cloudflare D1. Magic links, OTPs, and rate limits in KV. No Postgres.</p>
+      <div class="fc-visual fc-tags"><span class="fc-tag blue">D1 SQLite</span><span class="fc-tag">KV store</span><span class="fc-tag green">edge-native</span></div>
+    </a>
+    <a class="fc-card" href="/article/plugins">
+      <div class="fc-top"><span class="fc-num">05</span><span class="fc-arrow">↗</span></div>
+      <p class="fc-title">Plugin system.</p>
+      <p class="fc-desc">Extend with custom endpoints, schema fields, and lifecycle hooks. Admin, usernames, One Tap included.</p>
+      <div class="fc-visual fc-tags"><span class="fc-tag">admin</span><span class="fc-tag">username</span><span class="fc-tag blue">one-tap</span><span class="fc-tag green">custom</span></div>
+    </a>
+    <a class="fc-card" href="/article/cli-login-setup">
+      <div class="fc-top"><span class="fc-num">06</span><span class="fc-arrow">↗</span></div>
+      <p class="fc-title">CLI + auto-provision.</p>
+      <p class="fc-desc">Login to Cloudflare, auto-create D1 + KV, apply migrations, deploy — one command each.</p>
+      <div class="fc-visual"><div class="fc-code"><span class="kw">$</span> <span class="val">gately-auth setup</span></div></div>
+    </a>
+  </div>
+</div></section>
+<!-- ROUTES -->
+<section class="sec bd"><div class="c">
+  <p class="stag reveal">API Surface</p>
+  <h2 class="sh reveal reveal-delay-1">Every route, out of the box.</h2>
+  <p class="ss reveal reveal-delay-2">Mount on <code>/auth/*</code> and all endpoints are live immediately.</p>
+  <div class="rt" style="grid-template-columns:repeat(3,1fr)">
+    <div class="rr"><span class="rm post">POST</span><span class="rp">/auth/sign-up/email</span></div>
+    <div class="rr"><span class="rm post">POST</span><span class="rp">/auth/sign-in/email</span></div>
+    <div class="rr"><span class="rm post">POST</span><span class="rp">/auth/sign-out</span></div>
+    <div class="rr"><span class="rm get">GET</span><span class="rp">/auth/session</span></div>
+    <div class="rr"><span class="rm post">POST</span><span class="rp">/auth/magic-link/send</span></div>
+    <div class="rr"><span class="rm get">GET</span><span class="rp">/auth/magic-link/verify</span></div>
+    <div class="rr"><span class="rm post">POST</span><span class="rp">/auth/otp/send</span></div>
+    <div class="rr"><span class="rm post">POST</span><span class="rp">/auth/otp/verify</span></div>
+    <div class="rr"><span class="rm get">GET</span><span class="rp">/auth/verify-email</span></div>
+    <div class="rr"><span class="rm get">GET</span><span class="rp">/auth/oauth/:provider</span></div>
+    <div class="rr"><span class="rm get">GET</span><span class="rp">/auth/oauth/:provider/callback</span></div>
+    <div class="rr"><span class="rm post">POST</span><span class="rp">/auth/password/reset</span></div>
+    <div class="rr"><span class="rm post">POST</span><span class="rp">/auth/password/reset/confirm</span></div>
+    <div class="rr"><span class="rm get">GET</span><span class="rp">/auth/sessions</span></div>
+    <div class="rr"><span class="rm del">DELETE</span><span class="rp">/auth/sessions/:token</span></div>
+    <div class="rr"><span class="rm del">DELETE</span><span class="rp">/auth/sessions</span></div>
+    <div class="rr"><span class="rm get">GET</span><span class="rp">/auth/health</span></div>
+    <div class="rr"><span class="rm get">GET</span><span class="rp">/auth/username/check</span></div>
+  </div>
+</div></section>
+<!-- PLUGINS -->
+<section class="sec bd"><div class="c">
+  <p class="stag">Extensible</p>
+  <h2 class="sh">Official plugins.</h2>
+  <p class="ss">Drop-in plugins that extend schema, routes, and email — without forking the core.</p>
+  <div class="plg">
+    <div class="pi"><p class="pt">Gately Email</p><p class="pd">Connect to Gately's transactional email platform. Handles password reset, magic links, OTP, and verification automatically.</p></div>
+    <div class="pi"><p class="pt">Admin Plugin</p><p class="pd">Protected /auth/admin/* endpoints for user listing, banning, session revocation, and deletion. X-Admin-Key required.</p></div>
+    <div class="pi"><p class="pt">Username Plugin</p><p class="pd">Adds a unique username field to sign-up. Validation, uniqueness check, and a public availability endpoint included.</p></div>
+    <div class="pi"><p class="pt">Google One Tap</p><p class="pd">Exchange a Google ID token for a gately-auth session — no redirect flow. Works with the One Tap JS snippet.</p></div>
+  </div>
+</div></section>
+
+<!-- SOCIAL PROVIDERS -->
+<section class="sec bd"><div class="c">
+  <p class="stag">Social sign-in</p>
+  <h2 class="sh">Every OAuth provider.</h2>
+  <p class="ss">Configure any OAuth 2.0 provider in one object. PKCE, state validation, and profile mapping handled automatically.</p>
+  <div class="social-grid">
+    <div class="soc">
+      <div class="soc-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></div>
+      <span class="soc-name">Google</span>
+    </div>
+    <div class="soc">
+      <div class="soc-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg></div>
+      <span class="soc-name">GitHub</span>
+    </div>
+    <div class="soc">
+      <div class="soc-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.17 8.17 0 0 0 4.77 1.52V6.76a4.85 4.85 0 0 1-1-.07z"/></svg></div>
+      <span class="soc-name">TikTok</span>
+    </div>
+    <div class="soc">
+      <div class="soc-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></div>
+      <span class="soc-name">Facebook</span>
+    </div>
+    <div class="soc">
+      <div class="soc-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>
+      <span class="soc-name">LinkedIn</span>
+    </div>
+  </div>
+  <p style="font-size:11px;color:#222;margin-top:16px;letter-spacing:0.04em">+ Any OAuth 2.0 / OIDC provider via <code style="color:#333;font-size:10px">socialProviders</code> config</p>
+</div></section>
+
+<!-- COMING SOON — Agents / MCP / CLI / Skills -->
+<section class="sec bd"><div class="c">
+  <p class="stag">Roadmap</p>
+  <h2 class="sh">What's coming.</h2>
+  <p class="ss">The next layer — build agents, MCP servers, CLI tools, and skills that connect directly to the Gately Auth platform.</p>
+  <div class="cs-grid-wide">
+    <div class="cs">
+      <span class="cs-soon">Coming soon</span>
+      <p class="cs-title">Agent Framework</p>
+      <p class="cs-desc">Build AI agents that authenticate on behalf of users. Session-aware, permission-scoped, deployable to Workers.</p>
+    </div>
+    <div class="cs">
+      <span class="cs-soon">Coming soon</span>
+      <p class="cs-title">MCP Servers</p>
+      <p class="cs-desc">Model Context Protocol servers for Gately Auth. Give AI assistants secure, authenticated access to your auth data.</p>
+    </div>
+    <div class="cs">
+      <span class="cs-soon">Coming soon</span>
+      <p class="cs-title">Skills</p>
+      <p class="cs-desc">Composable auth capabilities — "sign in with Google", "verify OTP", "get session" — that agents invoke directly.</p>
+    </div>
+    <div class="cs">
+      <span class="cs-soon">Coming soon</span>
+      <p class="cs-title">Extended CLI</p>
+      <p class="cs-desc">Agent-powered CLI. Describe what you need in plain language — the CLI scaffolds, migrates, and deploys for you.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- IDE MOCKUP -->
+<section class="sec bd"><div class="c">
+  <p class="stag reveal">Developer experience</p>
+  <h2 class="sh reveal reveal-delay-1">Scaffold and go.</h2>
+  <p class="ss reveal reveal-delay-2">Run <code>gately-auth init</code> and get a fully wired auth Worker with D1, KV, and email configured.</p>
+  <div class="ide reveal reveal-delay-3">
+    <div class="ide-bar">
+      <span class="ide-dot r"></span><span class="ide-dot y"></span><span class="ide-dot g"></span>
+      <span class="ide-title">my-auth-worker — VS Code</span>
+    </div>
+    <div class="ide-body">
+      <div class="ide-tree">
+        <div class="ide-file folder">📁 src</div>
+        <div class="ide-file active" style="padding-left:28px">  auth.ts</div>
+        <div class="ide-file" style="padding-left:28px">  worker.ts</div>
+        <div class="ide-file folder">📁 migrations</div>
+        <div class="ide-file" style="padding-left:28px">  0001_initial.sql</div>
+        <div class="ide-file">wrangler.toml</div>
+        <div class="ide-file">package.json</div>
+        <div class="ide-file">tsconfig.json</div>
+        <div class="ide-file">.dev.vars</div>
+        <div class="ide-file">.gitignore</div>
+      </div>
+      <div class="ide-right">
+        <div class="ide-tabs">
+          <div class="ide-tab active">src/auth.ts</div>
+          <div class="ide-tab">src/worker.ts</div>
+          <div class="ide-tab">wrangler.toml</div>
+        </div>
+        <div class="ide-editor">
+<span class="ide-ln">1</span><span class="ide-kw">import</span> <span class="ide-val">&#123; gatelyAuth &#125;</span> <span class="ide-kw">from</span> <span class="ide-str">'@gately/auth-core'</span>
+<span class="ide-ln">2</span><span class="ide-kw">import</span> <span class="ide-val">&#123; createD1Adapter, createKVStore &#125;</span> <span class="ide-kw">from</span> <span class="ide-str">'@gately/auth-core/adapters'</span>
+<span class="ide-ln">3</span><span class="ide-kw">import</span> <span class="ide-val">&#123; gatelyEmail &#125;</span> <span class="ide-kw">from</span> <span class="ide-str">'@gately/auth-core/plugins'</span>
+<span class="ide-ln">4</span>
+<span class="ide-ln">5</span><span class="ide-kw">export interface</span> <span class="ide-fn">Env</span> <span class="ide-val">&#123;</span>
+<span class="ide-ln">6</span>  <span class="ide-val">AUTH_DB</span>: <span class="ide-fn">D1Database</span>
+<span class="ide-ln">7</span>  <span class="ide-val">AUTH_KV</span>: <span class="ide-fn">KVNamespace</span>
+<span class="ide-ln">8</span>  <span class="ide-val">AUTH_SECRET</span>: <span class="ide-fn">string</span>
+<span class="ide-ln">9</span>  <span class="ide-val">GATELY_API_KEY</span>: <span class="ide-fn">string</span>
+<span class="ide-ln">10</span><span class="ide-val">&#125;</span>
+<span class="ide-ln">11</span>
+<span class="ide-ln">12</span><span class="ide-kw">export function</span> <span class="ide-fn">createAuth</span>(<span class="ide-val">env</span>: <span class="ide-fn">Env</span>) <span class="ide-val">&#123;</span>
+<span class="ide-ln">13</span>  <span class="ide-kw">return</span> <span class="ide-fn">gatelyAuth</span>(<span class="ide-val">&#123;</span>
+<span class="ide-ln">14</span>    <span class="ide-val">secret</span>: env.<span class="ide-fn">AUTH_SECRET</span>,
+<span class="ide-ln">15</span>    <span class="ide-val">db</span>: <span class="ide-fn">createD1Adapter</span>(env.<span class="ide-fn">AUTH_DB</span>),
+<span class="ide-ln">16</span>    <span class="ide-val">kv</span>: <span class="ide-fn">createKVStore</span>(env.<span class="ide-fn">AUTH_KV</span>),
+<span class="ide-ln">17</span>    <span class="ide-val">emailAndPassword</span>: <span class="ide-val">&#123;</span> <span class="ide-val">enabled</span>: <span class="ide-kw">true</span> <span class="ide-val">&#125;</span>,
+<span class="ide-ln">18</span>    <span class="ide-val">plugins</span>: [<span class="ide-fn">gatelyEmail</span>(<span class="ide-val">&#123;</span> <span class="ide-val">apiKey</span>: env.<span class="ide-fn">GATELY_API_KEY</span> <span class="ide-val">&#125;</span>)],
+<span class="ide-ln">19</span>  <span class="ide-val">&#125;</span>)
+<span class="ide-ln">20</span><span class="ide-val">&#125;</span>
+        </div>
+        <div class="ide-terminal">
+          <div class="ide-term-line"><span class="ide-prompt">~/my-auth-worker $</span><span class="ide-cmd">gately-auth init</span></div>
+          <div class="ide-out info">✓ Scaffolded project files</div>
+          <div class="ide-term-line"><span class="ide-prompt">~/my-auth-worker $</span><span class="ide-cmd">gately-auth login</span></div>
+          <div class="ide-out info">✓ Authenticated — Cloudflare account linked</div>
+          <div class="ide-term-line"><span class="ide-prompt">~/my-auth-worker $</span><span class="ide-cmd">gately-auth setup</span></div>
+          <div class="ide-out ok">✓ D1 database created — auth-db (abc123)</div>
+          <div class="ide-out ok">✓ KV namespace created — AUTH_KV (def456)</div>
+          <div class="ide-out ok">✓ wrangler.toml updated</div>
+          <div class="ide-out ok">✓ Migrations applied</div>
+          <div class="ide-term-line"><span class="ide-prompt">~/my-auth-worker $</span><span class="ide-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- HOW IT WORKS -->
+<section class="sec bd"><div class="c">
+  <p class="stag">Getting started</p>
+  <h2 class="sh">Three steps.</h2>
+  <p class="ss">From install to a working auth Worker — in under 5 minutes.</p>
+  <div class="sg">
+    <div class="si"><p class="sn">01</p><p class="st">Create your instance</p><p class="sd">Call <code>gatelyAuth()</code> with your D1 binding, KV namespace, and secret. One function, fully typed, zero globals.</p></div>
+    <div class="si"><p class="sn">02</p><p class="st">Mount the handler</p><p class="sd">Route <code>/auth/*</code> to <code>auth.handler(request)</code>. Works with Hono, plain Workers, itty-router, or any fetch handler.</p></div>
+    <div class="si"><p class="sn">03</p><p class="st">Use the client SDK</p><p class="sd">Install <code>@gately/auth-client</code> in your frontend. React hooks, typed methods, automatic cookie/token management.</p></div>
+  </div>
+</div></section>
+
+<!-- FRAMEWORKS -->
+<section class="sec bd"><div class="c">
+  <p class="stag">Compatibility</p>
+  <h2 class="sh">Works with your stack.</h2>
+  <div class="fwr">
+    <span class="fwt">Hono</span><span class="fwt">Next.js</span><span class="fwt">SvelteKit</span>
+    <span class="fwt">Remix</span><span class="fwt">Astro</span><span class="fwt">React</span>
+    <span class="fwt">Vue</span><span class="fwt">itty-router</span><span class="fwt">Cloudflare Workers</span>
+    <span class="fwt">Cloudflare Pages</span>
+  </div>
+</div></section>
+
+<!-- PACKAGES -->
+<section class="sec bd"><div class="c">
+  <p class="stag">Monorepo</p>
+  <h2 class="sh">The packages.</h2>
+  <p class="ss">A focused set — nothing more, nothing less.</p>
+  <div class="pkgl">
+    <div class="pkgr"><span class="pkgn">@gately/auth-core</span><span class="pkgd">Worker handler, D1/KV adapters, all auth providers and plugins</span><span class="pkgv">0.1.0</span></div>
+    <div class="pkgr"><span class="pkgn">@gately/auth-client</span><span class="pkgd">Browser SDK with React hooks and session management</span><span class="pkgv">0.1.0</span></div>
+    <div class="pkgr"><span class="pkgn">@gately/auth-cli</span><span class="pkgd">CLI — scaffold, login to Cloudflare, auto-provision D1/KV, migrate, deploy</span><span class="pkgv">0.1.0</span></div>
+  </div>
+</div></section>
+
+<!-- CTA -->
+<section class="cta bd"><div class="c">
+  <h2 class="sh">Ready to ship?</h2>
+  <p>Get authentication running in your Cloudflare Worker in under 5 minutes. No account required to get started.</p>
+  <div class="cta-row">
+    <a href="/article/quick-start" class="btn btn-w">Read the Docs →</a>
+    <a href="https://github.com/gately-auth/gately-auth" class="btn btn-o" target="_blank" rel="noopener">Star on GitHub</a>
+  </div>
+</div></section>
+
+<!-- FOOTER -->
+<footer><div class="c"><div class="fi-r">
+  <p class="fc">Gately Auth — Built for the Cloudflare Workers platform.</p>
+  <div class="flinks">
+    <a href="/docs" class="fl">Docs</a>
+    <a href="https://github.com/gately-auth/gately-auth" class="fl" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://www.npmjs.com/package/@gately/auth-core" class="fl" target="_blank" rel="noopener">npm</a>
+    <a href="https://usegately.com" class="fl" target="_blank" rel="noopener">usegately.com</a>
+  </div>
+</div></div></footer>
+
+</div><!-- /#layout -->
+
+<script>
+// Noise animation
+(function(){
+  const c=document.getElementById('noise-canvas');
+  if(!c)return;
+  const x=c.getContext('2d');
+  let f=0,a;
+  function r(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  function draw(){
+    const w=c.width,h=c.height,d=x.createImageData(w,h),b=d.data;
+    let s=f*1234567+987654;
+    for(let i=0;i<b.length;i+=4){s=(s*1664525+1013904223)&0xffffffff;const v=(s>>>24)&0xff;b[i]=b[i+1]=b[i+2]=v;b[i+3]=255;}
+    x.putImageData(d,0,0);f++;
+  }
+  function loop(){draw();a=requestAnimationFrame(loop);}
+  r();window.addEventListener('resize',r);loop();
+  document.addEventListener('visibilitychange',()=>{document.hidden?cancelAnimationFrame(a):loop();});
+})();
+
+// Scramble text effect on section labels (.stag)
+(function() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%@![]';
+  
+  function scramble(el) {
+    const original = el.getAttribute('data-text') || el.textContent.replace(/^\[|\]$/g, '').trim();
+    if (!el.getAttribute('data-text')) el.setAttribute('data-text', original);
+    
+    const display = `[ ${original.toUpperCase()} ]`;
+    let iteration = 0;
+    
+    clearInterval(el._si);
+    el._si = setInterval(() => {
+      el.textContent = display
+        .split('')
+        .map((char, i) => {
+          if (char === ' ' || char === '[' || char === ']') return char;
+          if (i < iteration) return display[i];
+          return chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join('');
+      
+      iteration += 1.2;
+      if (iteration >= display.length) {
+        el.textContent = display;
+        clearInterval(el._si);
+      }
+    }, 35);
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target._done) {
+        entry.target._done = true;
+        scramble(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('.stag').forEach(el => observer.observe(el));
+
+  // Also scramble immediately for first visible ones
+  document.querySelectorAll('.stag').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight) {
+      el._done = true;
+      scramble(el);
+    }
+  });
+})();
+
+// Scroll reveal animations
+(function() {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  // Animate individual reveal elements
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Animate grid parents (triggers child stagger via CSS)
+  document.querySelectorAll('.fg, .plg, .sg, .cs-grid-wide, .social-grid').forEach(el => {
+    io.observe(el);
+  });
+
+  // Also animate the code grid, route table, package list
+  const gridObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        gridObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.code-grid, .rt, .pkgl').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    gridObs.observe(el);
+  });
+})();
+const cmds = {
+  npm:  'npm install @gately/auth-core @gately/auth-client',
+  pnpm: 'pnpm add @gately/auth-core @gately/auth-client',
+  yarn: 'yarn add @gately/auth-core @gately/auth-client',
+  bun:  'bun add @gately/auth-core @gately/auth-client',
+};
+
+function showTab(pm) {
+  const el = document.getElementById('install-cmd');
+  if (el) el.textContent = cmds[pm];
+  document.querySelectorAll('.itab').forEach(t => {
+    t.classList.toggle('active', t.getAttribute('data-pm') === pm);
+  });
+}
+
+function copyText(sourceId, btnId) {
+  const el = document.getElementById(sourceId);
+  const btn = document.getElementById(btnId);
+  if (!el || !btn) return;
+  const text = el.textContent.trim();
+
+  function onSuccess() {
+    btn.textContent = 'Copied!';
+    btn.style.color = '#4ade80';
+    btn.style.borderColor = '#14532d';
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 2000);
+  }
+
+  // Try modern clipboard API first
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopy(text, onSuccess));
+  } else {
+    fallbackCopy(text, onSuccess);
+  }
+}
+
+function fallbackCopy(text, onSuccess) {
+  // Create a temporary textarea, select it, copy
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.top = '-9999px';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    onSuccess();
+  } catch(e) {
+    console.warn('Copy failed:', e);
+  } finally {
+    document.body.removeChild(ta);
+  }
+}
+
+function copyInstall() {
+  copyText('install-cmd', 'btn-install');
+}
+(function(){
+  function updateRails(){
+    const el = document.querySelector('.c');
+    if(!el) return;
+    const rect = el.getBoundingClientRect();
+    document.documentElement.style.setProperty('--rail-left', rect.left + 'px');
+    document.documentElement.style.setProperty('--rail-right', (window.innerWidth - rect.right) + 'px');
+  }
+  updateRails();
+  window.addEventListener('resize', updateRails);
+})();
+</script>
+</body>
+</html>
