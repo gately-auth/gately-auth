@@ -11,6 +11,7 @@ import { coreConceptsCategory } from './categories/core-concepts';
 import { authMethodsCategory } from './categories/auth-methods';
 import { clientSdkCategory } from './categories/client-sdk';
 import { cliCategory } from './categories/cli';
+import { pluginsCategory } from './categories/plugins';
 import { apiReferenceCategory } from './categories/api-reference';
 import { integrationsCategory } from './categories/integrations';
 import { deploymentCategory } from './categories/deployment';
@@ -21,6 +22,7 @@ export const categories = [
   authMethodsCategory,
   clientSdkCategory,
   cliCategory,
+  pluginsCategory,
   apiReferenceCategory,
   integrationsCategory,
   deploymentCategory,
@@ -48,6 +50,13 @@ import { reactHooksArticle } from './articles/client-sdk/react-hooks';
 
 // ─── Articles: CLI ────────────────────────────────────────────────────────────
 import { cliOverviewArticle } from './articles/cli/cli-overview';
+import { cliLoginSetupArticle } from './articles/cli/cli-login-setup';
+
+// ─── Articles: Plugins ────────────────────────────────────────────────────────
+import { gatelyEmailPluginArticle } from './articles/plugins/gately-email';
+import { adminPluginArticle } from './articles/plugins/admin-plugin';
+import { usernamePluginArticle } from './articles/plugins/username-plugin';
+import { oneTapPluginArticle } from './articles/plugins/one-tap-plugin';
 
 // ─── Articles: API Reference ──────────────────────────────────────────────────
 import { coreApiArticle } from './articles/api-reference/core-api';
@@ -81,6 +90,12 @@ export const articles = [
   reactHooksArticle,
   // CLI
   cliOverviewArticle,
+  cliLoginSetupArticle,
+  // Plugins
+  gatelyEmailPluginArticle,
+  adminPluginArticle,
+  usernamePluginArticle,
+  oneTapPluginArticle,
   // API Reference
   coreApiArticle,
   clientApiArticle,
