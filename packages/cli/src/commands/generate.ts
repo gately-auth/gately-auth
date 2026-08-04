@@ -36,7 +36,7 @@ function getCoreSchema(): string {
   // Try to read from the published package migrations
   const candidates = [
     resolve(__dirname, "../../core/migrations/0001_initial_schema.sql"),
-    resolve(process.cwd(), "node_modules/@gately-auth/core/migrations/0001_initial_schema.sql"),
+    resolve(process.cwd(), "node_modules/@gately/auth-core/migrations/0001_initial_schema.sql"),
   ];
 
   for (const candidate of candidates) {

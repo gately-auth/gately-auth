@@ -85,7 +85,7 @@ export async function migrate(opts: MigrateOptions): Promise<void> {
 function findMigrationsDir(): string | null {
   const candidates = [
     "./migrations",
-    "./node_modules/@gately-auth/core/migrations",
+    "./node_modules/@gately/auth-core/migrations",
   ];
 
   for (const candidate of candidates) {

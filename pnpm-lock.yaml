@@ -35,7 +35,7 @@ importers:
 
   examples/basic-worker:
     dependencies:
-      '@gately-auth/core':
+      '@gately/auth-core':
         specifier: workspace:*
         version: link:../../packages/core
       hono:
