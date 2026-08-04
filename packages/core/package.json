@@ -1,5 +1,5 @@
 {
-  "name": "@gately-auth/core",
+  "name": "@gately/auth-core",
   "version": "0.1.0",
   "description": "Cloudflare-native auth framework core — D1, KV, Workers",
   "type": "module",
@@ -45,5 +45,8 @@
     "authentication",
     "gately"
   ],
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  }
 }

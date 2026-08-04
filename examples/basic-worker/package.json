@@ -7,12 +7,12 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "migrate:local": "npx @gately-auth/cli migrate --local",
-    "migrate:remote": "npx @gately-auth/cli migrate --remote",
+    "migrate:local": "npx @gately/auth-cli migrate --local",
+    "migrate:remote": "npx @gately/auth-cli migrate --remote",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@gately-auth/core": "workspace:*",
+    "@gately/auth-core": "workspace:*",
     "hono": "^4.6.0"
   },
   "devDependencies": {

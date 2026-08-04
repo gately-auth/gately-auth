@@ -9,9 +9,9 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "pnpm --filter \"@gately-auth/*\" -r build",
-    "dev": "pnpm --filter \"@gately-auth/*\" -r --parallel dev",
-    "typecheck": "pnpm --filter \"@gately-auth/*\" -r typecheck",
+    "build": "pnpm --filter \"@gately/auth-*\" -r build",
+    "dev": "pnpm --filter \"@gately/auth-*\" -r --parallel dev",
+    "typecheck": "pnpm --filter \"@gately/auth-*\" -r typecheck",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",

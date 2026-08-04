@@ -1,5 +1,5 @@
 {
-  "name": "@gately-auth/client",
+  "name": "@gately/auth-client",
   "version": "0.1.0",
   "description": "Gately Auth client SDK — vanilla JS, React, Vue, Svelte",
   "type": "module",
@@ -45,5 +45,8 @@
     "typescript": "^5.5.0"
   },
   "keywords": ["cloudflare", "auth", "client", "gately"],
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  }
 }

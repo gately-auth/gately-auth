@@ -180,10 +180,10 @@ function buildAuthConfig(answers: Record<string, unknown>): string {
     gatelyEmail({ apiKey: env.GATELY_API_KEY }),`
     : "";
 
-  return `import { gatelyAuth } from '@gately-auth/core'
-import { createD1Adapter } from '@gately-auth/core/adapters'
-import { createKVStore } from '@gately-auth/core/adapters'
-${answers["enableGatelyEmail"] ? "import { gatelyEmail } from '@gately-auth/core/plugins'" : ""}
+  return `import { gatelyAuth } from '@gately/auth-core'
+import { createD1Adapter } from '@gately/auth-core/adapters'
+import { createKVStore } from '@gately/auth-core/adapters'
+${answers["enableGatelyEmail"] ? "import { gatelyEmail } from '@gately/auth-core/plugins'" : ""}
 
 export interface Env {
   AUTH_DB: D1Database
@@ -263,7 +263,7 @@ function buildPackageJson(name: string): string {
         "migrate:local": "gately-auth migrate --local",
       },
       dependencies: {
-        "@gately-auth/core": "^0.1.0",
+        "@gately/auth-core": "^0.1.0",
       },
       devDependencies: {
         "@cloudflare/workers-types": "^4.0.0",
