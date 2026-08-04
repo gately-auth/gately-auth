@@ -9,7 +9,7 @@ export const errorCodesArticle = {
   is_published: true,
   display_order: 3,
   sidebar_title: null as string | null,
-  icon: 'hugeicons:alert-circle' as string | null,
+  icon: 'hugeicons:alert-02' as string | null,
   created_at: '2025-01-01T00:00:00Z',
   updated_at: '2025-01-01T00:00:00Z',
   content: bn([

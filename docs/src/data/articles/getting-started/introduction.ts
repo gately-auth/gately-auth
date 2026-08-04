@@ -26,10 +26,10 @@ export const introductionArticle = {
 
     h2('What it includes'),
     cardGroup(2, [
-      card({ icon: 'hugeicons:mail-01', title: 'Email + Password', body: 'Sign up, sign in, email verification, and password reset. Configurable minimum length and auto sign-in after verification.' }),
-      card({ icon: 'hugeicons:magic-wand-01', title: 'Magic Links', body: 'Passwordless sign-in via a time-limited link sent to the user\'s email address.' }),
-      card({ icon: 'hugeicons:smartphone-01', title: 'Email OTP', body: 'Six-digit one-time codes for sign-in, sign-up, or two-factor flows.' }),
-      card({ icon: 'hugeicons:google', title: 'OAuth / Social', body: 'Google, GitHub, and any OAuth 2.0 provider — PKCE, state validation, and profile mapping built in.' }),
+      { icon: 'hugeicons:mail-01', title: 'Email + Password', body: 'Sign up, sign in, email verification, and password reset. Configurable minimum length and auto sign-in after verification.' },
+      { icon: 'hugeicons:magic-wand-01', title: 'Magic Links', body: 'Passwordless sign-in via a time-limited link sent to the user\'s email address.' },
+      { icon: 'hugeicons:mobile-navigator-01', title: 'Email OTP', body: 'Six-digit one-time codes for sign-in, sign-up, or two-factor flows.' },
+      { icon: 'hugeicons:google', title: 'OAuth / Social', body: 'Google, GitHub, and any OAuth 2.0 provider — PKCE, state validation, and profile mapping built in.' },
     ]),
 
     h2('Packages'),

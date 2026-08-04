@@ -9,7 +9,7 @@ export const cliOverviewArticle = {
   is_published: true,
   display_order: 1,
   sidebar_title: null as string | null,
-  icon: 'hugeicons:terminal' as string | null,
+  icon: 'hugeicons:command-line' as string | null,
   created_at: '2025-01-01T00:00:00Z',
   updated_at: '2025-01-01T00:00:00Z',
   content: bn([

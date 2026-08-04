@@ -9,7 +9,7 @@ export const reactHooksArticle = {
   is_published: true,
   display_order: 2,
   sidebar_title: null as string | null,
-  icon: 'hugeicons:react' as string | null,
+  icon: 'hugeicons:atom-01' as string | null,
   created_at: '2025-01-01T00:00:00Z',
   updated_at: '2025-01-01T00:00:00Z',
   content: bn([

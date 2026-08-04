@@ -97,12 +97,12 @@ export const step = (stepNumber: number, stepTitle: string, body: string) => ({
   content: [{ type: 'text', text: body, styles: {} }], children: [],
 });
 
-export const card = (opts: { icon?: string; cardTitle: string; cardBody: string; href?: string; imageUrl?: string }) => ({
+export const card = (opts: { icon?: string; title?: string; cardTitle?: string; body?: string; cardBody?: string; href?: string; imageUrl?: string }) => ({
   id: uid(), type: 'card',
   props: {
     icon: opts.icon || 'hugeicons:file-01',
-    cardTitle: opts.cardTitle,
-    cardBody: opts.cardBody,
+    cardTitle: opts.cardTitle || opts.title || '',
+    cardBody: opts.cardBody || opts.body || '',
     href: opts.href || '',
     imageUrl: opts.imageUrl || '',
     textColor: 'default', backgroundColor: 'default', textAlignment: 'left',
@@ -136,13 +136,13 @@ export const cardGroup = (columns: 2 | 3, cards: { icon?: string; title: string;
   id: uid(), type: 'cardGroup',
   props: {
     columns,
-    cards: JSON.stringify(cards.map(c => ({
-      icon: c.icon || '',
-      title: c.title,
-      body: c.body,
-      href: c.href || '',
-      imageUrl: c.imageUrl || '',
-    }))),
+    cardCount: cards.length,
+    card0icon: cards[0]?.icon || '', card0title: cards[0]?.title || '', card0body: cards[0]?.body || '', card0href: cards[0]?.href || '',
+    card1icon: cards[1]?.icon || '', card1title: cards[1]?.title || '', card1body: cards[1]?.body || '', card1href: cards[1]?.href || '',
+    card2icon: cards[2]?.icon || '', card2title: cards[2]?.title || '', card2body: cards[2]?.body || '', card2href: cards[2]?.href || '',
+    card3icon: cards[3]?.icon || '', card3title: cards[3]?.title || '', card3body: cards[3]?.body || '', card3href: cards[3]?.href || '',
+    card4icon: cards[4]?.icon || '', card4title: cards[4]?.title || '', card4body: cards[4]?.body || '', card4href: cards[4]?.href || '',
+    card5icon: cards[5]?.icon || '', card5title: cards[5]?.title || '', card5body: cards[5]?.body || '', card5href: cards[5]?.href || '',
     textColor: 'default', backgroundColor: 'default', textAlignment: 'left',
   },
   content: [], children: [],

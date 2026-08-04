@@ -9,7 +9,7 @@ export const deployToCloudflareArticle = {
   is_published: true,
   display_order: 1,
   sidebar_title: null as string | null,
-  icon: 'hugeicons:cloud-upload' as string | null,
+  icon: 'hugeicons:cloud-server' as string | null,
   created_at: '2025-01-01T00:00:00Z',
   updated_at: '2025-01-01T00:00:00Z',
   content: bn([

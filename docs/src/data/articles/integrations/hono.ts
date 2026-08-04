@@ -9,7 +9,7 @@ export const honoArticle = {
   is_published: true,
   display_order: 2,
   sidebar_title: null as string | null,
-  icon: 'hugeicons:fire-01' as string | null,
+  icon: 'hugeicons:fire-02' as string | null,
   created_at: '2025-01-01T00:00:00Z',
   updated_at: '2025-01-01T00:00:00Z',
   content: bn([

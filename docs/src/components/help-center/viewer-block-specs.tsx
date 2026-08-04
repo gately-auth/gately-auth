@@ -813,23 +813,30 @@ export const cardGroupBlockSpec = createReactBlockSpec(
     type: 'cardGroup' as const,
     propSchema: {
       ...defaultProps,
-      columns: { default: 2 },
-      cards: { default: '[]' }, // Store as JSON string to avoid type issues
+      columns:   { default: 2 },
+      cardCount: { default: 0 },
+      card0icon: { default: '' }, card0title: { default: '' }, card0body: { default: '' }, card0href: { default: '' },
+      card1icon: { default: '' }, card1title: { default: '' }, card1body: { default: '' }, card1href: { default: '' },
+      card2icon: { default: '' }, card2title: { default: '' }, card2body: { default: '' }, card2href: { default: '' },
+      card3icon: { default: '' }, card3title: { default: '' }, card3body: { default: '' }, card3href: { default: '' },
+      card4icon: { default: '' }, card4title: { default: '' }, card4body: { default: '' }, card4href: { default: '' },
+      card5icon: { default: '' }, card5title: { default: '' }, card5body: { default: '' }, card5href: { default: '' },
     },
     content: 'none',
   },
   {
     render: ({ block }) => {
       const columns = Math.max(2, Math.min(3, Number(block.props.columns) || 2));
-      // Parse cards from JSON string
-      let cards: Array<{ icon: string; title: string; body: string; href: string; imageUrl: string }> = [];
-      try {
-        const cardsData = block.props.cards;
-        cards = typeof cardsData === 'string' ? JSON.parse(cardsData) : (Array.isArray(cardsData) ? cardsData : []);
-      } catch {
-        cards = [];
-      }
-      
+      const count = Number(block.props.cardCount) || 0;
+
+      // Rebuild cards from indexed props
+      const cards = Array.from({ length: Math.max(count, 6) }, (_, i) => ({
+        icon:  String((block.props as any)[`card${i}icon`]  || ''),
+        title: String((block.props as any)[`card${i}title`] || ''),
+        body:  String((block.props as any)[`card${i}body`]  || ''),
+        href:  String((block.props as any)[`card${i}href`]  || ''),
+      })).filter(c => c.title || c.body);
+
       const gridClass = columns === 3 ? 'grid-cols-3' : 'grid-cols-2';
 
       return (

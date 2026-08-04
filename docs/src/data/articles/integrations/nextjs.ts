@@ -9,7 +9,7 @@ export const nextjsArticle = {
   is_published: true,
   display_order: 1,
   sidebar_title: null as string | null,
-  icon: 'hugeicons:nextjs' as string | null,
+  icon: 'hugeicons:black-hole' as string | null,
   created_at: '2025-01-01T00:00:00Z',
   updated_at: '2025-01-01T00:00:00Z',
   content: bn([
