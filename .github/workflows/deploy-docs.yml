@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+      - 'pnpm-workspace.yaml'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -32,7 +33,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build docs
-        run: pnpm --filter docs build
+        run: pnpm --filter docs exec astro build
+        env:
+          NODE_ENV: production
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
