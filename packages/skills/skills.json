@@ -1,0 +1,17 @@
+{
+  "name": "gately-auth",
+  "description": "Coding agent skills for gately-auth — Cloudflare Workers authentication",
+  "version": "0.1.0",
+  "skills": [
+    {
+      "name": "gately-auth",
+      "file": "SKILL.md",
+      "description": "Core gately-auth patterns, setup, and conventions"
+    },
+    {
+      "name": "gately-auth-recipes",
+      "file": "SKILL.recipes.md",
+      "description": "Common recipes — OAuth, magic links, OTP, React hooks"
+    }
+  ]
+}

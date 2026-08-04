@@ -36,6 +36,11 @@ export const installationArticle = {
       { label: 'npm', language: 'bash', code: 'npm install @gately/auth-client' },
       { label: 'pnpm', language: 'bash', code: 'pnpm add @gately/auth-client' },
     ]),
+    p('For agent and MCP workflows, also install the MCP and Skills packages:'),
+    codeGroup([
+      { label: 'npm', language: 'bash', code: 'npm install @gately/auth-mcp @gately/auth-skills' },
+      { label: 'pnpm', language: 'bash', code: 'pnpm add @gately/auth-mcp @gately/auth-skills' },
+    ]),
 
     h2('Create a D1 database'),
     p('gately-auth stores users, sessions, accounts, and verification tokens in a Cloudflare D1 SQLite database.'),

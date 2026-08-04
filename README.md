@@ -229,6 +229,8 @@ Cloudflare Worker  ←── gately-auth handler
 | [`@gately-auth/core`](packages/core) | [![npm](https://img.shields.io/npm/v/@gately-auth/core?color=black)](https://www.npmjs.com/package/@gately-auth/core) | Worker handler, D1/KV adapters, all providers |
 | [`@gately-auth/client`](packages/client) | [![npm](https://img.shields.io/npm/v/@gately-auth/client?color=black)](https://www.npmjs.com/package/@gately-auth/client) | Browser client, React hooks |
 | [`@gately-auth/cli`](packages/cli) | [![npm](https://img.shields.io/npm/v/@gately-auth/cli?color=black)](https://www.npmjs.com/package/@gately-auth/cli) | CLI — init, migrate, generate, deploy |
+| [`@gately-auth/mcp`](packages/mcp) | [![npm](https://img.shields.io/npm/v/@gately-auth/mcp?color=black)](https://www.npmjs.com/package/@gately/auth-mcp) | MCP server runtime for agent-aware auth workflows |
+| [`@gately-auth/skills`](packages/skills) | [![npm](https://img.shields.io/npm/v/@gately-auth/skills?color=black)](https://www.npmjs.com/package/@gately/auth-skills) | Composable auth skills for agent actions |
 
 ---
 

@@ -1,0 +1,16 @@
+{
+  "name": "@gately/auth-skills",
+  "version": "0.1.0",
+  "description": "Agent skills for gately-auth — install with: npx skills add gately-auth/skills",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Skills are static markdown files, no build needed'"
+  },
+  "keywords": ["skills", "agent-skills", "cloudflare", "auth", "gately-auth", "kiro", "cursor", "copilot"],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gately-auth/gately-auth",
+    "directory": "packages/skills"
+  }
+}

@@ -33,10 +33,12 @@ export const introductionArticle = {
     ]),
 
     h2('Packages'),
-    p('gately-auth is a monorepo with three packages:'),
+    p('gately-auth is a monorepo with five packages:'),
     bullet('@gately/auth-core — the Worker handler, adapters, providers, session management, and plugin system'),
     bullet('@gately/auth-client — a browser/React client SDK with reactive session state'),
     bullet('@gately/auth-cli — CLI to scaffold, generate migrations, and deploy'),
+    bullet('@gately/auth-mcp — MCP server runtime for agent-aware auth workflows'),
+    bullet('@gately/auth-skills — composable auth skills for agent actions and automation'),
 
     h2('How it works'),
     p('You call gatelyAuth() with your D1 database, KV namespace, secret, and the auth methods you want to enable. It returns a handler function and a server-side API object.'),

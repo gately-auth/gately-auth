@@ -1,0 +1,19 @@
+{
+  "name": "@gately/auth-mcp",
+  "version": "0.1.0",
+  "description": "Remote MCP server for gately-auth documentation",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Deployed via wrangler'",
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241224.0",
+    "typescript": "^5.5.0",
+    "wrangler": "^3.95.0"
+  },
+  "license": "Apache-2.0"
+}

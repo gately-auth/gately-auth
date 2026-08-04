@@ -51,6 +51,7 @@ import { reactHooksArticle } from './articles/client-sdk/react-hooks';
 // ─── Articles: CLI ────────────────────────────────────────────────────────────
 import { cliOverviewArticle } from './articles/cli/cli-overview';
 import { cliLoginSetupArticle } from './articles/cli/cli-login-setup';
+import { skillsArticle } from './articles/cli/skills';
 
 // ─── Articles: Plugins ────────────────────────────────────────────────────────
 import { gatelyEmailPluginArticle } from './articles/plugins/gately-email';
