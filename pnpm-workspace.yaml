@@ -5,5 +5,9 @@ packages:
 allowBuilds:
   esbuild: true
   sharp: true
-  vue-demi: false
   workerd: true
+  rollup: true
+  "@rollup/rollup-linux-x64-gnu": true
+  "@rollup/rollup-linux-x64-musl": true
+  "@rollup/rollup-linux-arm64-gnu": true
+  "@rollup/rollup-linux-arm64-musl": true
