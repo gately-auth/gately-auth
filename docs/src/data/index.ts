@@ -1,11 +1,5 @@
 /**
- * Central data registry
- * Import categories, articles, and folders from their individual files.
- * localData.ts consumes these exports.
- *
- * To add content:
- *   1. Create a file in src/data/categories/, src/data/articles/<category>/, or src/data/folders.ts
- *   2. Import and add it to the arrays below
+ * Gately Auth — Central data registry
  */
 
 // ─── Folders ──────────────────────────────────────────────────────────────────
@@ -13,86 +7,88 @@ export { folders } from './folders';
 
 // ─── Categories ──────────────────────────────────────────────────────────────
 import { gettingStartedCategory } from './categories/getting-started';
-import { componentsCategory } from './categories/components';
-import { guidesCategory } from './categories/guides';
+import { coreConceptsCategory } from './categories/core-concepts';
+import { authMethodsCategory } from './categories/auth-methods';
+import { clientSdkCategory } from './categories/client-sdk';
+import { cliCategory } from './categories/cli';
 import { apiReferenceCategory } from './categories/api-reference';
-import { troubleshootingCategory } from './categories/troubleshooting';
-import { blogCategory } from './categories/blog';
+import { integrationsCategory } from './categories/integrations';
+import { deploymentCategory } from './categories/deployment';
 
 export const categories = [
   gettingStartedCategory,
-  componentsCategory,
-  guidesCategory,
+  coreConceptsCategory,
+  authMethodsCategory,
+  clientSdkCategory,
+  cliCategory,
   apiReferenceCategory,
-  troubleshootingCategory,
-  blogCategory,
+  integrationsCategory,
+  deploymentCategory,
 ];
 
 // ─── Articles: Getting Started ────────────────────────────────────────────────
-import { welcomeArticle } from './articles/getting-started/welcome';
+import { introductionArticle } from './articles/getting-started/introduction';
 import { installationArticle } from './articles/getting-started/installation';
 import { quickStartArticle } from './articles/getting-started/quick-start';
 
-// ─── Articles: Template Components ───────────────────────────────────────────
-import { componentsOverviewArticle } from './articles/components/overview';
-import { heroBlockArticle } from './articles/components/hero-block';
-import { textBlockArticle } from './articles/components/text-block';
-import { codeBlockArticle } from './articles/components/code-block';
-import { ctaBlockArticle } from './articles/components/cta-block';
-import { faqBlockArticle } from './articles/components/faq-block';
-import { sidebarBlockArticle } from './articles/components/sidebar-block';
-import { searchBlockArticle } from './articles/components/search-block';
+// ─── Articles: Core Concepts ──────────────────────────────────────────────────
+import { howItWorksArticle } from './articles/core-concepts/how-it-works';
+import { configurationArticle } from './articles/core-concepts/configuration';
+import { pluginsArticle } from './articles/core-concepts/plugins';
 
-// ─── Articles: Guides ─────────────────────────────────────────────────────────
-import { configurationArticle } from './articles/guides/configuration';
-import { themingArticle } from './articles/guides/theming';
-import { addingContentArticle } from './articles/guides/adding-content';
+// ─── Articles: Auth Methods ───────────────────────────────────────────────────
+import { emailPasswordArticle } from './articles/auth-methods/email-password';
+import { magicLinksArticle } from './articles/auth-methods/magic-links';
+import { emailOtpArticle } from './articles/auth-methods/email-otp';
+import { oauthSocialArticle } from './articles/auth-methods/oauth-social';
+
+// ─── Articles: Client SDK ─────────────────────────────────────────────────────
+import { clientOverviewArticle } from './articles/client-sdk/overview';
+import { reactHooksArticle } from './articles/client-sdk/react-hooks';
+
+// ─── Articles: CLI ────────────────────────────────────────────────────────────
+import { cliOverviewArticle } from './articles/cli/cli-overview';
 
 // ─── Articles: API Reference ──────────────────────────────────────────────────
-import { apiIntroductionArticle } from './articles/api-reference/introduction';
-import { apiAuthenticationArticle } from './articles/api-reference/authentication';
+import { coreApiArticle } from './articles/api-reference/core-api';
+import { clientApiArticle } from './articles/api-reference/client-api';
+import { errorCodesArticle } from './articles/api-reference/error-codes';
 
-// ─── Articles: Troubleshooting ────────────────────────────────────────────────
-import { commonErrorsArticle } from './articles/troubleshooting/common-errors';
-import { performanceArticle } from './articles/troubleshooting/performance';
+// ─── Articles: Integrations ───────────────────────────────────────────────────
+import { nextjsArticle } from './articles/integrations/nextjs';
+import { honoArticle } from './articles/integrations/hono';
 
-// ─── Articles: Blog ───────────────────────────────────────────────────────────
-import { introducingHelioArticle } from './articles/blog/introducing-helio';
-import { buildingDocsWithBlocksArticle } from './articles/blog/building-docs-with-blocks';
-import { seoForDocsArticle } from './articles/blog/seo-for-docs';
-import { deployingToCloudflareArticle } from './articles/blog/deploying-to-cloudflare';
-import { darkModeThemingArticle } from './articles/blog/dark-mode-theming';
-import { writingGreatDocsArticle } from './articles/blog/writing-great-docs';
+// ─── Articles: Deployment ─────────────────────────────────────────────────────
+import { deployToCloudflareArticle } from './articles/deployment/deploy-to-cloudflare';
+import { environmentVariablesArticle } from './articles/deployment/environment-variables';
 
 export const articles = [
   // Getting Started
-  welcomeArticle,
+  introductionArticle,
   installationArticle,
   quickStartArticle,
-  // Template Components
-  componentsOverviewArticle,
-  heroBlockArticle,
-  textBlockArticle,
-  codeBlockArticle,
-  ctaBlockArticle,
-  faqBlockArticle,
-  sidebarBlockArticle,
-  searchBlockArticle,
-  // Guides
+  // Core Concepts
+  howItWorksArticle,
   configurationArticle,
-  themingArticle,
-  addingContentArticle,
+  pluginsArticle,
+  // Auth Methods
+  emailPasswordArticle,
+  magicLinksArticle,
+  emailOtpArticle,
+  oauthSocialArticle,
+  // Client SDK
+  clientOverviewArticle,
+  reactHooksArticle,
+  // CLI
+  cliOverviewArticle,
   // API Reference
-  apiIntroductionArticle,
-  apiAuthenticationArticle,
-  // Troubleshooting
-  commonErrorsArticle,
-  performanceArticle,
-  // Blog
-  introducingHelioArticle,
-  buildingDocsWithBlocksArticle,
-  seoForDocsArticle,
-  deployingToCloudflareArticle,
-  darkModeThemingArticle,
-  writingGreatDocsArticle,
+  coreApiArticle,
+  clientApiArticle,
+  errorCodesArticle,
+  // Integrations
+  nextjsArticle,
+  honoArticle,
+  // Deployment
+  deployToCloudflareArticle,
+  environmentVariablesArticle,
 ];

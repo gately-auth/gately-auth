@@ -1,9 +1,9 @@
 export const gettingStartedCategory = {
   id: 'getting-started',
   name: 'Getting Started',
-  description: 'Everything you need to get up and running quickly.',
+  description: 'Install gately-auth and have authentication running in your Cloudflare Worker.',
   icon: 'hugeicons:rocket-01',
   display_order: 1,
-  folder_id: 'docs' as string | null,
-  parent_category_id: null as string | null,
+  folder_id: 'docs',
+  parent_category_id: null,
 };
