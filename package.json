@@ -1,0 +1,36 @@
+{
+  "name": "gately-auth",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Cloudflare-native authentication framework — D1, KV, and Gately email",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "pnpm --filter \"@gately-auth/*\" -r build",
+    "dev": "pnpm --filter \"@gately-auth/*\" -r --parallel dev",
+    "typecheck": "pnpm --filter \"@gately-auth/*\" -r typecheck",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "changeset": "changeset",
+    "release": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "@cloudflare/workers-types": "^4.20241224.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "wrangler": "^3.95.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

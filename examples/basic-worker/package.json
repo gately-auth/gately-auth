@@ -1,0 +1,23 @@
+{
+  "name": "gately-auth-basic-worker-example",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Example: standalone Cloudflare Worker using gately-auth",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "migrate:local": "npx @gately-auth/cli migrate --local",
+    "migrate:remote": "npx @gately-auth/cli migrate --remote",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gately-auth/core": "workspace:*",
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241224.0",
+    "typescript": "^5.5.0",
+    "wrangler": "^3.95.0"
+  }
+}
