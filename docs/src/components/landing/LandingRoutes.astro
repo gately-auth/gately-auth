@@ -1,0 +1,31 @@
+---
+---
+<section class="bd">
+  <div class="lc" style="padding-top:0;padding-bottom:0">
+    <div class="l-split">
+      <div class="l-split-left">
+        <span class="l-split-label">API Surface</span>
+        <h2 class="l-split-title">Every route, out of the box.</h2>
+        <p class="l-split-desc">RESTful API endpoints ready to use. Mount on <code style="font-size:11px;color:#555">/auth/*</code> and everything is live.</p>
+      </div>
+      <div class="l-split-right" style="padding:0">
+        <div class="l-rt" style="margin:0;border:none;border-left:1px solid #111">
+          <div class="l-rr"><span class="l-rm post">POST</span><span class="l-rp">/auth/sign-up/email</span><span class="l-rd">Create account</span></div>
+          <div class="l-rr"><span class="l-rm post">POST</span><span class="l-rp">/auth/sign-in/email</span><span class="l-rd">Login with email + password</span></div>
+          <div class="l-rr"><span class="l-rm post">POST</span><span class="l-rp">/auth/sign-out</span><span class="l-rd">Logout the current user</span></div>
+          <div class="l-rr"><span class="l-rm get">GET</span><span class="l-rp">/auth/session</span><span class="l-rd">Get current user</span></div>
+          <div class="l-rr"><span class="l-rm post">POST</span><span class="l-rp">/auth/magic-link/send</span><span class="l-rd">Send magic link</span></div>
+          <div class="l-rr"><span class="l-rm get">GET</span><span class="l-rp">/auth/magic-link/verify</span><span class="l-rd">Verify magic link token</span></div>
+          <div class="l-rr"><span class="l-rm post">POST</span><span class="l-rp">/auth/otp/send</span><span class="l-rd">Send OTP code</span></div>
+          <div class="l-rr"><span class="l-rm post">POST</span><span class="l-rp">/auth/otp/verify</span><span class="l-rd">Verify OTP code</span></div>
+          <div class="l-rr"><span class="l-rm get">GET</span><span class="l-rp">/auth/oauth/:provider</span><span class="l-rd">Start OAuth flow</span></div>
+          <div class="l-rr"><span class="l-rm get">GET</span><span class="l-rp">/auth/oauth/:provider/callback</span><span class="l-rd">OAuth callback</span></div>
+          <div class="l-rr"><span class="l-rm post">POST</span><span class="l-rp">/auth/password/reset</span><span class="l-rd">Send reset email</span></div>
+          <div class="l-rr"><span class="l-rm get">GET</span><span class="l-rp">/auth/sessions</span><span class="l-rd">List active sessions</span></div>
+          <div class="l-rr"><span class="l-rm del">DEL</span><span class="l-rp">/auth/sessions/:token</span><span class="l-rd">Revoke session</span></div>
+          <div class="l-rr"><span class="l-rm get">GET</span><span class="l-rp">/auth/health</span><span class="l-rd">Health check</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

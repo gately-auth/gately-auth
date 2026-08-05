@@ -1,0 +1,542 @@
+/* ─── Gately Auth Landing Page ─────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #000;
+  color: #fff;
+  font-family: 'Onest', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+pre, code, kbd { font-family: 'Geist Mono', ui-monospace, Menlo, Consolas, monospace; }
+
+#noise-canvas {
+  position: fixed; inset: 0; width: 100vw; height: 100vh;
+  pointer-events: none; z-index: 0; opacity: 0.035; mix-blend-mode: screen;
+}
+
+#layout {
+  max-width: 1500px; margin: 0 auto;
+  border-left: 1px solid #111; border-right: 1px solid #111;
+  min-height: 100vh; position: relative; z-index: 1;
+}
+
+nav, section, footer, main { position: relative; z-index: 1; }
+
+.lc { padding: 0 48px; }
+.bd { border-bottom: 1px solid #111; }
+.sec { padding: 80px 0; }
+
+/* ── Type ── */
+h1 {
+  font-family: 'Onest', sans-serif;
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #fff;
+  margin-bottom: 24px;
+  white-space: nowrap;
+}
+.sh {
+  font-family: 'Onest', sans-serif;
+  font-size: clamp(20px, 3vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.stag {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #555;
+  margin-bottom: 12px;
+  display: block;
+}
+.ss {
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 40px;
+  max-width: 480px;
+  line-height: 1.7;
+}
+
+/* ── Buttons ── */
+.l-btn-primary {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.04em;
+  background: #fff; color: #000;
+  padding: 10px 22px;
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid #fff;
+  transition: background 0.15s;
+}
+.l-btn-primary:hover { background: #e4e4e7; }
+
+.l-btn-ghost {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px; letter-spacing: 0.04em;
+  background: transparent; color: #555;
+  padding: 10px 22px;
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid #222;
+  transition: border-color 0.15s, color 0.15s;
+}
+.l-btn-ghost:hover { border-color: #444; color: #fff; }
+
+/* ── Terminal / window colors ── */
+.tc-d { color: #444; }
+.tc-w { color: #bbb; }
+.tc-s { color: #666; }
+.tc-k { color: #888; }
+.tc-g { color: #4ade80; }
+.tc-b { color: #60a5fa; }
+.tc-p { color: #333; }
+
+/* ── Window chrome ── */
+.l-win { background: #080808; border: 1px solid #111; }
+.l-win-bar {
+  display: flex; align-items: center; gap: 5px;
+  padding: 8px 12px;
+  background: #0a0a0a; border-bottom: 1px solid #111;
+}
+.l-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.l-win-title { font-family: 'Geist Mono', monospace; font-size: 10px; color: #333; margin-left: 8px; }
+.l-win-file { font-family: 'Geist Mono', monospace; font-size: 10px; color: #333; letter-spacing: 0.04em; }
+.l-win-lang { font-family: 'Geist Mono', monospace; font-size: 9px; color: #222; letter-spacing: 0.08em; text-transform: uppercase; margin-left: auto; }
+.l-term-body { padding: 14px 16px; font-family: 'Geist Mono', monospace; font-size: 11px; line-height: 1.85; }
+
+/* ── Nav ── */
+.l-nav {
+  border-bottom: 1px solid #111;
+  position: fixed; top: 0; left: 0; right: 0;
+  background: rgba(0,0,0,0.9);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+.l-nav-i {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 48px; max-width: 1500px; margin: 0 auto; padding: 0 48px;
+}
+.l-nav-logo {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.l-nav-links { display: flex; align-items: center; gap: 24px; }
+.l-nav-link {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #555;
+}
+.l-nav-link:hover { color: #fff; }
+.l-nav-right { display: flex; align-items: center; gap: 10px; }
+.l-nav-star {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: #555; border: 1px solid #1e1e1e;
+  padding: 5px 12px; display: inline-flex; align-items: center; gap: 6px;
+}
+.l-nav-star:hover { border-color: #333; color: #bbb; }
+.l-nav-cta {
+  font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.06em; background: #fff; color: #000; padding: 6px 16px;
+}
+.l-nav-cta:hover { background: #e4e4e7; }
+
+/* ── Hero ── */
+.l-hero { border-bottom: 1px solid #111; }
+.l-hero-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: start; padding-top: 64px;
+  gap: 0;
+}
+.l-hero-left { padding: 32px 48px 52px 0; }
+.l-hero-right { border-left: 1px solid #111; background: #040404; }
+
+.l-topbar-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 28px;
+}
+.l-ver { font-family: 'Geist Mono', monospace; font-size: 10px; color: #333; letter-spacing: 0.06em; }
+.l-prod-badge {
+  font-family: 'Geist Mono', monospace; font-size: 10px;
+  color: #4ade80; border: 1px solid #14532d;
+  padding: 2px 8px; letter-spacing: 0.06em;
+}
+
+.l-hero-sub { font-size: 14px; color: #555; max-width: 460px; line-height: 1.75; margin-bottom: 24px; }
+
+.l-hero-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 28px; }
+.l-hero-tag {
+  font-family: 'Geist Mono', monospace; font-size: 10px;
+  letter-spacing: 0.06em; color: #333;
+  border: 1px solid #1a1a1a; padding: 3px 10px; background: #080808;
+}
+
+.l-hero-install {
+  display: flex; align-items: center; gap: 0;
+  border: 1px solid #1a1a1a; background: #080808;
+  margin-bottom: 24px; max-width: 380px;
+}
+.l-hero-install-num {
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+  color: #2a2a2a; padding: 9px 12px;
+  border-right: 1px solid #1a1a1a; user-select: none;
+}
+.l-hero-install code { padding: 9px 14px; font-size: 12px; color: #777; flex: 1; }
+.l-hero-install-copy {
+  padding: 9px 12px; color: #2a2a2a; background: transparent;
+  border: none; cursor: pointer; font-size: 14px;
+  border-left: 1px solid #1a1a1a;
+}
+.l-hero-install-copy:hover { color: #666; }
+
+.l-hero-actions { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+
+.l-fw-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.l-fw-item {
+  font-family: 'Geist Mono', monospace; font-size: 10px;
+  letter-spacing: 0.04em; color: #2a2a2a;
+  border: 1px solid #111; padding: 4px 10px; background: #060606;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.l-fw-item:hover { color: #555; border-color: #1e1e1e; }
+
+.l-hero-code-split {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #111;
+}
+.l-win-sm { border: none; border-radius: 0; }
+
+/* ── Install section ── */
+.l-install-grid {
+  display: grid; grid-template-columns: 1fr 2fr;
+  gap: 48px; align-items: start; padding-top: 40px;
+}
+.l-install-label { font-size: 13px; color: #555; line-height: 1.75; }
+.l-install-right {}
+.l-itabs { display: flex; border-bottom: 1px solid #111; margin-bottom: 0; }
+.l-itab {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  letter-spacing: 0.04em; padding: 8px 16px; color: #333;
+  background: transparent; border: none; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: color 0.1s;
+}
+.l-itab:hover { color: #888; }
+.l-itab.active { color: #fff; border-bottom-color: #fff; }
+.l-install-box {
+  border: 1px solid #111; border-top: none;
+  background: #050505; padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.l-install-box code { font-size: 13px; color: #777; }
+.l-install-box .l-dol { color: #2a2a2a; margin-right: 8px; }
+.l-copy-btn {
+  font-family: 'Geist Mono', monospace; font-size: 10px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: #333; background: transparent;
+  border: 1px solid #1a1a1a; padding: 4px 10px;
+  cursor: pointer; flex-shrink: 0; transition: color 0.1s, border-color 0.1s;
+}
+.l-copy-btn:hover { color: #aaa; border-color: #333; }
+
+/* Agent prompt */
+.l-prompt { border: 1px solid #111; margin-top: 1px; }
+.l-prompt-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 18px; border-bottom: 1px solid #111; background: #050505;
+}
+.l-prompt-label { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #333; }
+.l-prompt-badge { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #222; border: 1px solid #1a1a1a; padding: 2px 7px; }
+.l-prompt-body { padding: 14px 18px; font-family: 'Geist Mono', monospace; font-size: 12px; color: #555; line-height: 1.8; }
+
+/* ── Quick start 3-col code ── */
+.l-qs-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: #111; border: 1px solid #111; margin-top: 32px;
+}
+.l-qs-panel { background: #000; }
+.l-qs-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px; border-bottom: 1px solid #111; background: #060606;
+}
+.l-qs-file { font-family: 'Geist Mono', monospace; font-size: 10px; color: #333; }
+.l-qs-lang { font-family: 'Geist Mono', monospace; font-size: 9px; color: #1e1e1e; text-transform: uppercase; letter-spacing: 0.08em; }
+.l-qs-body { padding: 14px 16px; font-family: 'Geist Mono', monospace; font-size: 11px; line-height: 1.85; overflow-x: auto; }
+
+/* ── Features 4-col ── */
+.l-fg {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: #111; border: 1px solid #111; margin-top: 40px;
+}
+.l-fi { background: #000; padding: 24px 20px; transition: background 0.1s; }
+.l-fi:hover { background: #080808; }
+/* Feature icon */
+.l-fi-ico {
+  display: block;
+  color: #333;
+  margin-bottom: 10px;
+}
+.l-fi-name {
+  font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase; color: #777; margin-bottom: 8px;
+}
+.l-fi-items { display: flex; flex-direction: column; gap: 4px; }
+.l-fi-item { font-family: 'Geist Mono', monospace; font-size: 10px; color: #2a2a2a; }
+
+/* ── Routes ── */
+.l-rt {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: #111; border: 1px solid #111; margin-top: 32px;
+}
+.l-rr {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px; background: #000; transition: background 0.1s;
+}
+.l-rr:hover { background: #070707; }
+.l-rm {
+  font-family: 'Geist Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.06em; padding: 2px 6px; flex-shrink: 0;
+  min-width: 44px; text-align: center;
+  background: #0a0a0a; border: 1px solid #1a1a1a;
+}
+.l-rm.get { color: #4ade80; border-color: #14532d; }
+.l-rm.post { color: #60a5fa; border-color: #1e3a5f; }
+.l-rm.del { color: #f87171; border-color: #5f1e1e; }
+.l-rp { font-family: 'Geist Mono', monospace; font-size: 11px; color: #555; flex: 1; }
+.l-rd { font-family: 'Geist Mono', monospace; font-size: 10px; color: #2a2a2a; margin-left: auto; white-space: nowrap; }
+
+/* ── Packages 4-col card grid ── */
+.l-pkg-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: #111; border: 1px solid #111; margin-top: 40px;
+}
+.l-pkg-card { background: #000; padding: 22px 20px; transition: background 0.1s; }
+.l-pkg-card:hover { background: #080808; }
+.l-pkg-name { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; color: #bbb; margin-bottom: 6px; }
+.l-pkg-sub { font-family: 'Geist Mono', monospace; font-size: 10px; color: #2a2a2a; letter-spacing: 0.04em; margin-bottom: 10px; }
+.l-pkg-desc { font-size: 12px; color: #3a3a3a; line-height: 1.6; margin-bottom: 12px; }
+.l-pkg-ver { font-family: 'Geist Mono', monospace; font-size: 9px; color: #1e1e1e; letter-spacing: 0.06em; }
+.l-pkg-view-all {
+  font-family: 'Geist Mono', monospace; font-size: 11px; color: #333;
+  letter-spacing: 0.04em; margin-top: 12px; display: inline-block;
+}
+.l-pkg-view-all:hover { color: #777; }
+
+/* ── OAuth providers ── */
+.l-providers-row {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 32px;
+}
+.l-prov-badge {
+  display: flex; align-items: center; gap: 7px;
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: #555; border: 1px solid #1a1a1a;
+  padding: 7px 14px; background: #080808; transition: border-color 0.1s, color 0.1s;
+  cursor: default;
+}
+.l-prov-badge:hover { border-color: #333; color: #bbb; }
+.l-prov-badge iconify-icon { color: #333; transition: color 0.1s; flex-shrink: 0; }
+.l-prov-badge:hover iconify-icon { color: #888; }
+.l-prov-more {
+  font-family: 'Geist Mono', monospace; font-size: 11px;
+  color: #333; border: 1px solid #1a1a1a;
+  padding: 7px 14px; background: #080808;
+}
+
+/* ── Documentation preview ── */
+.l-doc-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: #111; border: 1px solid #111; margin-top: 40px;
+}
+.l-doc-left { background: #000; }
+.l-doc-right { background: #050505; }
+.l-doc-browser-bar {
+  display: flex; align-items: center; gap: 5px;
+  padding: 8px 12px; background: #060606; border-bottom: 1px solid #111;
+}
+.l-doc-inner { display: grid; grid-template-columns: 150px 1fr; min-height: 280px; }
+.l-doc-sidebar { border-right: 1px solid #111; padding: 10px 0; overflow: hidden; }
+.l-doc-group { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #1e1e1e; padding: 8px 12px 4px; }
+.l-doc-link { font-family: 'Geist Mono', monospace; font-size: 10px; color: #2a2a2a; padding: 4px 12px; display: block; }
+.l-doc-link.active { color: #777; background: #0d0d0d; }
+.l-doc-link:hover { color: #555; }
+.l-doc-content { padding: 14px 16px; overflow: hidden; }
+.l-doc-breadcrumb { font-family: 'Geist Mono', monospace; font-size: 9px; color: #1e1e1e; margin-bottom: 8px; }
+.l-doc-title { font-size: 13px; font-weight: 600; color: #777; margin-bottom: 6px; }
+.l-doc-p { font-family: 'Geist Mono', monospace; font-size: 10px; color: #2a2a2a; line-height: 1.7; margin-bottom: 8px; }
+.l-doc-tabs { display: flex; gap: 4px; margin: 8px 0; }
+.l-doc-tab { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: #2a2a2a; border: 1px solid #111; padding: 3px 8px; }
+.l-doc-tab.active { color: #777; border-color: #333; }
+.l-doc-cmd { font-family: 'Geist Mono', monospace; font-size: 10px; color: #555; background: #060606; border: 1px solid #111; padding: 7px 10px; display: flex; align-items: center; justify-content: space-between; }
+
+/* ── MCP ── */
+.l-mcp-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: #111; border: 1px solid #111; margin-top: 40px;
+}
+.l-mcp-left { background: #000; padding: 32px 28px; }
+.l-mcp-right { background: #050505; }
+.l-mcp-panel-hd { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #222; padding: 9px 20px; border-bottom: 1px solid #111; background: #080808; }
+.l-mcp-tools { display: flex; flex-direction: column; gap: 1px; background: #111; }
+.l-mcp-tool { background: #000; padding: 12px 20px; display: flex; flex-direction: column; gap: 2px; transition: background 0.1s; }
+.l-mcp-tool:hover { background: #080808; }
+.l-mcp-tool-name { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; color: #777; }
+.l-mcp-tool-desc { font-size: 11px; color: #2a2a2a; }
+.l-mcp-endpoint { display: flex; align-items: center; gap: 8px; border: 1px solid #111; padding: 9px 12px; background: #050505; margin-top: 16px; font-family: 'Geist Mono', monospace; font-size: 11px; color: #2a2a2a; }
+.l-mcp-endpoint code { color: #444; font-size: 11px; }
+.l-mcp-clients { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.l-mcp-client { display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; color: #2a2a2a; }
+.l-mcp-dot { width: 4px; height: 4px; border-radius: 50%; background: #1e1e1e; flex-shrink: 0; }
+.l-mcp-client code { color: #3a3a3a; font-size: 10px; }
+.l-mcp-json { margin-top: 16px; border: 1px solid #111; background: #050505; padding: 12px 14px; }
+.l-mcp-json-label { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #1e1e1e; margin-bottom: 8px; }
+.l-mcp-json pre { font-size: 11px; color: #333; line-height: 1.8; padding: 0; }
+
+/* ── What's coming ── */
+.l-cs-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: #111; border: 1px solid #111; margin-top: 40px;
+}
+.l-cs { background: #000; padding: 28px 24px; transition: background 0.1s; }
+.l-cs:hover { background: #080808; }
+.l-cs-badge { font-family: 'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #1e1e1e; border: 1px solid #1a1a1a; padding: 2px 7px; display: inline-block; margin-bottom: 12px; }
+.l-cs-title { font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #555; margin-bottom: 8px; }
+.l-cs-desc { font-size: 12px; color: #2a2a2a; line-height: 1.7; }
+
+/* ── Three steps ── */
+.l-steps-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: #111; border: 1px solid #111; margin-top: 40px;
+}
+.l-step { background: #000; padding: 32px 28px; }
+.l-step-num { font-family: 'Onest', sans-serif; font-size: 52px; font-weight: 800; color: #0d0d0d; margin-bottom: 16px; letter-spacing: -0.04em; line-height: 1; }
+.l-step-title { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #bbb; margin-bottom: 8px; }
+.l-step-desc { font-family: 'Onest', sans-serif; font-size: 13px; color: #3a3a3a; line-height: 1.7; }
+.l-step-desc code { font-family: 'Geist Mono', monospace; font-size: 11px; color: #555; }
+
+/* ── CTA ── */
+.l-cta-section { padding: 100px 0; text-align: center; border-bottom: 1px solid #111; }
+.l-cta-title { font-family: 'Onest', sans-serif; font-size: clamp(24px, 4vw, 40px); font-weight: 400; letter-spacing: -0.02em; color: #fff; margin-bottom: 12px; }
+.l-cta-sub { font-size: 14px; color: #555; margin-bottom: 32px; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+.l-cta-row { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+/* ── Plugins 2-col ── */
+.l-plg { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: #111; border: 1px solid #111; margin-top: 40px; }
+.l-pi { background: #000; padding: 24px 22px; transition: background 0.1s; }
+.l-pi:hover { background: #080808; }
+.l-pt { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #bbb; margin-bottom: 8px; }
+.l-pd { font-family: 'Onest', sans-serif; font-size: 13px; color: #3a3a3a; line-height: 1.7; }
+
+/* ── Social providers ── */
+.l-social-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: #111; border: 1px solid #111; margin-top: 40px; }
+.l-soc { background: #000; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: background 0.1s; }
+.l-soc:hover { background: #080808; }
+.l-soc svg { width: 24px; height: 24px; fill: #2a2a2a; transition: fill 0.1s; }
+.l-soc:hover svg { fill: #777; }
+.l-soc-name { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #2a2a2a; }
+
+/* ── Footer ── */
+.l-footer { padding: 40px 0; border-top: 1px solid #0d0d0d; }
+.l-footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.l-footer-copy { font-family: 'Geist Mono', monospace; font-size: 11px; color: #1e1e1e; }
+.l-flinks { display: flex; align-items: center; gap: 20px; }
+.l-fl { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #222; }
+.l-fl:hover { color: #555; }
+
+/* ── Responsive ── */
+@media (max-width: 1000px) {
+  .l-hero-inner { grid-template-columns: 1fr; padding-top: 48px; }
+  .l-hero-right { border-left: none; border-top: 1px solid #111; }
+  .l-hero-left { padding-right: 0; }
+  .l-install-grid { grid-template-columns: 1fr; gap: 24px; }
+  .l-fg { grid-template-columns: repeat(2, 1fr); }
+  .l-rt { grid-template-columns: 1fr; }
+  .l-pkg-grid { grid-template-columns: repeat(2, 1fr); }
+  .l-doc-grid { grid-template-columns: 1fr; }
+  .l-mcp-grid { grid-template-columns: 1fr; }
+  .l-cs-grid { grid-template-columns: repeat(2, 1fr); }
+  .l-social-grid { grid-template-columns: repeat(3, 1fr); }
+  .l-steps-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .lc { padding: 0 20px; }
+  .l-nav-i { padding: 0 20px; }
+  .l-fg { grid-template-columns: 1fr; }
+  .l-pkg-grid { grid-template-columns: 1fr; }
+  .l-cs-grid { grid-template-columns: 1fr; }
+  .l-social-grid { grid-template-columns: repeat(2, 1fr); }
+  .l-qs-grid { grid-template-columns: 1fr; }
+  .l-hero-code-split { grid-template-columns: 1fr; }
+  .l-plg { grid-template-columns: 1fr; }
+  .l-nav-links { display: none; }
+  h1 { font-size: 40px; white-space: normal; }
+}
+
+/* ── Section split layout (text left, content right) ── */
+.l-split {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  border-top: 1px solid #111;
+}
+.l-split-left {
+  padding: 40px 32px 40px 0;
+  border-right: 1px solid #111;
+}
+.l-split-right {
+  padding: 40px 0 40px 40px;
+}
+.l-split-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #555;
+  margin-bottom: 8px; display: block;
+}
+.l-split-title {
+  font-family: 'Onest', sans-serif;
+  font-size: clamp(18px, 2.5vw, 26px);
+  font-weight: 400; letter-spacing: -0.02em;
+  color: #fff; margin-bottom: 10px; line-height: 1.2;
+}
+.l-split-desc {
+  font-family: 'Onest', sans-serif;
+  font-size: 13px; color: #555; line-height: 1.75;
+}
+
+@media (max-width: 800px) {
+  .l-split { grid-template-columns: 1fr; }
+  .l-split-left { border-right: none; border-bottom: 1px solid #111; padding: 32px 0 24px; }
+  .l-split-right { padding: 32px 0 0; }
+}
+
+/* Routes inside split — single column */
+.l-rt-single {
+  display: flex; flex-direction: column;
+  gap: 1px; background: #111;
+}
+.l-rt-single .l-rr { background: #000; }
+.l-rt-single .l-rr:hover { background: #080808; }
+
+/* Qs grid inside split — no outer border */
+.l-qs-grid-split {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: #111;
+}
+.l-qs-grid-split .l-qs-panel { background: #000; }
+
+@media (max-width: 800px) {
+  .l-qs-grid, .l-qs-grid-split { grid-template-columns: 1fr; }
+  .l-pkg-grid { grid-template-columns: 1fr 1fr; }
+  .l-cs-grid { grid-template-columns: 1fr 1fr; }
+  .l-steps-row { grid-template-columns: 1fr; }
+  .l-mcp-grid { grid-template-columns: 1fr; }
+}

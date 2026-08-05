@@ -1,0 +1,54 @@
+---
+---
+<section class="bd">
+  <div class="lc" style="padding-top:0;padding-bottom:0">
+    <div class="l-split">
+      <div class="l-split-left">
+        <span class="l-split-label">Quick start</span>
+        <h2 class="l-split-title">Three files.<br>That's it.</h2>
+        <p class="l-split-desc">Create your auth instance, mount the handler. Every route is live immediately.</p>
+      </div>
+      <div class="l-split-right" style="padding:0">
+        <div class="l-qs-grid" style="border:none;margin:0;border-left:none">
+          <div class="l-qs-panel">
+            <div class="l-qs-hd"><span class="l-qs-file">auth.ts</span><span class="l-qs-lang">middleware</span></div>
+            <div class="l-qs-body">
+              <div><span class="tc-d">import</span> <span class="tc-k">&#123; gatelyAuth &#125;</span> <span class="tc-d">from</span> <span class="tc-s">'@gately/auth-core'</span></div>
+              <div><span class="tc-d">import</span> <span class="tc-k">&#123; createD1Adapter, createKVStore &#125;</span> <span class="tc-d">from</span> <span class="tc-s">'@gately/auth-core/adapters'</span></div>
+              <div style="margin-top:6px"><span class="tc-d">export const</span> <span class="tc-w">auth</span> = <span class="tc-w">gatelyAuth</span>(&#123;</div>
+              <div>&nbsp;&nbsp;<span class="tc-k">secret</span>: <span style="color:#555">env.AUTH_SECRET</span>,</div>
+              <div>&nbsp;&nbsp;<span class="tc-k">db</span>: <span class="tc-w">createD1Adapter</span>(<span style="color:#555">env.AUTH_DB</span>),</div>
+              <div>&nbsp;&nbsp;<span class="tc-k">kv</span>: <span class="tc-w">createKVStore</span>(<span style="color:#555">env.AUTH_KV</span>),</div>
+              <div>&nbsp;&nbsp;<span class="tc-k">emailAndPassword</span>: &#123; <span class="tc-k">enabled</span>: <span class="tc-d">true</span> &#125;,</div>
+              <div>&#125;)</div>
+            </div>
+          </div>
+          <div class="l-qs-panel">
+            <div class="l-qs-hd"><span class="l-qs-file">middleware.ts</span><span class="l-qs-lang">worker</span></div>
+            <div class="l-qs-body">
+              <div><span class="tc-d">import</span> <span class="tc-k">&#123; auth &#125;</span> <span class="tc-d">from</span> <span class="tc-s">'./auth'</span></div>
+              <div style="margin-top:6px"><span class="tc-d">export default</span> &#123;</div>
+              <div>&nbsp;&nbsp;<span class="tc-d">async</span> <span class="tc-w">fetch</span>(req, env) &#123;</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tc-d">return</span> <span class="tc-w">auth</span>.<span class="tc-w">handler</span>(req)</div>
+              <div>&nbsp;&nbsp;&#125;</div>
+              <div>&#125;</div>
+            </div>
+          </div>
+          <div class="l-qs-panel">
+            <div class="l-qs-hd"><span class="l-qs-file">services.ts</span><span class="l-qs-lang">hono</span></div>
+            <div class="l-qs-body">
+              <div><span class="tc-d">import</span> <span class="tc-k">&#123; Hono &#125;</span> <span class="tc-d">from</span> <span class="tc-s">'hono'</span></div>
+              <div style="margin-top:6px"><span class="tc-d">const</span> <span class="tc-w">app</span> = <span class="tc-d">new</span> <span class="tc-w">Hono</span>()</div>
+              <div style="margin-top:4px"><span class="tc-w">app</span>.<span class="tc-w">all</span>(<span class="tc-s">'/auth/*'</span>, (c) =&gt; <span class="tc-w">auth</span>.<span class="tc-w">handler</span>(c.req.raw))</div>
+              <div style="margin-top:4px"><span class="tc-w">app</span>.<span class="tc-w">get</span>(<span class="tc-s">'/api/me'</span>, <span class="tc-d">async</span> (c) =&gt; &#123;</div>
+              <div>&nbsp;&nbsp;<span class="tc-d">const</span> <span class="tc-k">s</span> = <span class="tc-d">await</span> <span class="tc-w">auth</span>.<span class="tc-w">api</span>.<span class="tc-w">getSession</span>(c.req.raw)</div>
+              <div>&nbsp;&nbsp;<span class="tc-d">return</span> c.json(s)</div>
+              <div>&#125;)</div>
+              <div style="margin-top:4px"><span class="tc-d">export default</span> <span class="tc-w">app</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

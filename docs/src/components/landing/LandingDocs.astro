@@ -1,0 +1,65 @@
+---
+---
+<section class="bd">
+  <div class="lc" style="padding-top:0;padding-bottom:0">
+    <div class="l-split">
+      <div class="l-split-left">
+        <span class="l-split-label">Docs</span>
+        <h2 class="l-split-title">Documentation.</h2>
+        <p class="l-split-desc">Everything you need to ship fast.</p>
+      </div>
+      <div class="l-split-right" style="padding:0">
+        <div class="l-doc-grid" style="margin-top:0;border:none;border-left:1px solid #111">
+          <div class="l-doc-left">
+            <div class="l-doc-browser-bar">
+              <span class="l-dot" style="background:#3a1a1a"></span>
+              <span class="l-dot" style="background:#3a3a1a"></span>
+              <span class="l-dot" style="background:#1a3a1a"></span>
+            </div>
+            <div class="l-doc-inner">
+              <div class="l-doc-sidebar">
+                <div class="l-doc-group">Getting Started</div>
+                <a class="l-doc-link" href="/article/installation">Installation</a>
+                <a class="l-doc-link active" href="/article/quick-start">Quick Start</a>
+                <a class="l-doc-link" href="/article/configuration">Configuration</a>
+                <div class="l-doc-group">Guides</div>
+                <a class="l-doc-link" href="/article/email-password">Authentication</a>
+                <a class="l-doc-link" href="/article/oauth-social">OAuth</a>
+                <a class="l-doc-link" href="/article/error-codes">Errors</a>
+              </div>
+              <div class="l-doc-content">
+                <div class="l-doc-breadcrumb">Getting Started &rsaquo; Installation</div>
+                <div class="l-doc-title">Installation</div>
+                <div class="l-doc-p">Install Gately Auth using your preferred package manager.</div>
+                <div class="l-doc-tabs">
+                  <span class="l-doc-tab active">npm</span>
+                  <span class="l-doc-tab">pnpm</span>
+                  <span class="l-doc-tab">bun</span>
+                  <span class="l-doc-tab">yarn</span>
+                </div>
+                <div class="l-doc-cmd">
+                  <span><span style="color:#2a2a2a">$</span> <span style="color:#555">npm i @gately/auth-core</span></span>
+                  <span style="font-size:10px;color:#1e1e1e">copy</span>
+                </div>
+                <div class="l-doc-p" style="margin-top:10px">&#9432; <a href="/article/quick-start" style="color:#444">Read the quick-start guide</a></div>
+              </div>
+            </div>
+          </div>
+          <div class="l-doc-right">
+            <div class="l-win-bar" style="border-bottom:1px solid #111">
+              <span class="l-win-file">Example</span>
+              <span class="l-win-lang">TypeScript</span>
+            </div>
+            <div class="l-term-body" style="font-size:11px;line-height:1.85">
+              <div><span class="tc-d">import</span> <span class="tc-k">&#123; gatelyAuth &#125;</span> <span class="tc-d">from</span> <span class="tc-s">'@gately/auth-core'</span></div>
+              <div style="margin-top:6px"><span class="tc-d">export const</span> <span class="tc-w">auth</span> = <span class="tc-w">gatelyAuth</span>(&#123;</div>
+              <div>&nbsp;&nbsp;<span class="tc-k">providers</span>: [&#123; <span class="tc-k">provider</span>: <span class="tc-s">'google'</span> &#125;],</div>
+              <div>&nbsp;&nbsp;<span class="tc-k">session</span>: &#123; <span class="tc-k">strategy</span>: <span class="tc-s">'jwt'</span> &#125;,</div>
+              <div>&#125;)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,42 @@
+---
+import Icon from './Icon.astro';
+---
+<section class="bd">
+  <div class="lc" style="padding-top:0;padding-bottom:0">
+    <div class="l-split">
+      <div class="l-split-left">
+        <span class="l-split-label">Getting started</span>
+        <h2 class="l-split-title">Three steps to production.</h2>
+        <p class="l-split-desc">From zero to auth in under 5 minutes.</p>
+      </div>
+      <div class="l-split-right" style="padding-left:40px;padding-top:40px;padding-bottom:40px">
+        <div class="l-steps-row" style="margin-top:0">
+          <div class="l-step">
+            <p class="l-step-num">01</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <Icon name="download-04" size={15} style="color:#444;flex-shrink:0" />
+              <p class="l-step-title" style="margin:0">Install</p>
+            </div>
+            <p class="l-step-desc">Add the package to your project. <code>npm install @gately/auth-core</code></p>
+          </div>
+          <div class="l-step">
+            <p class="l-step-num">02</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <Icon name="settings-02" size={15} style="color:#444;flex-shrink:0" />
+              <p class="l-step-title" style="margin:0">Configure</p>
+            </div>
+            <p class="l-step-desc">Set up your providers and D1/KV bindings. One function call, fully typed.</p>
+          </div>
+          <div class="l-step">
+            <p class="l-step-num">03</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <Icon name="rocket-01" size={15} style="color:#444;flex-shrink:0" />
+              <p class="l-step-title" style="margin:0">Ship</p>
+            </div>
+            <p class="l-step-desc">You're ready to authenticate users. <code>npx wrangler deploy</code></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,60 @@
+---
+---
+<section class="bd">
+  <div class="lc" style="padding-top:0;padding-bottom:0">
+    <div class="l-split">
+      <div class="l-split-left">
+        <span class="l-split-label">Setup</span>
+        <h2 class="l-split-title">Install in seconds.</h2>
+        <p class="l-split-desc">Add Gately Auth to your project with your favourite package manager.</p>
+      </div>
+      <div class="l-split-right">
+        <div class="l-itabs">
+          <button class="l-itab active" onclick="lTab(this,'npm')">npm</button>
+          <button class="l-itab" onclick="lTab(this,'pnpm')">pnpm</button>
+          <button class="l-itab" onclick="lTab(this,'bun')">bun</button>
+          <button class="l-itab" onclick="lTab(this,'yarn')">yarn</button>
+        </div>
+        <div class="l-install-box">
+          <div><span class="l-dol">$</span><code id="l-icmd">npm i @gately/auth-core</code></div>
+          <button class="l-copy-btn" onclick="lCopy('l-icmd')">copy</button>
+        </div>
+        <div class="l-prompt" style="margin-top:1px">
+          <div class="l-prompt-hd">
+            <span class="l-prompt-label">Agent Prompt</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="l-prompt-badge">Kiro / Cursor / Claude</span>
+              <button class="l-copy-btn" onclick="lCopy('l-aprompt')">copy</button>
+            </div>
+          </div>
+          <div class="l-prompt-body" id="l-aprompt">Set up gately-auth in this Cloudflare Worker. Install @gately/auth-core and @gately/auth-client. Create src/auth.ts using gatelyAuth() with createD1Adapter(env.AUTH_DB), createKVStore(env.AUTH_KV), and gatelyEmail plugin. Enable emailAndPassword. Mount auth.handler(request) on /auth/*. Add bindings to wrangler.toml. Run migrations.</div>
+        </div>
+        <div class="l-prompt">
+          <div class="l-prompt-hd">
+            <span class="l-prompt-label">MCP Server</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="l-prompt-badge" style="color:#4ade80;border-color:#14532d">Live</span>
+              <button class="l-copy-btn" onclick="lCopyText('https://mcp.auth.usegately.com/mcp')">copy</button>
+            </div>
+          </div>
+          <div class="l-prompt-body" style="display:flex;align-items:center;gap:8px">
+            <span style="color:#2a2a2a">url</span>
+            <code style="color:#555">https://mcp.auth.usegately.com/mcp</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+const lCmds = { npm:'npm i @gately/auth-core', pnpm:'pnpm add @gately/auth-core', bun:'bun add @gately/auth-core', yarn:'yarn add @gately/auth-core' };
+function lTab(el, pm) {
+  document.querySelectorAll('.l-itab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const cmd = document.getElementById('l-icmd');
+  if (cmd) cmd.textContent = lCmds[pm];
+}
+function lCopy(id) { const el = document.getElementById(id); if (el) navigator.clipboard?.writeText(el.textContent.trim()); }
+function lCopyText(t) { navigator.clipboard?.writeText(t); }
+</script>

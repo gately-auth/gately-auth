@@ -1,0 +1,50 @@
+---
+import Icon from './Icon.astro';
+---
+<section class="bd">
+  <div class="lc" style="padding-top:0;padding-bottom:0">
+    <div class="l-split">
+      <div class="l-split-left">
+        <span class="l-split-label">Roadmap</span>
+        <h2 class="l-split-title">What's coming.</h2>
+        <p class="l-split-desc">We're building the future of auth.</p>
+      </div>
+      <div class="l-split-right" style="padding-left:40px;padding-top:40px;padding-bottom:40px">
+        <div class="l-cs-grid" style="margin-top:0">
+          <div class="l-cs">
+            <span class="l-cs-badge">Coming soon</span>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <Icon name="fingerprint-scan" size={16} style="color:#333;flex-shrink:0" />
+              <p class="l-cs-title" style="margin:0">WebAuthn / Passkeys</p>
+            </div>
+            <p class="l-cs-desc">Passwordless sign-in using device biometrics. FIDO2 compliant, works on all platforms.</p>
+          </div>
+          <div class="l-cs">
+            <span class="l-cs-badge">Coming soon</span>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <Icon name="building-04" size={16} style="color:#333;flex-shrink:0" />
+              <p class="l-cs-title" style="margin:0">Organisations</p>
+            </div>
+            <p class="l-cs-desc">Multi-tenant auth with organisations, teams, invitations, and role-based access control.</p>
+          </div>
+          <div class="l-cs">
+            <span class="l-cs-badge">Coming soon</span>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <Icon name="task-01" size={16} style="color:#333;flex-shrink:0" />
+              <p class="l-cs-title" style="margin:0">Auth Logs</p>
+            </div>
+            <p class="l-cs-desc">Tamper-evident audit log of every auth event. Replay, filter, and export.</p>
+          </div>
+          <div class="l-cs">
+            <span class="l-cs-badge">Coming soon</span>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <Icon name="dashboard-square-02" size={16} style="color:#333;flex-shrink:0" />
+              <p class="l-cs-title" style="margin:0">Admin Panel</p>
+            </div>
+            <p class="l-cs-desc">Drop-in user management UI. Search, ban, impersonate, and manage sessions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

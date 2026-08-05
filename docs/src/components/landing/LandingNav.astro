@@ -1,0 +1,25 @@
+---
+import Icon from './Icon.astro';
+---
+<nav class="l-nav">
+  <div class="l-nav-i">
+    <a href="/" class="l-nav-logo">
+      <img src="/Logo-nvc.png" alt="Gately Auth" width="20" height="20" style="object-fit:contain;filter:brightness(0) invert(1);opacity:0.7" />
+      Gately Auth
+    </a>
+    <div class="l-nav-links">
+      <a href="/article/quick-start" class="l-nav-link">Docs</a>
+      <a href="/article/cli-overview" class="l-nav-link">Guides</a>
+      <a href="/article/core-api" class="l-nav-link">API</a>
+      <a href="/article/admin-plugin" class="l-nav-link">Adapters</a>
+      <a href="https://mcp.auth.usegately.com" class="l-nav-link" target="_blank" rel="noopener">MCP</a>
+    </div>
+    <div class="l-nav-right">
+      <a href="https://github.com/gately-auth/gately-auth" class="l-nav-star" target="_blank" rel="noopener">
+        <Icon name="star" size={12} />
+        Star
+      </a>
+      <a href="/article/quick-start" class="l-nav-cta">Get Started</a>
+    </div>
+  </div>
+</nav>

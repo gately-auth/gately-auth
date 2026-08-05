@@ -1,0 +1,100 @@
+---
+import BrandIcon from './BrandIcon.astro';
+---
+<section class="l-hero bd">
+  <div class="lc l-hero-inner">
+
+    <!-- LEFT -->
+    <div class="l-hero-left">
+      <div class="l-topbar-row">
+        <span class="l-ver">v1.0.0</span>
+        <span class="l-prod-badge">Production Ready</span>
+      </div>
+      <h1>Auth for<br>Cloudflare Workers.</h1>
+      <p class="l-hero-sub">The authentication framework built specifically for Cloudflare Workers and the edge.</p>
+      <div class="l-hero-tags">
+        <span class="l-hero-tag">OAuth</span>
+        <span class="l-hero-tag">Email &amp; Password</span>
+        <span class="l-hero-tag">Magic Links</span>
+        <span class="l-hero-tag">Sessions</span>
+        <span class="l-hero-tag">MFA</span>
+        <span class="l-hero-tag">Plugins</span>
+      </div>
+      <div class="l-hero-install">
+        <span class="l-hero-install-num">1</span>
+        <code>npm create gately-auth@latest</code>
+        <button class="l-hero-install-copy" aria-label="copy" onclick="navigator.clipboard?.writeText('npm create gately-auth@latest')">&#x2398;</button>
+      </div>
+      <div class="l-hero-actions">
+        <a href="/article/quick-start" class="l-btn-primary">Get Started &rarr;</a>
+        <a href="/article/quick-start" class="l-btn-ghost">Documentation</a>
+      </div>
+      <div class="l-fw-row">
+        <span class="l-fw-item"><BrandIcon name="hono" size={13} style="opacity:0.5" /> Hono</span>
+        <span class="l-fw-item"><BrandIcon name="nextdotjs" size={13} style="opacity:0.5" /> Next.js</span>
+        <span class="l-fw-item"><BrandIcon name="astro" size={13} style="opacity:0.5" /> Astro</span>
+        <span class="l-fw-item"><BrandIcon name="svelte" size={13} style="opacity:0.5" /> SvelteKit</span>
+        <span class="l-fw-item"><BrandIcon name="remix" size={13} style="opacity:0.5" /> Remix</span>
+        <span class="l-fw-item"><BrandIcon name="react" size={13} style="opacity:0.5" /> React</span>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="l-hero-right">
+      <div class="l-win">
+        <div class="l-win-bar">
+          <span class="l-dot" style="background:#ef4444"></span>
+          <span class="l-dot" style="background:#eab308"></span>
+          <span class="l-dot" style="background:#22c55e"></span>
+          <span class="l-win-title">bash</span>
+        </div>
+        <div class="l-term-body">
+          <div><span class="tc-p">$</span> <span class="tc-w">npm create gately-auth@latest</span></div>
+          <div class="tc-d">  Creating project...</div>
+          <div class="tc-d">  Installing dependencies...</div>
+          <div class="tc-d">  Setting up auth...</div>
+          <div style="margin-top:4px"><span class="tc-g">&#x2714; Done.</span> <span class="tc-d">Your project is ready!</span></div>
+          <div class="tc-d">  cd my-app &amp;&amp; npm run dev</div>
+          <div style="margin-top:4px" class="tc-d">&#x279C; Local: <span class="tc-b">http://localhost:8787</span></div>
+        </div>
+      </div>
+      <div class="l-hero-code-split">
+        <div class="l-win l-win-sm">
+          <div class="l-win-bar">
+            <span class="l-win-file">auth.ts</span>
+            <span class="l-win-lang">middleware</span>
+          </div>
+          <div class="l-term-body" style="font-size:10px;line-height:1.75">
+            <div><span class="tc-d">import</span> <span class="tc-k">&#123; gatelyAuth &#125;</span> <span class="tc-d">from</span> <span class="tc-s">'@gately/auth-core'</span></div>
+            <div style="margin-top:4px"><span class="tc-d">export const</span> <span class="tc-w">auth</span> = <span class="tc-w">gatelyAuth</span>(&#123;</div>
+            <div>&nbsp;&nbsp;<span class="tc-k">providers</span>: [</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&#123; <span class="tc-k">provider</span>: <span class="tc-s">'google'</span> &#125;,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&#123; <span class="tc-k">provider</span>: <span class="tc-s">'github'</span> &#125;,</div>
+            <div>&nbsp;&nbsp;],</div>
+            <div>&nbsp;&nbsp;<span class="tc-k">session</span>: &#123; <span class="tc-k">strategy</span>: <span class="tc-s">'jwt'</span> &#125;,</div>
+            <div>&#125;)</div>
+          </div>
+        </div>
+        <div class="l-win l-win-sm" style="border-left:1px solid #111">
+          <div class="l-win-bar">
+            <span class="l-win-file">services.ts</span>
+            <span class="l-win-lang">worker</span>
+          </div>
+          <div class="l-term-body" style="font-size:10px;line-height:1.75">
+            <div><span class="tc-d">export default</span> &#123;</div>
+            <div>&nbsp;&nbsp;<span class="tc-d">async</span> <span class="tc-w">fetch</span>(req, env) &#123;</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tc-d">return</span> <span class="tc-w">auth</span>.<span class="tc-w">handler</span>(req)</div>
+            <div>&nbsp;&nbsp;&#125;</div>
+            <div>&#125;</div>
+            <div style="margin-top:8px;color:#2a2a2a">// Response</div>
+            <div>&#123;</div>
+            <div>&nbsp;&nbsp;<span class="tc-k">"success"</span>: <span class="tc-g">true</span>,</div>
+            <div>&nbsp;&nbsp;<span class="tc-k">"user"</span>: &#123; <span class="tc-k">"id"</span>: <span class="tc-s">"usr_01j..."</span> &#125;</div>
+            <div>&#125;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
