@@ -5,7 +5,7 @@
 // Implements the Model Context Protocol over HTTP with SSE transport.
 // Compatible with: Cursor, Claude Code, Open Code, Kiro, and any MCP client.
 //
-// Endpoint: https://mcp.g-a.usegately.com/mcp
+// Endpoint: https://mcp.auth.usegately.com/mcp
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { tools, callTool } from './tools.js';
@@ -101,7 +101,7 @@ async function handleMCP(request: Request): Promise<Response> {
       }
 
       try {
-        const result = callTool(toolName, toolArgs);
+        const result = await callTool(toolName, toolArgs);
         return json(mcpOk(id, {
           content: [
             {
@@ -186,9 +186,10 @@ export default {
           endpoint: '/mcp',
           tools: tools.map(t => ({ name: t.name, description: t.description })),
           usage: {
-            cursor: 'Add to ~/.cursor/mcp.json: { "gately-auth": { "url": "https://mcp.g-a.usegately.com/mcp" } }',
-            claude_code: 'claude mcp add gately-auth https://mcp.g-a.usegately.com/mcp',
-            manual: 'Use URL transport with endpoint: https://mcp.g-a.usegately.com/mcp',
+            cursor: 'Add to ~/.cursor/mcp.json: { "gately-auth": { "url": "https://mcp.auth.usegately.com/mcp" } }',
+            claude_code: 'claude mcp add gately-auth https://mcp.auth.usegately.com/mcp',
+            kiro: 'Add to .kiro/settings/mcp.json: { "gately-auth": { "url": "https://mcp.auth.usegately.com/mcp" } }',
+            manual: 'Use URL transport with endpoint: https://mcp.auth.usegately.com/mcp',
           },
         }, null, 2),
         {

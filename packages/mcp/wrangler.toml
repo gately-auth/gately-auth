@@ -4,7 +4,8 @@ compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-MCP_ENDPOINT = "https://mcp.g-a.usegately.com/mcp"
+MCP_ENDPOINT = "https://mcp.auth.usegately.com/mcp"
+DOCS_URL = "https://auth.usegately.com/articles.txt"
 
 # Deploy: npx wrangler deploy
-# Custom domain: add mcp.g-a.usegately.com in CF Workers dashboard
+# Custom domain: add mcp.auth.usegately.com in CF Workers dashboard
