@@ -13,8 +13,17 @@ export const GET: APIRoute = async () => {
   const getCategoryName = (id: string | null) =>
     categories.find(c => c.id === id)?.name ?? 'General';
 
-  const stripHtml = (html: string) =>
-    html
+  const stripContent = (raw: string): string => {
+    const trimmed = raw.trim();
+    // Handle BlockNote JSON format
+    if (trimmed.startsWith('[{')) {
+      try {
+        const blocks = JSON.parse(trimmed);
+        return blocksToText(blocks);
+      } catch { /* fall through */ }
+    }
+    // Handle HTML
+    return trimmed
       .replace(/<\/p>/g, '\n\n')
       .replace(/<br\s*\/?>/g, '\n')
       .replace(/<h([1-6])[^>]*>(.*?)<\/h[1-6]>/g, (_, level, text) => {
@@ -25,13 +34,31 @@ export const GET: APIRoute = async () => {
       .replace(/<code[^>]*>(.*?)<\/code>/g, '`$1`')
       .replace(/<pre[^>]*>(.*?)<\/pre>/gs, (_, code) => `\`\`\`\n${code.replace(/<[^>]*>/g, '')}\n\`\`\``)
       .replace(/<[^>]*>/gm, '')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
       .replace(/\n{3,}/g, '\n\n')
       .trim();
+  };
+
+  function blocksToText(blocks: any[]): string {
+    if (!Array.isArray(blocks)) return '';
+    return blocks.map((block: any) => {
+      const type = block.type ?? '';
+      const content: any[] = Array.isArray(block.content) ? block.content : [];
+      const children: any[] = Array.isArray(block.children) ? block.children : [];
+      const inlineText = content.map((c: any) => c.type === 'text' ? (c.text ?? '') : '').join('');
+      let result = '';
+      switch (type) {
+        case 'heading': result = `${'#'.repeat(block.props?.level ?? 2)} ${inlineText}`; break;
+        case 'bulletListItem': result = `- ${inlineText}`; break;
+        case 'numberedListItem': result = `1. ${inlineText}`; break;
+        case 'codeBlock': result = `\`\`\`${block.props?.language ?? ''}\n${inlineText}\n\`\`\``; break;
+        default: result = inlineText;
+      }
+      if (children.length > 0) result += '\n' + blocksToText(children);
+      return result;
+    }).filter(Boolean).join('\n\n').trim();
+  }
 
   const header = `# gately-auth Documentation
 
@@ -69,7 +96,7 @@ export const GET: APIRoute = async () => {
         `URL: https://auth.usegately.com/article/${a.slug}`,
         `---`,
         '',
-        stripHtml(a.content),
+        stripContent(a.content),
       ].join('\n');
     })
     .join('\n\n---\n\n');

@@ -90,7 +90,10 @@ function parseArticlesTxt(text: string): DocEntry[] {
 
     // Content is everything after the front-matter block
     const contentStart = trimmed.indexOf('\n\n');
-    const content = contentStart >= 0 ? trimmed.slice(contentStart).trim() : trimmed;
+    const rawContent = contentStart >= 0 ? trimmed.slice(contentStart).trim() : trimmed;
+
+    // Convert to plain readable text
+    const content = extractReadableText(rawContent);
 
     // Derive slug and id from title
     const slug = slugify(title);
@@ -114,6 +117,99 @@ function parseArticlesTxt(text: string): DocEntry[] {
   }
 
   return entries;
+}
+
+/**
+ * Extract readable plain text from content that may be:
+ * - BlockNote JSON (array of block objects)
+ * - HTML string
+ * - Already plain text
+ */
+function extractReadableText(raw: string): string {
+  const trimmed = raw.trim();
+
+  // Detect BlockNote JSON — starts with [{
+  if (trimmed.startsWith('[{') || trimmed.startsWith('[{\n')) {
+    try {
+      const blocks = JSON.parse(trimmed);
+      return blocksToText(blocks);
+    } catch {
+      // fall through to HTML stripping
+    }
+  }
+
+  // Strip HTML tags
+  return trimmed
+    .replace(/<\/p>/g, '\n\n')
+    .replace(/<br\s*\/?>/g, '\n')
+    .replace(/<h([1-6])[^>]*>(.*?)<\/h[1-6]>/g, (_, l, t) => `\n${'#'.repeat(Number(l))} ${t}\n`)
+    .replace(/<li[^>]*>(.*?)<\/li>/g, '- $1\n')
+    .replace(/<code[^>]*>(.*?)<\/code>/g, '`$1`')
+    .replace(/<[^>]*>/gm, '')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/** Recursively extract text from BlockNote block array */
+function blocksToText(blocks: any[]): string {
+  if (!Array.isArray(blocks)) return '';
+  return blocks.map(block => blockToText(block)).filter(Boolean).join('\n\n').trim();
+}
+
+function blockToText(block: any): string {
+  if (!block || typeof block !== 'object') return '';
+
+  const type: string = block.type ?? '';
+  const content: any[] = Array.isArray(block.content) ? block.content : [];
+  const children: any[] = Array.isArray(block.children) ? block.children : [];
+
+  // Extract inline text from content array
+  const inlineText = content
+    .map((c: any) => {
+      if (c.type === 'text') return c.text ?? '';
+      if (c.type === 'link') {
+        const linkText = (c.content ?? []).map((lc: any) => lc.text ?? '').join('');
+        return `${linkText} (${c.href ?? ''})`;
+      }
+      return '';
+    })
+    .join('');
+
+  let result = '';
+
+  switch (type) {
+    case 'heading': {
+      const level = block.props?.level ?? 2;
+      result = `${'#'.repeat(level)} ${inlineText}`;
+      break;
+    }
+    case 'bulletListItem':
+      result = `- ${inlineText}`;
+      break;
+    case 'numberedListItem':
+      result = `1. ${inlineText}`;
+      break;
+    case 'codeBlock':
+      result = `\`\`\`${block.props?.language ?? ''}\n${inlineText}\n\`\`\``;
+      break;
+    case 'table': {
+      // Tables are nested differently — just extract all text
+      result = inlineText || blocksToText(content as any[]);
+      break;
+    }
+    default:
+      result = inlineText;
+  }
+
+  // Append children
+  if (children.length > 0) {
+    const childText = blocksToText(children);
+    if (childText) result += '\n' + childText;
+  }
+
+  return result;
 }
 
 function slugify(str: string): string {

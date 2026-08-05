@@ -8,7 +8,7 @@ export const prerender = false;
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gately Auth — Auth for Cloudflare Workers</title>
-  <meta name="description" content="D1 + KV + Workers. Production-grade email, magic links, OTP, and OAuth — no Node.js required." />
+  <meta name="description" content="The authentication framework built specifically for Cloudflare Workers and the edge." />
   <style>
     @font-face {
       font-family: 'Geist Mono';
@@ -18,508 +18,610 @@ export const prerender = false;
       font-display: swap;
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg1: #111111;
+      --bg2: #161616;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --fg: #ffffff;
+      --fg1: #e4e4e7;
+      --fg2: #a1a1aa;
+      --fg3: #71717a;
+      --fg4: #52525b;
+      --fg5: #3f3f46;
+      --accent: #ffffff;
+      --green: #22c55e;
+      --blue: #3b82f6;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --purple: #a855f7;
+      --mono: 'Geist Mono', ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
     }
 
     html, body {
-      background-color: #0a0a0a;
-      color: #ffffff;
-      font-family: 'Geist Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
-      font-size: 14px;
+      background: var(--bg);
+      color: var(--fg1);
+      font-family: var(--mono);
+      font-size: 13px;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: var(--mono); }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .section-border { border-bottom: 1px solid var(--border); }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      border-bottom: 1px solid var(--border);
+      padding: 6px 0;
+      background: var(--bg);
+    }
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .version-badge {
+      font-size: 10px;
+      color: var(--fg4);
+      letter-spacing: 0.06em;
+    }
+    .prod-badge {
+      font-size: 10px;
+      color: var(--green);
+      border: 1px solid #166534;
+      padding: 1px 7px;
+      letter-spacing: 0.06em;
     }
 
-    /* ── Layout ── */
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* ── Nav ── */
+    /* ── NAV ── */
     nav {
-      border-bottom: 1px solid #1a1a1a;
+      border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
-      background: #0a0a0a;
-      z-index: 50;
+      background: var(--bg);
+      z-index: 100;
     }
-
     .nav-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 52px;
+      height: 48px;
     }
-
     .nav-logo {
-      font-family: 'Geist Mono', monospace;
       font-weight: 700;
       font-size: 13px;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #ffffff;
+      color: var(--fg);
     }
-
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 24px;
     }
-
     .nav-link {
       font-size: 12px;
-      letter-spacing: 0.06em;
-      color: #a1a1aa;
-      text-transform: uppercase;
+      color: var(--fg3);
+      letter-spacing: 0.04em;
     }
-
-    .nav-link:hover {
-      color: #ffffff;
-    }
-
-    .nav-cta {
-      font-family: 'Geist Mono', monospace;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: #ffffff;
-      color: #0a0a0a;
-      padding: 8px 16px;
-      border: none;
-      cursor: pointer;
-      display: inline-block;
-    }
-
-    .nav-cta:hover {
-      background: #e4e4e7;
-    }
-
-    /* ── Hero ── */
-    .hero {
-      padding: 96px 0 80px;
-      border-bottom: 1px solid #1a1a1a;
-    }
-
-    .hero-badge {
-      display: inline-block;
+    .nav-link:hover { color: var(--fg); }
+    .nav-actions { display: flex; align-items: center; gap: 8px; }
+    .btn-sm {
       font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #a1a1aa;
-      border: 1px solid #27272a;
-      padding: 5px 12px;
-      margin-bottom: 32px;
-    }
-
-    .hero-badge:hover {
-      border-color: #3f3f46;
-      color: #d4d4d8;
-    }
-
-    h1 {
-      font-family: 'Geist Mono', monospace;
-      font-size: clamp(36px, 6vw, 68px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      line-height: 1.05;
-      color: #ffffff;
-      margin-bottom: 20px;
-    }
-
-    .hero-sub {
-      font-size: 15px;
-      color: #a1a1aa;
-      max-width: 520px;
-      line-height: 1.7;
-      margin-bottom: 36px;
-    }
-
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 36px;
-    }
-
-    .btn-primary {
-      font-family: 'Geist Mono', monospace;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: #ffffff;
-      color: #0a0a0a;
-      padding: 11px 22px;
-      display: inline-block;
-      border: 1px solid #ffffff;
-    }
-
-    .btn-primary:hover {
-      background: #e4e4e7;
-    }
-
-    .btn-secondary {
-      font-family: 'Geist Mono', monospace;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-family: var(--mono);
+      letter-spacing: 0.06em;
+      padding: 5px 14px;
+      border: 1px solid var(--border2);
       background: transparent;
-      color: #a1a1aa;
-      padding: 11px 22px;
-      display: inline-block;
-      border: 1px solid #27272a;
-    }
-
-    .btn-secondary:hover {
-      border-color: #3f3f46;
-      color: #ffffff;
-    }
-
-    .npm-badge {
+      color: var(--fg2);
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      background: #111111;
-      border: 1px solid #1e1e1e;
-      padding: 10px 16px;
-      font-size: 13px;
-      color: #71717a;
+      gap: 6px;
     }
-
-    .npm-badge code {
-      color: #e4e4e7;
-      font-family: 'Geist Mono', monospace;
-    }
-
-    .npm-badge .dollar {
-      color: #3f3f46;
-    }
-
-    /* ── Code block ── */
-    .code-section {
-      padding: 64px 0;
-      border-bottom: 1px solid #1a1a1a;
-    }
-
-    .section-label {
+    .btn-sm:hover { border-color: var(--fg4); color: var(--fg1); }
+    .btn-sm-primary {
+      background: var(--fg);
+      color: var(--bg);
+      border-color: var(--fg);
       font-size: 11px;
-      letter-spacing: 0.14em;
+      font-family: var(--mono);
+      letter-spacing: 0.06em;
+      padding: 5px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-sm-primary:hover { background: #e4e4e7; }
+    .star-count {
+      font-size: 10px;
+      color: var(--fg4);
+    }
+  </style>
+    /* ── HERO ── */
+    .hero {
+      padding: 56px 0 0;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      align-items: start;
+    }
+    .hero-left { padding-bottom: 56px; padding-right: 48px; }
+    .hero-right {
+      border-left: 1px solid var(--border);
+      background: var(--bg1);
+      min-height: 420px;
+      overflow: hidden;
+    }
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #52525b;
+      color: var(--fg4);
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: var(--fg);
+      margin-bottom: 16px;
+    }
+    .hero-sub {
+      font-size: 13px;
+      color: var(--fg3);
+      max-width: 440px;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+    .tag {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--fg4);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      background: var(--bg1);
+    }
+    .hero-install {
+      display: flex;
+      align-items: center;
+      gap: 0;
       margin-bottom: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg1);
+      overflow: hidden;
+      max-width: 360px;
     }
-
-    .code-block {
-      background: #0f0f0f;
-      border: 1px solid #1a1a1a;
-      overflow-x: auto;
+    .hero-install-prompt {
+      padding: 9px 12px;
+      color: var(--fg4);
+      font-size: 13px;
+      border-right: 1px solid var(--border);
+      user-select: none;
     }
+    .hero-install code {
+      padding: 9px 14px;
+      font-size: 13px;
+      color: var(--fg1);
+      flex: 1;
+    }
+    .hero-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-primary {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      background: var(--fg);
+      color: var(--bg);
+      padding: 10px 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--fg);
+    }
+    .btn-primary:hover { background: #e4e4e7; }
+    .btn-secondary {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      background: transparent;
+      color: var(--fg2);
+      padding: 10px 20px;
+      border: 1px solid var(--border2);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-secondary:hover { border-color: var(--fg4); color: var(--fg1); }
 
-    .code-block-header {
+    /* Terminal window */
+    .terminal {
+      background: var(--bg1);
+      height: 100%;
+    }
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .terminal-title {
+      font-size: 11px;
+      color: var(--fg4);
+      margin-left: 8px;
+      letter-spacing: 0.04em;
+    }
+    .terminal-body { padding: 20px; font-size: 12px; line-height: 1.8; }
+    .t-dim { color: var(--fg4); }
+    .t-green { color: var(--green); }
+    .t-blue { color: #60a5fa; }
+    .t-yellow { color: var(--yellow); }
+    .t-white { color: var(--fg1); }
+    .t-prompt { color: var(--fg4); margin-right: 8px; }
+
+    /* Code window */
+    .code-window {
+      border-top: 1px solid var(--border);
+    }
+    .code-window-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 16px;
-      border-bottom: 1px solid #1a1a1a;
-      background: #0d0d0d;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
     }
-
-    .code-block-filename {
+    .code-window-file { font-size: 11px; color: var(--fg4); letter-spacing: 0.04em; }
+    .code-window-lang { font-size: 10px; color: var(--fg5); letter-spacing: 0.08em; text-transform: uppercase; }
+    .code-window-body { padding: 16px 20px; font-size: 12px; line-height: 1.8; overflow-x: auto; }
+    .kw { color: #c084fc; }
+    .fn { color: #60a5fa; }
+    .str { color: #86efac; }
+    .cm { color: var(--fg5); }
+    .prop { color: var(--fg1); }
+    .num { color: #fb923c; }
+    /* ── INSTALL SECTION ── */
+    .install-section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+    .install-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-top: 32px; }
+    .install-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+    .install-tab {
       font-size: 11px;
-      color: #52525b;
       letter-spacing: 0.06em;
+      padding: 8px 16px;
+      background: transparent;
+      color: var(--fg4);
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
     }
-
-    .code-block-lang {
+    .install-tab.active { color: var(--fg1); border-bottom-color: var(--fg1); }
+    .install-tab:hover { color: var(--fg2); }
+    .install-box {
+      border: 1px solid var(--border);
+      border-top: none;
+      background: var(--bg1);
+    }
+    .install-cmd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+    }
+    .install-cmd code { font-size: 13px; color: var(--fg1); }
+    .install-cmd span { color: var(--fg4); margin-right: 8px; }
+    .copy-btn {
       font-size: 10px;
-      color: #3f3f46;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    pre {
-      padding: 24px;
-      overflow-x: auto;
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
-    .tok-import  { color: #71717a; }
-    .tok-from    { color: #71717a; }
-    .tok-func    { color: #e4e4e7; }
-    .tok-kw      { color: #a1a1aa; }
-    .tok-str     { color: #d4d4d8; }
-    .tok-key     { color: #e4e4e7; }
-    .tok-comment { color: #3f3f46; }
-    .tok-type    { color: #a1a1aa; }
-    .tok-punc    { color: #52525b; }
-
-    /* ── Features ── */
-    .features-section {
-      padding: 72px 0;
-      border-bottom: 1px solid #1a1a1a;
-    }
-
-    .section-heading {
-      font-family: 'Geist Mono', monospace;
-      font-size: clamp(22px, 3vw, 32px);
-      font-weight: 700;
+      color: var(--fg4);
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 3px 8px;
       letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: #ffffff;
-      margin-bottom: 8px;
     }
+    .copy-btn:hover { color: var(--fg2); border-color: var(--fg4); }
 
-    .section-sub {
-      font-size: 14px;
-      color: #71717a;
-      margin-bottom: 48px;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1px;
-      background: #1a1a1a;
-      border: 1px solid #1a1a1a;
-    }
-
-    .feature-card {
-      background: #0a0a0a;
-      padding: 28px 28px 24px;
-    }
-
-    .feature-card:hover {
-      background: #0f0f0f;
-    }
-
-    .feature-num {
+    /* ── SECTIONS SHARED ── */
+    .section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+    .section-label {
       font-size: 10px;
-      letter-spacing: 0.12em;
-      color: #3f3f46;
-      margin-bottom: 12px;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-    }
-
-    .feature-title {
-      font-family: 'Geist Mono', monospace;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #e4e4e7;
+      color: var(--fg4);
       margin-bottom: 8px;
     }
-
-    .feature-desc {
-      font-size: 13px;
-      color: #52525b;
-      line-height: 1.65;
+    .section-title {
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      margin-bottom: 8px;
     }
+    .section-sub { font-size: 13px; color: var(--fg4); margin-bottom: 40px; }
 
-    /* ── How it works ── */
-    .how-section {
-      padding: 72px 0;
-      border-bottom: 1px solid #1a1a1a;
-    }
-
-    .steps {
+    /* ── QUICK START ── */
+    .quickstart-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1px;
-      background: #1a1a1a;
-      border: 1px solid #1a1a1a;
-      margin-top: 48px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 32px;
     }
-
-    .step {
-      background: #0a0a0a;
-      padding: 32px 28px;
-    }
-
-    .step-num {
-      font-family: 'Geist Mono', monospace;
-      font-size: 28px;
-      font-weight: 800;
-      color: #1a1a1a;
-      margin-bottom: 16px;
-      letter-spacing: -0.02em;
-    }
-
-    .step-title {
-      font-family: 'Geist Mono', monospace;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #e4e4e7;
-      margin-bottom: 8px;
-    }
-
-    .step-desc {
-      font-size: 13px;
-      color: #52525b;
-      line-height: 1.65;
-    }
-
-    /* ── Frameworks ── */
-    .frameworks-section {
-      padding: 56px 0;
-      border-bottom: 1px solid #1a1a1a;
-    }
-
-    .frameworks-label {
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #3f3f46;
-      margin-bottom: 20px;
-    }
-
-    .frameworks-row {
+    .qs-panel { background: var(--bg); padding: 0; }
+    .qs-panel-header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .qs-panel-file { font-size: 11px; color: var(--fg4); letter-spacing: 0.04em; }
+    .qs-panel-body { padding: 16px; font-size: 11.5px; line-height: 1.8; overflow-x: auto; }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    .feature-card {
+      background: var(--bg);
+      padding: 24px 20px;
+    }
+    .feature-card:hover { background: var(--bg1); }
+    .feature-icon {
+      font-size: 18px;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .feature-card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg1);
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .feature-card-body { font-size: 12px; color: var(--fg4); line-height: 1.6; }
+    .feature-items { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; }
+    .feature-item { font-size: 11px; color: var(--fg5); }
+
+    /* ── ROUTES ── */
+    .routes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 32px;
+    }
+    .route-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .route-row:hover { background: var(--bg1); }
+    .route-method {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 2px 7px;
+      min-width: 42px;
+      text-align: center;
+    }
+    .method-get { background: #052e16; color: var(--green); }
+    .method-post { background: #1e3a5f; color: #60a5fa; }
+    .method-delete { background: #3b0000; color: #f87171; }
+    .route-path { font-size: 12px; color: var(--fg1); flex: 1; }
+    .route-desc { font-size: 11px; color: var(--fg4); text-align: right; }
+
+    /* ── PACKAGES ── */
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    .pkg-card {
+      background: var(--bg);
+      padding: 20px;
+    }
+    .pkg-card:hover { background: var(--bg1); }
+    .pkg-name { font-size: 12px; font-weight: 600; color: var(--fg1); margin-bottom: 6px; }
+    .pkg-desc { font-size: 11px; color: var(--fg4); line-height: 1.6; margin-bottom: 12px; }
+    .pkg-version { font-size: 10px; color: var(--fg5); letter-spacing: 0.04em; }
+    .pkg-link { font-size: 10px; color: var(--fg4); margin-top: 8px; display: block; }
+    .pkg-link:hover { color: var(--fg2); }
+    .view-all-link { font-size: 11px; color: var(--fg4); letter-spacing: 0.04em; }
+    .view-all-link:hover { color: var(--fg2); }
+
+    /* ── OAUTH PROVIDERS ── */
+    .providers-row {
+      display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      margin-top: 32px;
     }
-
-    .fw-badge {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #71717a;
-      border: 1px solid #1e1e1e;
-      padding: 6px 14px;
-      background: #0d0d0d;
-    }
-
-    /* ── Packages ── */
-    .packages-section {
-      padding: 72px 0;
-      border-bottom: 1px solid #1a1a1a;
-    }
-
-    .packages-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      background: #1a1a1a;
-      border: 1px solid #1a1a1a;
-      margin-top: 48px;
-    }
-
-    .package-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 24px;
-      background: #0a0a0a;
-      padding: 24px 28px;
-    }
-
-    .package-row:hover {
-      background: #0f0f0f;
-    }
-
-    .package-name {
-      font-family: 'Geist Mono', monospace;
-      font-size: 13px;
-      font-weight: 600;
-      color: #e4e4e7;
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-    }
-
-    .package-desc {
-      font-size: 13px;
-      color: #52525b;
-      flex: 1;
-      text-align: right;
-    }
-
-    /* ── Footer ── */
-    footer {
-      border-top: 1px solid #1a1a1a;
-      padding: 40px 0;
-    }
-
-    .footer-inner {
+    .provider-badge {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .footer-copy {
-      font-size: 12px;
-      color: #3f3f46;
+      gap: 7px;
+      font-size: 11px;
+      color: var(--fg3);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      background: var(--bg1);
       letter-spacing: 0.04em;
     }
+    .provider-badge:hover { border-color: var(--border2); color: var(--fg1); }
+    .provider-more {
+      font-size: 11px;
+      color: var(--fg4);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      background: var(--bg1);
+    }
 
-    .footer-links {
+    /* ── MCP ── */
+    .mcp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    .mcp-left { background: var(--bg); padding: 32px 28px; }
+    .mcp-right { background: var(--bg1); padding: 0; }
+    .mcp-tools-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); }
+    .mcp-tool-row {
+      background: var(--bg);
+      padding: 12px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .mcp-tool-row:hover { background: var(--bg1); }
+    .mcp-tool-name { font-size: 12px; font-weight: 600; color: var(--fg1); }
+    .mcp-tool-desc { font-size: 11px; color: var(--fg4); }
+    .mcp-endpoint {
+      font-size: 11px;
+      color: var(--fg3);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      background: var(--bg1);
+      margin-top: 16px;
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: 8px;
     }
+    .mcp-endpoint code { color: var(--fg2); font-size: 11px; }
+    .mcp-clients { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .mcp-client-row { font-size: 11px; color: var(--fg4); display: flex; align-items: center; gap: 8px; }
+    .mcp-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--fg5); flex-shrink: 0; }
 
-    .footer-link {
-      font-size: 11px;
+    /* ── WHATS COMING ── */
+    .coming-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    .coming-card { background: var(--bg); padding: 20px; }
+    .coming-card:hover { background: var(--bg1); }
+    .coming-title { font-size: 12px; font-weight: 600; color: var(--fg1); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .coming-desc { font-size: 11px; color: var(--fg4); line-height: 1.6; }
+    .coming-badge {
+      display: inline-block;
+      font-size: 9px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #3f3f46;
+      color: var(--fg5);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      margin-bottom: 10px;
     }
 
-    .footer-link:hover {
-      color: #71717a;
+    /* ── THREE STEPS ── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 40px;
     }
-
-    /* ── Responsive ── */
-    @media (max-width: 640px) {
-      .nav-links {
-        gap: 16px;
-      }
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-      .steps {
-        grid-template-columns: 1fr;
-      }
-      .package-row {
-        flex-direction: column;
-        gap: 8px;
-      }
-      .package-desc {
-        text-align: left;
-      }
-      .footer-inner {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+    .step-card { background: var(--bg); padding: 32px 24px; }
+    .step-num {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--fg5);
+      letter-spacing: -0.04em;
+      margin-bottom: 16px;
     }
+    .step-title { font-size: 12px; font-weight: 600; color: var(--fg1); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .step-desc { font-size: 12px; color: var(--fg4); line-height: 1.65; }
 
-    @media (max-width: 480px) {
-      .nav-link:not(:last-child) {
-        display: none;
-      }
+    /* ── CTA ── */
+    .cta-section {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .cta-title { font-size: clamp(24px, 4vw, 40px); font-weight: 800; color: var(--fg); margin-bottom: 12px; letter-spacing: -0.02em; }
+    .cta-sub { font-size: 13px; color: var(--fg4); margin-bottom: 28px; }
+    .cta-actions { display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+    /* ── FOOTER ── */
+    footer { padding: 28px 0; border-top: 1px solid var(--border); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-copy { font-size: 11px; color: var(--fg5); }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-link { font-size: 11px; color: var(--fg5); letter-spacing: 0.04em; }
+    .footer-link:hover { color: var(--fg3); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-grid, .install-grid, .mcp-grid { grid-template-columns: 1fr; }
+      .hero-right { border-left: none; border-top: 1px solid var(--border); }
+      .quickstart-grid, .features-grid, .packages-grid, .coming-grid { grid-template-columns: 1fr 1fr; }
+      .routes-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .quickstart-grid, .features-grid, .packages-grid, .coming-grid, .steps-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
     }
   </style>
 </head>
 <body>
+
+  <!-- ── TOP BAR ── -->
+  <div class="topbar">
+    <div class="container">
+      <div class="topbar-inner">
+        <div class="topbar-left">
+          <span class="version-badge">v1.0.0</span>
+          <span class="prod-badge">Production Ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ── NAV ── -->
   <nav>
@@ -528,202 +630,352 @@ export const prerender = false;
         <a href="/" class="nav-logo">Gately Auth</a>
         <div class="nav-links">
           <a href="/article/quick-start" class="nav-link">Docs</a>
-          <a href="https://github.com/gately-auth/gately-auth" class="nav-link" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://www.npmjs.com/package/@gately/auth-core" class="nav-link" target="_blank" rel="noopener">npm</a>
-          <a href="/article/quick-start" class="nav-cta">Get Started</a>
+          <a href="/article/cli-overview" class="nav-link">Guides</a>
+          <a href="/article/core-api" class="nav-link">API</a>
+          <a href="/article/admin-plugin" class="nav-link">Adapters</a>
+          <a href="https://mcp.auth.usegately.com" class="nav-link" target="_blank" rel="noopener">MCP</a>
+        </div>
+        <div class="nav-actions">
+          <a href="https://github.com/gately-auth/gately-auth" class="btn-sm" target="_blank" rel="noopener">
+            ★ Star
+            <span class="star-count">1.2k</span>
+          </a>
+          <a href="/article/quick-start" class="btn-sm-primary">Get Started</a>
         </div>
       </div>
     </div>
   </nav>
 
   <!-- ── HERO ── -->
-  <section class="hero">
+  <section class="hero section-border">
     <div class="container">
-      <a href="https://www.npmjs.com/package/@gately/auth-core" class="hero-badge" target="_blank" rel="noopener">
-        Now on npm →
-      </a>
-      <h1>Auth for Cloudflare<br />Workers.</h1>
-      <p class="hero-sub">
-        D1 + KV + Workers. Production-grade email, magic links, OTP, and OAuth — no Node.js required.
-      </p>
-      <div class="hero-actions">
-        <a href="/article/quick-start" class="btn-primary">Read the Docs</a>
-        <a href="https://github.com/gately-auth/gately-auth" class="btn-secondary" target="_blank" rel="noopener">View on GitHub</a>
-      </div>
-      <div class="npm-badge">
-        <span class="dollar">$</span>
-        <code>npm install @gately/auth-core</code>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── CODE SNIPPET ── -->
-  <section class="code-section">
-    <div class="container">
-      <p class="section-label">Quick start</p>
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-filename">src/auth.ts</span>
-          <span class="code-block-lang">TypeScript</span>
+      <div class="hero-grid">
+        <!-- LEFT -->
+        <div class="hero-left">
+          <p class="hero-eyebrow">v1.0.0 · Production Ready</p>
+          <h1>Auth for<br />Cloudflare<br />Workers.</h1>
+          <p class="hero-sub">The authentication framework built specifically for Cloudflare Workers and the edge.</p>
+          <div class="tag-row">
+            <span class="tag">OAuth</span>
+            <span class="tag">Email + Password</span>
+            <span class="tag">Magic Links</span>
+            <span class="tag">Sessions</span>
+            <span class="tag">MFA</span>
+            <span class="tag">Plugins</span>
+          </div>
+          <div class="hero-install">
+            <span class="hero-install-prompt">$</span>
+            <code>npm create gately-auth@latest</code>
+          </div>
+          <div class="hero-actions">
+            <a href="/article/quick-start" class="btn-primary">Get Started →</a>
+            <a href="/article/quick-start" class="btn-secondary">Documentation</a>
+          </div>
+          <div class="tag-row" style="margin-top:24px;margin-bottom:0;">
+            <span class="tag">🐎 Hono</span>
+            <span class="tag">▲ Next.js</span>
+            <span class="tag">⚡ Astro</span>
+            <span class="tag">🟠 SvelteKit</span>
+            <span class="tag">💿 Remix</span>
+            <span class="tag">⚛️ React</span>
+          </div>
         </div>
-        <pre><code><span class="tok-import">import</span> <span style="color:#e4e4e7">{ gatelyAuth }</span> <span class="tok-import">from</span> <span class="tok-str">'@gately/auth-core'</span>
-<span class="tok-import">import</span> <span style="color:#e4e4e7">{ createD1Adapter, createKVStore }</span> <span class="tok-import">from</span> <span class="tok-str">'@gately/auth-core/adapters'</span>
-<span class="tok-import">import</span> <span style="color:#e4e4e7">{ gatelyEmail }</span> <span class="tok-import">from</span> <span class="tok-str">'@gately/auth-core/plugins'</span>
 
-<span class="tok-kw">export function</span> <span style="color:#ffffff">createAuth</span><span class="tok-punc">(</span><span style="color:#e4e4e7">env</span><span class="tok-punc">:</span> <span class="tok-type">Env</span><span class="tok-punc">) {</span>
-  <span class="tok-kw">return</span> <span style="color:#ffffff">gatelyAuth</span><span class="tok-punc">({</span>
-    <span class="tok-key">secret</span><span class="tok-punc">:</span> <span style="color:#e4e4e7">env</span><span class="tok-punc">.</span><span style="color:#a1a1aa">AUTH_SECRET</span><span class="tok-punc">,</span>
-    <span class="tok-key">db</span><span class="tok-punc">:</span> <span style="color:#ffffff">createD1Adapter</span><span class="tok-punc">(</span><span style="color:#e4e4e7">env</span><span class="tok-punc">.</span><span style="color:#a1a1aa">AUTH_DB</span><span class="tok-punc">),</span>
-    <span class="tok-key">kv</span><span class="tok-punc">:</span> <span style="color:#ffffff">createKVStore</span><span class="tok-punc">(</span><span style="color:#e4e4e7">env</span><span class="tok-punc">.</span><span style="color:#a1a1aa">AUTH_KV</span><span class="tok-punc">),</span>
-    <span class="tok-key">emailAndPassword</span><span class="tok-punc">:</span> <span class="tok-punc">{</span> <span class="tok-key">enabled</span><span class="tok-punc">:</span> <span class="tok-kw">true</span> <span class="tok-punc">},</span>
-    <span class="tok-key">plugins</span><span class="tok-punc">:</span> <span class="tok-punc">[</span><span style="color:#ffffff">gatelyEmail</span><span class="tok-punc">({</span> <span class="tok-key">apiKey</span><span class="tok-punc">:</span> <span style="color:#e4e4e7">env</span><span class="tok-punc">.</span><span style="color:#a1a1aa">GATELY_API_KEY</span> <span class="tok-punc">})],</span>
-  <span class="tok-punc">})</span>
-<span class="tok-punc">}</span></code></pre>
+        <!-- RIGHT — split: terminal top, code bottom -->
+        <div class="hero-right">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <div class="terminal-dot" style="background:#ef4444"></div>
+              <div class="terminal-dot" style="background:#eab308"></div>
+              <div class="terminal-dot" style="background:#22c55e"></div>
+              <span class="terminal-title">bash</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="t-prompt">$</span><span class="t-white">npm create gately-auth@latest</span></div>
+              <div class="t-dim">  Creating project...</div>
+              <div class="t-dim">  Installing dependencies...</div>
+              <div class="t-dim">  Setting up auth...</div>
+              <div style="margin-top:8px"><span class="t-green">✔ Done.</span> <span class="t-dim">Your project is ready!</span></div>
+              <div class="t-dim">  cd my-app</div>
+              <div class="t-dim">  npm run dev</div>
+              <div style="margin-top:8px" class="t-dim">➜ Local: <span class="t-blue">http://localhost:8787</span></div>
+            </div>
+          </div>
+          <div class="code-window">
+            <div class="code-window-bar">
+              <span class="code-window-file">auth.ts</span>
+              <span class="code-window-lang">TypeScript</span>
+            </div>
+            <div class="code-window-body">
+              <div><span class="kw">import</span> <span class="prop">{ gatelyAuth }</span> <span class="kw">from</span> <span class="str">'@gately/auth-core'</span></div>
+              <div><span class="kw">import</span> <span class="prop">{ createD1Adapter }</span> <span class="kw">from</span> <span class="str">'@gately/auth-core/adapters'</span></div>
+              <div>&nbsp;</div>
+              <div><span class="kw">export const</span> <span class="fn">auth</span> = <span class="fn">gatelyAuth</span>({</div>
+              <div>&nbsp;&nbsp;<span class="prop">providers</span>: [</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="prop">provider</span>: <span class="str">'google'</span> },</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="prop">provider</span>: <span class="str">'github'</span> },</div>
+              <div>&nbsp;&nbsp;],</div>
+              <div>&nbsp;&nbsp;<span class="prop">session</span>: {</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="prop">strategy</span>: <span class="str">'jwt'</span>,</div>
+              <div>&nbsp;&nbsp;},</div>
+              <div>})</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ── FEATURES ── -->
-  <section class="features-section">
+  <!-- ── INSTALL IN SECONDS ── -->
+  <section class="install-section section-border">
     <div class="container">
-      <h2 class="section-heading">Everything you need.</h2>
-      <p class="section-sub">All auth primitives built for the Workers runtime.</p>
+      <div class="section-label">Setup</div>
+      <h2 class="section-title">Install in seconds.</h2>
+      <p class="section-sub">Add Gately Auth to your project with your favourite package manager.</p>
+      <div class="install-grid">
+        <div>
+          <div class="install-tabs">
+            <button class="install-tab active" onclick="setTab(this,'npm')">npm</button>
+            <button class="install-tab" onclick="setTab(this,'pnpm')">pnpm</button>
+            <button class="install-tab" onclick="setTab(this,'bun')">bun</button>
+            <button class="install-tab" onclick="setTab(this,'yarn')">yarn</button>
+          </div>
+          <div class="install-box">
+            <div class="install-cmd">
+              <div><span>$</span><code id="install-cmd-text">npm i @gately/auth-core</code></div>
+              <button class="copy-btn" onclick="copyInstall()">copy</button>
+            </div>
+          </div>
+        </div>
+        <div style="padding-top:32px;">
+          <p style="font-size:12px;color:var(--fg4);line-height:1.8;">
+            Works with any Cloudflare Worker project. D1 and KV bindings are all you need —
+            no external auth service, no per-user pricing, your data stays in your account.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── QUICK START ── -->
+  <section class="section section-border">
+    <div class="container">
+      <div class="section-label">Quick start</div>
+      <h2 class="section-title">Three files. That's it.</h2>
+      <div class="quickstart-grid">
+        <div class="qs-panel">
+          <div class="qs-panel-header">
+            <span class="qs-panel-file">auth.ts</span>
+            <span class="code-window-lang">TypeScript</span>
+          </div>
+          <div class="qs-panel-body">
+            <div><span class="kw">import</span> <span class="prop">{ gatelyAuth }</span> <span class="kw">from</span> <span class="str">'@gately/auth-core'</span></div>
+            <div><span class="kw">import</span> <span class="prop">{ createD1Adapter, createKVStore }</span></div>
+            <div>&nbsp;&nbsp;<span class="kw">from</span> <span class="str">'@gately/auth-core/adapters'</span></div>
+            <div>&nbsp;</div>
+            <div><span class="kw">export function</span> <span class="fn">createAuth</span>(<span class="prop">env</span>) {</div>
+            <div>&nbsp;&nbsp;<span class="kw">return</span> <span class="fn">gatelyAuth</span>({</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="prop">secret</span>: <span class="prop">env</span>.<span class="fn">AUTH_SECRET</span>,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="prop">db</span>: <span class="fn">createD1Adapter</span>(<span class="prop">env</span>.<span class="fn">AUTH_DB</span>),</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="prop">kv</span>: <span class="fn">createKVStore</span>(<span class="prop">env</span>.<span class="fn">AUTH_KV</span>),</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="prop">emailAndPassword</span>: { <span class="prop">enabled</span>: <span class="kw">true</span> },</div>
+            <div>&nbsp;&nbsp;})</div>
+            <div>}</div>
+          </div>
+        </div>
+        <div class="qs-panel">
+          <div class="qs-panel-header">
+            <span class="qs-panel-file">middleware.ts</span>
+            <span class="code-window-lang">TypeScript</span>
+          </div>
+          <div class="qs-panel-body">
+            <div><span class="kw">import</span> <span class="prop">{ auth }</span> <span class="kw">from</span> <span class="str">'./auth'</span></div>
+            <div>&nbsp;</div>
+            <div><span class="kw">export default</span> {</div>
+            <div>&nbsp;&nbsp;<span class="kw">async</span> <span class="fn">fetch</span>(<span class="prop">req</span>, <span class="prop">env</span>) {</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span> <span class="prop">a</span> = <span class="fn">createAuth</span>(<span class="prop">env</span>)</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="prop">a</span>.<span class="fn">handler</span>(<span class="prop">req</span>)</div>
+            <div>&nbsp;&nbsp;}</div>
+            <div>}</div>
+          </div>
+        </div>
+        <div class="qs-panel">
+          <div class="qs-panel-header">
+            <span class="qs-panel-file">services.ts</span>
+            <span class="code-window-lang">TypeScript</span>
+          </div>
+          <div class="qs-panel-body">
+            <div><span class="kw">import</span> <span class="prop">{ auth }</span> <span class="kw">from</span> <span class="str">'./auth'</span></div>
+            <div><span class="kw">import</span> <span class="prop">{ Hono }</span> <span class="kw">from</span> <span class="str">'hono'</span></div>
+            <div>&nbsp;</div>
+            <div><span class="kw">const</span> <span class="prop">app</span> = <span class="kw">new</span> <span class="fn">Hono</span>()</div>
+            <div>&nbsp;</div>
+            <div><span class="prop">app</span>.<span class="fn">get</span>(<span class="str">'/api/me'</span>, <span class="kw">async</span> (<span class="prop">c</span>) => {</div>
+            <div>&nbsp;&nbsp;<span class="kw">const</span> <span class="prop">auth</span> = <span class="fn">createAuth</span>(<span class="prop">c</span>.<span class="prop">env</span>)</div>
+            <div>&nbsp;&nbsp;<span class="kw">const</span> <span class="prop">s</span> = <span class="kw">await</span> <span class="prop">auth</span>.<span class="prop">api</span>.<span class="fn">getSession</span>(<span class="prop">c</span>.<span class="prop">req</span>.<span class="prop">raw</span>)</div>
+            <div>&nbsp;&nbsp;<span class="kw">return</span> <span class="prop">c</span>.<span class="fn">json</span>(<span class="prop">s</span>)</div>
+            <div>})</div>
+            <div>&nbsp;</div>
+            <div><span class="kw">export default</span> <span class="prop">app</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── EVERYTHING BUILT IN ── -->
+  <section class="section section-border">
+    <div class="container">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything built in.</h2>
+      <p class="section-sub">All the tools you need. No fluff.</p>
       <div class="features-grid">
-
         <div class="feature-card">
-          <p class="feature-num">01</p>
-          <p class="feature-title">Email + Password</p>
-          <p class="feature-desc">Sign up, sign in, email verification, and password reset — all handled out of the box.</p>
+          <span class="feature-icon">🔐</span>
+          <p class="feature-card-title">Authentication</p>
+          <div class="feature-items">
+            <span class="feature-item">Email + Password</span>
+            <span class="feature-item">Magic Links</span>
+            <span class="feature-item">OAuth / Social</span>
+            <span class="feature-item">Magic Passwords</span>
+          </div>
         </div>
-
         <div class="feature-card">
-          <p class="feature-num">02</p>
-          <p class="feature-title">Magic Links</p>
-          <p class="feature-desc">Passwordless sign-in via time-limited email links. Zero friction for your users.</p>
+          <span class="feature-icon">🗄️</span>
+          <p class="feature-card-title">Databases</p>
+          <div class="feature-items">
+            <span class="feature-item">Cloudflare D1</span>
+            <span class="feature-item">Cloudflare KV</span>
+            <span class="feature-item">Workers, R2, Durable</span>
+            <span class="feature-item">Postgres, MySQL, SQLite</span>
+          </div>
         </div>
-
         <div class="feature-card">
-          <p class="feature-num">03</p>
-          <p class="feature-title">Email OTP</p>
-          <p class="feature-desc">6-digit codes for sign-in or 2FA flows. Works anywhere email delivery is available.</p>
+          <span class="feature-icon">👤</span>
+          <p class="feature-card-title">User Management</p>
+          <div class="feature-items">
+            <span class="feature-item">Roles &amp; Permissions</span>
+            <span class="feature-item">RBAC</span>
+            <span class="feature-item">Organisations</span>
+            <span class="feature-item">Teams</span>
+          </div>
         </div>
-
         <div class="feature-card">
-          <p class="feature-num">04</p>
-          <p class="feature-title">OAuth / Social</p>
-          <p class="feature-desc">Google, GitHub, and any OAuth 2.0 provider with PKCE. Configurable in one object.</p>
+          <span class="feature-icon">🔌</span>
+          <p class="feature-card-title">Adapters</p>
+          <div class="feature-items">
+            <span class="feature-item">Supabase</span>
+            <span class="feature-item">Prisma</span>
+            <span class="feature-item">Drizzle</span>
+            <span class="feature-item">Turso</span>
+          </div>
         </div>
-
         <div class="feature-card">
-          <p class="feature-num">05</p>
-          <p class="feature-title">Plugin System</p>
-          <p class="feature-desc">Extend with custom endpoints, schema fields, and lifecycle hooks. No forks required.</p>
+          <span class="feature-icon">🛡️</span>
+          <p class="feature-card-title">Security</p>
+          <div class="feature-items">
+            <span class="feature-item">Rate Limiting</span>
+            <span class="feature-item">CSRF Protection</span>
+            <span class="feature-item">Account Linking</span>
+          </div>
         </div>
-
         <div class="feature-card">
-          <p class="feature-num">06</p>
-          <p class="feature-title">Rate Limiting</p>
-          <p class="feature-desc">Built-in per-route rate limiting using Cloudflare KV. Protects every auth endpoint.</p>
+          <span class="feature-icon">✉️</span>
+          <p class="feature-card-title">Email</p>
+          <div class="feature-items">
+            <span class="feature-item">Resend</span>
+            <span class="feature-item">Postmark</span>
+            <span class="feature-item">Mailgun</span>
+            <span class="feature-item">AWS SES, SendGrid</span>
+          </div>
         </div>
-
+        <div class="feature-card">
+          <span class="feature-icon">🤖</span>
+          <p class="feature-card-title">MCP / AI</p>
+          <div class="feature-items">
+            <span class="feature-item">Cursor, Kiro, Claude</span>
+            <span class="feature-item">Live doc access</span>
+            <span class="feature-item">Code generation</span>
+          </div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🔧</span>
+          <p class="feature-card-title">Plugin System</p>
+          <div class="feature-items">
+            <span class="feature-item">Custom endpoints</span>
+            <span class="feature-item">Schema extensions</span>
+            <span class="feature-item">Lifecycle hooks</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ── HOW IT WORKS ── -->
-  <section class="how-section">
+  <!-- ── ROUTES ── -->
+  <section class="section section-border">
     <div class="container">
-      <h2 class="section-heading">How it works.</h2>
-      <p class="section-sub">Three steps from install to production.</p>
-      <div class="steps">
-
-        <div class="step">
-          <p class="step-num">01</p>
-          <p class="step-title">Create your auth instance</p>
-          <p class="step-desc">Pass your D1 database and KV namespace bindings. One function call, fully typed.</p>
+      <div class="section-label">API</div>
+      <h2 class="section-title">Every route, out of the box.</h2>
+      <p class="section-sub">RESTful API endpoints ready to use.</p>
+      <div class="routes-grid">
+        <div>
+          <div class="route-row"><span class="route-method method-post">POST</span><span class="route-path">/auth/sign-up/email</span><span class="route-desc">Create account</span></div>
+          <div class="route-row"><span class="route-method method-post">POST</span><span class="route-path">/auth/sign-in/email</span><span class="route-desc">Login with email + password</span></div>
+          <div class="route-row"><span class="route-method method-post">POST</span><span class="route-path">/auth/sign-out</span><span class="route-desc">Logout the current user</span></div>
+          <div class="route-row"><span class="route-method method-get">GET</span><span class="route-path">/auth/session</span><span class="route-desc">Get current user</span></div>
+          <div class="route-row"><span class="route-method method-get">GET</span><span class="route-path">/auth/sessions</span><span class="route-desc">Get OAuth providers</span></div>
+          <div class="route-row"><span class="route-method method-post">POST</span><span class="route-path">/auth/magic-link/send</span><span class="route-desc">Send magic link</span></div>
+          <div class="route-row"><span class="route-method method-post">POST</span><span class="route-path">/auth/password/reset</span><span class="route-desc">Reset password email</span></div>
         </div>
-
-        <div class="step">
-          <p class="step-num">02</p>
-          <p class="step-title">Mount the handler</p>
-          <p class="step-desc">Route <code style="color:#a1a1aa;font-size:12px;">/auth/*</code> to Gately in your Worker's fetch handler. Works with Hono, plain Workers, or any router.</p>
+        <div>
+          <div class="route-row"><span class="route-method method-get">GET</span><span class="route-path">/auth/oauth/:provider</span><span class="route-desc">Start OAuth flow</span></div>
+          <div class="route-row"><span class="route-method method-get">GET</span><span class="route-path">/auth/oauth/:provider/callback</span><span class="route-desc">OAuth callback</span></div>
+          <div class="route-row"><span class="route-method method-post">POST</span><span class="route-path">/auth/otp/send</span><span class="route-desc">Send OTP code</span></div>
+          <div class="route-row"><span class="route-method method-post">POST</span><span class="route-path">/auth/otp/verify</span><span class="route-desc">Verify OTP code</span></div>
+          <div class="route-row"><span class="route-method method-get">GET</span><span class="route-path">/auth/verify-email</span><span class="route-desc">Verify email address</span></div>
+          <div class="route-row"><span class="route-method method-delete">DEL</span><span class="route-path">/auth/sessions/:token</span><span class="route-desc">Revoke session</span></div>
+          <div class="route-row"><span class="route-method method-get">GET</span><span class="route-path">/auth/health</span><span class="route-desc">Health check</span></div>
         </div>
-
-        <div class="step">
-          <p class="step-num">03</p>
-          <p class="step-title">Use the client SDK</p>
-          <p class="step-desc">Drop <code style="color:#a1a1aa;font-size:12px;">@gately/auth-client</code> into your frontend for typed hooks and session management.</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ── FRAMEWORKS ── -->
-  <section class="frameworks-section">
-    <div class="container">
-      <p class="frameworks-label">Works with your stack</p>
-      <div class="frameworks-row">
-        <span class="fw-badge">Hono</span>
-        <span class="fw-badge">Next.js</span>
-        <span class="fw-badge">SvelteKit</span>
-        <span class="fw-badge">Remix</span>
-        <span class="fw-badge">Astro</span>
-        <span class="fw-badge">React</span>
       </div>
     </div>
   </section>
 
   <!-- ── PACKAGES ── -->
-  <section class="packages-section">
+  <section class="section section-border">
     <div class="container">
-      <h2 class="section-heading">The packages.</h2>
-      <p class="section-sub">A focused set of packages — nothing more, nothing less.</p>
-      <div class="packages-list">
-
-        <div class="package-row">
-          <span class="package-name">@gately/auth-core</span>
-          <span class="package-desc">The Worker handler, D1/KV adapters, all auth providers</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
+        <div>
+          <div class="section-label">Packages</div>
+          <h2 class="section-title">Official packages.</h2>
+          <p class="section-sub">Modular, lightweight, and tree-shakeable.</p>
         </div>
-
-        <div class="package-row">
-          <span class="package-name">@gately/auth-client</span>
-          <span class="package-desc">Browser client with React hooks and session management</span>
+        <a href="https://www.npmjs.com/search?q=%40gately" class="view-all-link" target="_blank" rel="noopener">View all packages →</a>
+      </div>
+      <div class="packages-grid">
+        <div class="pkg-card">
+          <p class="pkg-name">@gately/auth-core</p>
+          <p class="pkg-desc">Core auth engine — D1/KV adapters, all providers, session management</p>
+          <span class="pkg-version">v1.0.0</span>
+          <a href="https://www.npmjs.com/package/@gately/auth-core" class="pkg-link" target="_blank">npm →</a>
         </div>
-
-        <div class="package-row">
-          <span class="package-name">@gately/auth-cli</span>
-          <span class="package-desc">CLI to scaffold, migrate, and deploy your auth setup</span>
+        <div class="pkg-card">
+          <p class="pkg-name">@gately/auth-client</p>
+          <p class="pkg-desc">Browser client — React hooks, Vue composables, Svelte stores, and components</p>
+          <span class="pkg-version">v1.0.0</span>
+          <a href="https://www.npmjs.com/package/@gately/auth-client" class="pkg-link" target="_blank">npm →</a>
         </div>
-
-        <div class="package-row">
-          <span class="package-name">@gately/auth-mcp</span>
-          <span class="package-desc">MCP server runtime for agent-aware auth workflows</span>
+        <div class="pkg-card">
+          <p class="pkg-name">@gately/auth-cli</p>
+          <p class="pkg-desc">CLI tool — scaffold, migrate, generate, and deploy your auth Worker</p>
+          <span class="pkg-version">v1.0.0</span>
+          <a href="https://www.npmjs.com/package/@gately/auth-cli" class="pkg-link" target="_blank">npm →</a>
         </div>
-
-        <div class="package-row">
-          <span class="package-name">@gately/auth-skills</span>
-          <span class="package-desc">Composable skills for auth automation and agent actions</span>
+        <div class="pkg-card">
+          <p class="pkg-name">@gately/auth-mcp</p>
+          <p class="pkg-desc">MCP server — live doc access for Cursor, Claude, Kiro and any AI editor</p>
+          <span class="pkg-version">v1.0.0</span>
+          <a href="https://mcp.auth.usegately.com" class="pkg-link" target="_blank">endpoint →</a>
         </div>
-
       </div>
     </div>
   </section>
-
-  <!-- ── FOOTER ── -->
-  <footer>
-    <div class="container">
-      <div class="footer-inner">
-        <p class="footer-copy">Built for the Cloudflare Workers platform.</p>
-        <div class="footer-links">
-          <a href="/article/quick-start" class="footer-link">Docs</a>
-          <a href="https://github.com/gately-auth/gately-auth" class="footer-link" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://www.npmjs.com/package/@gately/auth-core" class="footer-link" target="_blank" rel="noopener">npm</a>
-          <a href="https://usegately.com" class="footer-link" target="_blank" rel="noopener">usegately.com</a>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-</body>
-</html>
