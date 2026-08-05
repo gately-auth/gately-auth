@@ -64,15 +64,15 @@ import BrandIcon from './BrandIcon.astro';
             <span class="l-win-file">auth.ts</span>
             <span class="l-win-lang">middleware</span>
           </div>
-          <div class="l-term-body" style="font-size:10px;line-height:1.75">
-            <div><span class="tc-d">import</span> <span class="tc-k">&#123; gatelyAuth &#125;</span> <span class="tc-d">from</span> <span class="tc-s">'@gately/auth-core'</span></div>
-            <div style="margin-top:4px"><span class="tc-d">export const</span> <span class="tc-w">auth</span> = <span class="tc-w">gatelyAuth</span>(&#123;</div>
-            <div>&nbsp;&nbsp;<span class="tc-k">providers</span>: [</div>
-            <div>&nbsp;&nbsp;&nbsp;&nbsp;&#123; <span class="tc-k">provider</span>: <span class="tc-s">'google'</span> &#125;,</div>
-            <div>&nbsp;&nbsp;&nbsp;&nbsp;&#123; <span class="tc-k">provider</span>: <span class="tc-s">'github'</span> &#125;,</div>
-            <div>&nbsp;&nbsp;],</div>
-            <div>&nbsp;&nbsp;<span class="tc-k">session</span>: &#123; <span class="tc-k">strategy</span>: <span class="tc-s">'jwt'</span> &#125;,</div>
-            <div>&#125;)</div>
+        <div class="l-term-body" style="font-size:10px;line-height:1.75">
+            <div><span class="tk-kw">import</span> <span class="tk-punc">&#123;</span> <span class="tk-prop">gatelyAuth</span> <span class="tk-punc">&#125;</span> <span class="tk-kw">from</span> <span class="tk-str">'@gately/auth-core'</span></div>
+            <div style="margin-top:4px"><span class="tk-kw">export const</span> <span class="tk-fn">auth</span> <span class="tk-op">=</span> <span class="tk-fn">gatelyAuth</span><span class="tk-punc">(&#123;</span></div>
+            <div>&nbsp;&nbsp;<span class="tk-prop">providers</span><span class="tk-punc">: [</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tk-punc">&#123;</span> <span class="tk-prop">provider</span><span class="tk-punc">:</span> <span class="tk-str">'google'</span> <span class="tk-punc">&#125;,</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tk-punc">&#123;</span> <span class="tk-prop">provider</span><span class="tk-punc">:</span> <span class="tk-str">'github'</span> <span class="tk-punc">&#125;,</span></div>
+            <div>&nbsp;&nbsp;<span class="tk-punc">],</span></div>
+            <div>&nbsp;&nbsp;<span class="tk-prop">session</span><span class="tk-punc">:</span> <span class="tk-punc">&#123;</span> <span class="tk-prop">strategy</span><span class="tk-punc">:</span> <span class="tk-str">'jwt'</span> <span class="tk-punc">&#125;,</span></div>
+            <div><span class="tk-punc">&#125;)</span></div>
           </div>
         </div>
         <div class="l-win l-win-sm" style="border-left:1px solid #111">
@@ -81,16 +81,16 @@ import BrandIcon from './BrandIcon.astro';
             <span class="l-win-lang">worker</span>
           </div>
           <div class="l-term-body" style="font-size:10px;line-height:1.75">
-            <div><span class="tc-d">export default</span> &#123;</div>
-            <div>&nbsp;&nbsp;<span class="tc-d">async</span> <span class="tc-w">fetch</span>(req, env) &#123;</div>
-            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tc-d">return</span> <span class="tc-w">auth</span>.<span class="tc-w">handler</span>(req)</div>
-            <div>&nbsp;&nbsp;&#125;</div>
-            <div>&#125;</div>
-            <div style="margin-top:8px;color:#2a2a2a">// Response</div>
-            <div>&#123;</div>
-            <div>&nbsp;&nbsp;<span class="tc-k">"success"</span>: <span class="tc-g">true</span>,</div>
-            <div>&nbsp;&nbsp;<span class="tc-k">"user"</span>: &#123; <span class="tc-k">"id"</span>: <span class="tc-s">"usr_01j..."</span> &#125;</div>
-            <div>&#125;</div>
+            <div><span class="tk-kw">export default</span> <span class="tk-punc">&#123;</span></div>
+            <div>&nbsp;&nbsp;<span class="tk-kw">async</span> <span class="tk-fn">fetch</span><span class="tk-punc">(</span><span class="tk-val">req</span><span class="tk-punc">,</span> <span class="tk-val">env</span><span class="tk-punc">) &#123;</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tk-kw">return</span> <span class="tk-val">auth</span><span class="tk-punc">.</span><span class="tk-fn">handler</span><span class="tk-punc">(</span><span class="tk-val">req</span><span class="tk-punc">)</span></div>
+            <div>&nbsp;&nbsp;<span class="tk-punc">&#125;</span></div>
+            <div><span class="tk-punc">&#125;</span></div>
+            <div style="margin-top:8px"><span class="tk-cm">// Response</span></div>
+            <div><span class="tk-punc">&#123;</span></div>
+            <div>&nbsp;&nbsp;<span class="tk-prop">"success"</span><span class="tk-punc">:</span> <span class="tk-kw">true</span><span class="tk-punc">,</span></div>
+            <div>&nbsp;&nbsp;<span class="tk-prop">"user"</span><span class="tk-punc">:</span> <span class="tk-punc">&#123;</span> <span class="tk-prop">"id"</span><span class="tk-punc">:</span> <span class="tk-str">"usr_01j..."</span> <span class="tk-punc">&#125;</span></div>
+            <div><span class="tk-punc">&#125;</span></div>
           </div>
         </div>
       </div>

@@ -8,53 +8,111 @@
         <h2 class="l-split-title">Install in seconds.</h2>
         <p class="l-split-desc">Add Gately Auth to your project with your favourite package manager.</p>
       </div>
-      <div class="l-split-right">
-        <div class="l-itabs">
-          <button class="l-itab active" onclick="lTab(this,'npm')">npm</button>
-          <button class="l-itab" onclick="lTab(this,'pnpm')">pnpm</button>
-          <button class="l-itab" onclick="lTab(this,'bun')">bun</button>
-          <button class="l-itab" onclick="lTab(this,'yarn')">yarn</button>
+      <div class="l-split-right" style="padding:32px 0 32px 40px">
+
+        <!-- Package manager tabs -->
+        <div class="l-itabs" id="l-pm-tabs">
+          <button class="l-itab active" data-pm="npm">npm</button>
+          <button class="l-itab" data-pm="pnpm">pnpm</button>
+          <button class="l-itab" data-pm="bun">bun</button>
+          <button class="l-itab" data-pm="yarn">yarn</button>
         </div>
         <div class="l-install-box">
-          <div><span class="l-dol">$</span><code id="l-icmd">npm i @gately/auth-core</code></div>
-          <button class="l-copy-btn" onclick="lCopy('l-icmd')">copy</button>
+          <div>
+            <span class="l-dol"><span class="tk-d">$</span></span>
+            <code id="l-icmd-display">
+              <span class="tk-d">npm</span> <span class="tk-prop">i</span> <span class="tk-str">@gately/auth-core</span>
+            </code>
+          </div>
+          <button class="l-copy-btn" id="l-install-copy-btn">copy</button>
         </div>
+
+        <!-- Agent prompt -->
         <div class="l-prompt" style="margin-top:1px">
           <div class="l-prompt-hd">
             <span class="l-prompt-label">Agent Prompt</span>
             <div style="display:flex;align-items:center;gap:8px">
               <span class="l-prompt-badge">Kiro / Cursor / Claude</span>
-              <button class="l-copy-btn" onclick="lCopy('l-aprompt')">copy</button>
+              <button class="l-copy-btn" id="l-prompt-copy-btn">copy</button>
             </div>
           </div>
           <div class="l-prompt-body" id="l-aprompt">Set up gately-auth in this Cloudflare Worker. Install @gately/auth-core and @gately/auth-client. Create src/auth.ts using gatelyAuth() with createD1Adapter(env.AUTH_DB), createKVStore(env.AUTH_KV), and gatelyEmail plugin. Enable emailAndPassword. Mount auth.handler(request) on /auth/*. Add bindings to wrangler.toml. Run migrations.</div>
         </div>
+
+        <!-- MCP -->
         <div class="l-prompt">
           <div class="l-prompt-hd">
             <span class="l-prompt-label">MCP Server</span>
             <div style="display:flex;align-items:center;gap:8px">
               <span class="l-prompt-badge" style="color:#4ade80;border-color:#14532d">Live</span>
-              <button class="l-copy-btn" onclick="lCopyText('https://mcp.auth.usegately.com/mcp')">copy</button>
+              <button class="l-copy-btn" id="l-mcp-copy-btn">copy</button>
             </div>
           </div>
           <div class="l-prompt-body" style="display:flex;align-items:center;gap:8px">
-            <span style="color:#2a2a2a">url</span>
-            <code style="color:#555">https://mcp.auth.usegately.com/mcp</code>
+            <span class="tk-d">url</span>
+            <code><span class="tk-str">https://mcp.auth.usegately.com/mcp</span></code>
           </div>
         </div>
+
       </div>
     </div>
   </div>
 </section>
 
 <script>
-const lCmds = { npm:'npm i @gately/auth-core', pnpm:'pnpm add @gately/auth-core', bun:'bun add @gately/auth-core', yarn:'yarn add @gately/auth-core' };
-function lTab(el, pm) {
-  document.querySelectorAll('.l-itab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  const cmd = document.getElementById('l-icmd');
-  if (cmd) cmd.textContent = lCmds[pm];
-}
-function lCopy(id) { const el = document.getElementById(id); if (el) navigator.clipboard?.writeText(el.textContent.trim()); }
-function lCopyText(t) { navigator.clipboard?.writeText(t); }
+(function () {
+  const cmds = {
+    npm:  { display: '<span class="tk-d">npm</span> <span class="tk-prop">i</span> <span class="tk-str">@gately/auth-core</span>', plain: 'npm i @gately/auth-core' },
+    pnpm: { display: '<span class="tk-d">pnpm</span> <span class="tk-prop">add</span> <span class="tk-str">@gately/auth-core</span>', plain: 'pnpm add @gately/auth-core' },
+    bun:  { display: '<span class="tk-d">bun</span> <span class="tk-prop">add</span> <span class="tk-str">@gately/auth-core</span>', plain: 'bun add @gately/auth-core' },
+    yarn: { display: '<span class="tk-d">yarn</span> <span class="tk-prop">add</span> <span class="tk-str">@gately/auth-core</span>', plain: 'yarn add @gately/auth-core' },
+  };
+
+  let currentPm = 'npm';
+
+  // Tab switching
+  const tabsEl = document.getElementById('l-pm-tabs');
+  if (tabsEl) {
+    tabsEl.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('[data-pm]') as HTMLElement | null;
+      if (!btn) return;
+      currentPm = btn.dataset.pm!;
+      tabsEl.querySelectorAll('.l-itab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      const display = document.getElementById('l-icmd-display');
+      if (display) display.innerHTML = cmds[currentPm].display;
+    });
+  }
+
+  // Copy install command
+  const installCopyBtn = document.getElementById('l-install-copy-btn');
+  if (installCopyBtn) {
+    installCopyBtn.addEventListener('click', () => {
+      navigator.clipboard?.writeText(cmds[currentPm].plain);
+      installCopyBtn.textContent = 'copied!';
+      setTimeout(() => { installCopyBtn.textContent = 'copy'; }, 1500);
+    });
+  }
+
+  // Copy agent prompt
+  const promptCopyBtn = document.getElementById('l-prompt-copy-btn');
+  if (promptCopyBtn) {
+    promptCopyBtn.addEventListener('click', () => {
+      const el = document.getElementById('l-aprompt');
+      if (el) navigator.clipboard?.writeText(el.textContent?.trim() || '');
+      promptCopyBtn.textContent = 'copied!';
+      setTimeout(() => { promptCopyBtn.textContent = 'copy'; }, 1500);
+    });
+  }
+
+  // Copy MCP url
+  const mcpCopyBtn = document.getElementById('l-mcp-copy-btn');
+  if (mcpCopyBtn) {
+    mcpCopyBtn.addEventListener('click', () => {
+      navigator.clipboard?.writeText('https://mcp.auth.usegately.com/mcp');
+      mcpCopyBtn.textContent = 'copied!';
+      setTimeout(() => { mcpCopyBtn.textContent = 'copy'; }, 1500);
+    });
+  }
+})();
 </script>

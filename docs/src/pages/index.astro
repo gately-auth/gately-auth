@@ -10,6 +10,7 @@ import LandingCode from '../components/landing/LandingCode.astro';
 import LandingFeatures from '../components/landing/LandingFeatures.astro';
 import LandingRoutes from '../components/landing/LandingRoutes.astro';
 import LandingPackages from '../components/landing/LandingPackages.astro';
+import LandingPlugins from '../components/landing/LandingPlugins.astro';
 import LandingProviders from '../components/landing/LandingProviders.astro';
 import LandingDocs from '../components/landing/LandingDocs.astro';
 import LandingMCP from '../components/landing/LandingMCP.astro';
@@ -41,6 +42,7 @@ import LandingFooter from '../components/landing/LandingFooter.astro';
 <body>
 
 <canvas id="noise-canvas" aria-hidden="true"></canvas>
+<div id="cursor-glow" aria-hidden="true"></div>
 
 <div id="layout">
   <LandingNav />
@@ -51,6 +53,7 @@ import LandingFooter from '../components/landing/LandingFooter.astro';
     <LandingFeatures />
     <LandingRoutes />
     <LandingPackages />
+    <LandingPlugins />
     <LandingProviders />
     <LandingDocs />
     <LandingMCP />
@@ -93,7 +96,41 @@ import LandingFooter from '../components/landing/LandingFooter.astro';
   });
 })();
 
-// Scroll reveal
+// Cursor glow spotlight
+(function () {
+  const glow = document.getElementById('cursor-glow');
+  if (!glow || window.matchMedia('(hover: none)').matches) return;
+
+  let mx = window.innerWidth / 2;
+  let my = window.innerHeight / 2;
+  let cx = mx, cy = my;
+  let visible = false;
+  let raf: number;
+
+  document.addEventListener('mousemove', (e) => {
+    mx = e.clientX;
+    my = e.clientY;
+    if (!visible) {
+      visible = true;
+      glow.classList.add('visible');
+    }
+  });
+
+  document.addEventListener('mouseleave', () => {
+    visible = false;
+    glow.classList.remove('visible');
+  });
+
+  function animate() {
+    // Smooth lerp — feels springy
+    cx += (mx - cx) * 0.1;
+    cy += (my - cy) * 0.1;
+    glow.style.left = cx + 'px';
+    glow.style.top = cy + 'px';
+    raf = requestAnimationFrame(animate);
+  }
+  animate();
+})();
 const observer = new IntersectionObserver(
   (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
   { threshold: 0.08 }

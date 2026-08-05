@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "gately-auth": {
+      "url": "https://mcp.auth.usegately.com/mcp"
+    }
+  }
+}

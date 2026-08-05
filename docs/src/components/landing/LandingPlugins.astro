@@ -1,0 +1,69 @@
+---
+import Icon from './Icon.astro';
+---
+<section class="bd">
+  <div class="lc" style="padding-top:0;padding-bottom:0">
+    <div class="l-split l-split-flush">
+      <div class="l-split-left">
+        <span class="l-split-label">Extensible</span>
+        <h2 class="l-split-title">Official plugins.</h2>
+        <p class="l-split-desc">Drop-in plugins that extend schema, routes, and email — without forking the core.</p>
+      </div>
+      <div class="l-split-right" style="padding:0">
+        <div class="l-plg-grid">
+
+          <div class="l-plg-card">
+            <div class="l-plg-icon">
+              <Icon name="mail-01" size={18} />
+            </div>
+            <p class="l-plg-name">Gately Email</p>
+            <p class="l-plg-desc">Plug-and-play transactional email. Handles password reset, magic links, OTP, and verification automatically.</p>
+            <div class="l-plg-tags">
+              <span class="l-plg-tag">magic-link</span>
+              <span class="l-plg-tag">otp</span>
+              <span class="l-plg-tag">verification</span>
+            </div>
+          </div>
+
+          <div class="l-plg-card">
+            <div class="l-plg-icon">
+              <Icon name="shield-01" size={18} />
+            </div>
+            <p class="l-plg-name">Admin Plugin</p>
+            <p class="l-plg-desc">Protected <code>/auth/admin/*</code> endpoints for user listing, banning, session revocation, and deletion.</p>
+            <div class="l-plg-tags">
+              <span class="l-plg-tag">ban</span>
+              <span class="l-plg-tag">sessions</span>
+              <span class="l-plg-tag">X-Admin-Key</span>
+            </div>
+          </div>
+
+          <div class="l-plg-card">
+            <div class="l-plg-icon">
+              <Icon name="user-group" size={18} />
+            </div>
+            <p class="l-plg-name">Username Plugin</p>
+            <p class="l-plg-desc">Adds a unique username field to sign-up with validation, uniqueness check, and a public availability endpoint.</p>
+            <div class="l-plg-tags">
+              <span class="l-plg-tag">unique</span>
+              <span class="l-plg-tag">validation</span>
+            </div>
+          </div>
+
+          <div class="l-plg-card">
+            <div class="l-plg-icon">
+              <Icon name="connect" size={18} />
+            </div>
+            <p class="l-plg-name">Google One Tap</p>
+            <p class="l-plg-desc">Exchange a Google ID token for a session — no redirect flow. Works with the One Tap JS snippet.</p>
+            <div class="l-plg-tags">
+              <span class="l-plg-tag">no-redirect</span>
+              <span class="l-plg-tag">id-token</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
