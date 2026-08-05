@@ -4,8 +4,8 @@
   <p>D1 · KV · Workers · Built for the edge</p>
 
   <p>
-    <a href="https://www.npmjs.com/package/@gately-auth/core"><img src="https://img.shields.io/npm/v/@gately-auth/core?label=%40gately-auth%2Fcore&color=black" alt="npm"></a>
-    <a href="https://www.npmjs.com/package/@gately-auth/client"><img src="https://img.shields.io/npm/v/@gately-auth/client?label=%40gately-auth%2Fclient&color=black" alt="npm"></a>
+    <a href="https://www.npmjs.com/package/@gately/auth-core"><img src="https://img.shields.io/npm/v/@gately/auth-core?label=%40gately%2Fauth-core&color=black" alt="npm"></a>
+    <a href="https://www.npmjs.com/package/@gately/auth-client"><img src="https://img.shields.io/npm/v/@gately/auth-client?label=%40gately%2Fauth-client&color=black" alt="npm"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="license"></a>
     <a href="https://github.com/gately-auth/gately-auth/actions"><img src="https://github.com/gately-auth/gately-auth/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   </p>
@@ -44,7 +44,7 @@ It ships with:
 ### 1. Scaffold a Worker
 
 ```bash
-npx @gately-auth/cli init
+npx @gately/auth-cli init
 ```
 
 This creates `wrangler.toml`, `src/auth.ts`, and `src/worker.ts` ready to deploy.
@@ -64,7 +64,7 @@ npx wrangler kv:namespace create AUTH_KV
 ### 3. Run migrations
 
 ```bash
-npx @gately-auth/cli migrate --local
+npx @gately/auth-cli migrate --local
 ```
 
 ### 4. Set secrets
@@ -89,9 +89,9 @@ Your auth API is live at `http://localhost:8787/auth`.
 
 ```ts
 // src/auth.ts
-import { gatelyAuth } from "@gately-auth/core";
-import { createD1Adapter, createKVStore } from "@gately-auth/core/adapters";
-import { gatelyEmail } from "@gately-auth/core/plugins";
+import { gatelyAuth } from "@gately/auth-core";
+import { createD1Adapter, createKVStore } from "@gately/auth-core/adapters";
+import { gatelyEmail } from "@gately/auth-core/plugins";
 
 export function createAuth(env: Env) {
   return gatelyAuth({
@@ -126,12 +126,12 @@ export default {
 ## Client setup
 
 ```bash
-npm install @gately-auth/client
+npm install @gately/auth-client
 ```
 
 ```ts
 // lib/auth-client.ts
-import { createAuthClient } from "@gately-auth/client";
+import { createAuthClient } from "@gately/auth-client";
 
 export const authClient = createAuthClient({
   baseURL: "https://my-auth-worker.workers.dev",
@@ -141,7 +141,7 @@ export const authClient = createAuthClient({
 ### React
 
 ```tsx
-import { createReactAuthClient } from "@gately-auth/client/react";
+import { createReactAuthClient } from "@gately/auth-client/react";
 
 export const authClient = createReactAuthClient({
   baseURL: "https://my-auth-worker.workers.dev",
@@ -226,18 +226,18 @@ Cloudflare Worker  ←── gately-auth handler
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@gately-auth/core`](packages/core) | [![npm](https://img.shields.io/npm/v/@gately-auth/core?color=black)](https://www.npmjs.com/package/@gately-auth/core) | Worker handler, D1/KV adapters, all providers |
-| [`@gately-auth/client`](packages/client) | [![npm](https://img.shields.io/npm/v/@gately-auth/client?color=black)](https://www.npmjs.com/package/@gately-auth/client) | Browser client, React hooks |
-| [`@gately-auth/cli`](packages/cli) | [![npm](https://img.shields.io/npm/v/@gately-auth/cli?color=black)](https://www.npmjs.com/package/@gately-auth/cli) | CLI — init, migrate, generate, deploy |
-| [`@gately-auth/mcp`](packages/mcp) | [![npm](https://img.shields.io/npm/v/@gately-auth/mcp?color=black)](https://www.npmjs.com/package/@gately/auth-mcp) | MCP server runtime for agent-aware auth workflows |
-| [`@gately-auth/skills`](packages/skills) | [![npm](https://img.shields.io/npm/v/@gately-auth/skills?color=black)](https://www.npmjs.com/package/@gately/auth-skills) | Composable auth skills for agent actions |
+| [`@gately/auth-core`](packages/core) | [![npm](https://img.shields.io/npm/v/@gately/auth-core?color=black)](https://www.npmjs.com/package/@gately/auth-core) | Worker handler, D1/KV adapters, all providers |
+| [`@gately/auth-client`](packages/client) | [![npm](https://img.shields.io/npm/v/@gately/auth-client?color=black)](https://www.npmjs.com/package/@gately/auth-client) | Browser client, React hooks |
+| [`@gately/auth-cli`](packages/cli) | [![npm](https://img.shields.io/npm/v/@gately/auth-cli?color=black)](https://www.npmjs.com/package/@gately/auth-cli) | CLI — init, migrate, generate, deploy |
+| [`@gately/auth-mcp`](packages/mcp) | [![npm](https://img.shields.io/npm/v/@gately/auth-mcp?color=black)](https://www.npmjs.com/package/@gately/auth-mcp) | MCP server runtime for agent-aware auth workflows |
+| [`@gately/auth-skills`](packages/skills) | [![npm](https://img.shields.io/npm/v/@gately/auth-skills?color=black)](https://www.npmjs.com/package/@gately/auth-skills) | Composable auth skills for agent actions |
 
 ---
 
 ## Plugin system
 
 ```ts
-import type { GatelyAuthPlugin } from "@gately-auth/core";
+import type { GatelyAuthPlugin } from "@gately/auth-core";
 
 export function myPlugin(): GatelyAuthPlugin {
   return {
@@ -290,17 +290,17 @@ Short-lived tokens (magic links, OTPs, rate-limit windows) live in **KV** — no
 
 ```bash
 # Scaffold a new auth Worker
-npx @gately-auth/cli init
+npx @gately/auth-cli init
 
 # Generate migration SQL from your config
-npx @gately-auth/cli generate
+npx @gately/auth-cli generate
 
 # Apply migrations
-npx @gately-auth/cli migrate --local   # local wrangler dev
-npx @gately-auth/cli migrate --remote  # production
+npx @gately/auth-cli migrate --local   # local wrangler dev
+npx @gately/auth-cli migrate --remote  # production
 
 # Deploy
-npx @gately-auth/cli deploy
+npx @gately/auth-cli deploy
 ```
 
 ---

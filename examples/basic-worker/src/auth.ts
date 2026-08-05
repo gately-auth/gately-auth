@@ -3,9 +3,9 @@
 // This is the only file you need to customise.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { gatelyAuth } from "@gately-auth/core";
-import { createD1Adapter, createKVStore } from "@gately-auth/core/adapters";
-import { gatelyEmail, emailTemplates } from "@gately-auth/core/plugins";
+import { gatelyAuth } from "@gately/auth-core";
+import { createD1Adapter, createKVStore } from "@gately/auth-core/adapters";
+import { gatelyEmail, emailTemplates } from "@gately/auth-core/plugins";
 
 // ── Cloudflare Worker bindings ────────────────────────────────────────────────
 

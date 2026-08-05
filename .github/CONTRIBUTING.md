@@ -54,9 +54,9 @@ pnpm test
 ```
 gately-auth/
 ├── packages/
-│   ├── core/           # @gately-auth/core — Worker handler, adapters, providers
-│   ├── client/         # @gately-auth/client — Browser/React/Vue/Svelte client
-│   └── cli/            # @gately-auth/cli — gately-auth CLI tool
+│   ├── core/           # @gately/auth-core — Worker handler, adapters, providers
+│   ├── client/         # @gately/auth-client — Browser/React/Vue/Svelte client
+│   └── cli/            # @gately/auth-cli — gately-auth CLI tool
 ├── examples/
 │   ├── basic-worker/   # Standalone Hono Worker example
 │   └── nextjs/         # Next.js frontend example
@@ -71,9 +71,9 @@ gately-auth/
 
 | Package | Description |
 |---|---|
-| `@gately-auth/core` | The auth engine — D1 adapter, KV adapter, all providers, session management, plugins |
-| `@gately-auth/client` | Client SDK — `createAuthClient()`, `useSession()`, React hooks |
-| `@gately-auth/cli` | CLI tool — `gately-auth init`, `migrate`, `generate`, `deploy` |
+| `@gately/auth-core` | The auth engine — D1 adapter, KV adapter, all providers, session management, plugins |
+| `@gately/auth-client` | Client SDK — `createAuthClient()`, `useSession()`, React hooks |
+| `@gately/auth-cli` | CLI tool — `gately-auth init`, `migrate`, `generate`, `deploy` |
 
 ---
 
@@ -83,7 +83,7 @@ gately-auth/
 
 ```bash
 # Build a single package
-pnpm --filter @gately-auth/core build
+pnpm --filter @gately/auth-core build
 
 # Build everything
 pnpm build
@@ -102,7 +102,7 @@ pnpm test
 pnpm test:watch
 
 # Test a single package
-pnpm --filter @gately-auth/core test
+pnpm --filter @gately/auth-core test
 ```
 
 Tests use [Vitest](https://vitest.dev/) and run entirely in Node.js — no Cloudflare emulation needed for unit tests. Integration tests that need D1/KV use the in-memory adapters from `packages/core/src/adapters/kv.ts`.

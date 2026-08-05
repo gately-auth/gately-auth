@@ -3,7 +3,7 @@
 // Import this everywhere you need auth state
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { createReactAuthClient } from "@gately-auth/client/react";
+import { createReactAuthClient } from "@gately/auth-client/react";
 
 export const authClient = createReactAuthClient({
   // Point to your deployed gately-auth Worker
@@ -23,4 +23,4 @@ export const authClient = createReactAuthClient({
   },
 });
 
-export type { SessionData } from "@gately-auth/client";
+export type { SessionData } from "@gately/auth-client";

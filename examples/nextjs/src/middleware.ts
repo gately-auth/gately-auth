@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionCookie } from "@gately-auth/client";
+import { getSessionCookie } from "@gately/auth-client";
 
 // Routes that require authentication
 const PROTECTED = ["/dashboard", "/profile", "/settings", "/api/protected"];

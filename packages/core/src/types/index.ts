@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Core types for @gately-auth/core
+// Core types for @gately/auth-core
 // Designed to be acquisition-friendly: clean interfaces, no framework coupling
 // ─────────────────────────────────────────────────────────────────────────────
 

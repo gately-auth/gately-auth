@@ -16,7 +16,7 @@ A clear description of what is wrong.
 What should happen.
 
 **Environment**
-- `@gately-auth/core` version:
+- `@gately/auth-core` version:
 - Cloudflare Workers runtime / Node version:
 - wrangler version:
 - OS:

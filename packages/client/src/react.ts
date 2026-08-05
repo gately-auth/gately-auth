@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// @gately-auth/client/react — React hooks
+// @gately/auth-client/react — React hooks
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from "react";
@@ -23,7 +23,7 @@ interface UseSessionReturn {
  *
  * @example
  * ```tsx
- * import { createReactAuthClient } from '@gately-auth/client/react'
+ * import { createReactAuthClient } from '@gately/auth-client/react'
  *
  * export const authClient = createReactAuthClient({
  *   baseURL: 'https://my-auth.workers.dev',

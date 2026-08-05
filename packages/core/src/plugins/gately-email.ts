@@ -77,8 +77,8 @@ class GatelyEmailProvider implements EmailProvider {
  *
  * @example
  * ```ts
- * import { gatelyAuth } from '@gately-auth/core'
- * import { gatelyEmail } from '@gately-auth/core/plugins'
+ * import { gatelyAuth } from '@gately/auth-core'
+ * import { gatelyEmail } from '@gately/auth-core/plugins'
  *
  * const auth = gatelyAuth({
  *   plugins: [
