@@ -132,6 +132,14 @@ h1 {
   letter-spacing: 0.1em; text-transform: uppercase;
   display: flex; align-items: center; gap: 8px;
 }
+.l-nav-logo-img {
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.l-nav-logo:hover .l-nav-logo-img { opacity: 1; }
+.l-nav-logo-text { letter-spacing: 0.12em; }
 .l-nav-links { display: flex; align-items: center; gap: 24px; }
 .l-nav-link {
   font-family: 'Geist Mono', monospace;
@@ -639,4 +647,188 @@ h1 {
 
 @media (max-width: 640px) {
   .l-plg-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Micro-interactions ── */
+
+/* Fade-in reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+/* Stagger delays */
+.reveal-d1 { transition-delay: 0.05s; }
+.reveal-d2 { transition-delay: 0.1s; }
+.reveal-d3 { transition-delay: 0.15s; }
+.reveal-d4 { transition-delay: 0.2s; }
+
+/* Card lift on hover — apply to inner icon/title only, not the card itself */
+.l-fi:hover .l-fi-ico,
+.l-plg-card:hover .l-plg-icon,
+.l-cs:hover .l-cs-title,
+.l-pkg-card:hover .l-pkg-name {
+  transform: translateY(-1px);
+  transition: transform 0.15s ease;
+}
+
+/* Remove transform from cards themselves */
+.l-fi, .l-plg-card, .l-cs, .l-pkg-card, .l-step, .l-mcp-tool, .l-rr {
+  transition: background 0.15s ease;
+}
+
+/* Badge pop */
+.l-hero-tag, .l-fw-item, .l-prov-badge, .l-plg-tag {
+  transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.l-hero-tag:hover { transform: scale(1.04); border-color: #333; color: #aaa; }
+.l-fw-item:hover { transform: scale(1.04); }
+
+/* Button press */
+.l-btn-primary, .l-btn-ghost, .l-nav-cta, .l-copy-btn {
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+}
+.l-btn-primary:active, .l-btn-ghost:active, .l-nav-cta:active { transform: scale(0.97); }
+.l-copy-btn:active { transform: scale(0.95); }
+
+/* Nav link underline slide */
+.l-nav-link {
+  position: relative;
+}
+.l-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 0; height: 1px;
+  background: #fff;
+  transition: width 0.2s ease;
+}
+.l-nav-link:hover::after { width: 100%; }
+
+/* Section label scramble cursor */
+.stag, .l-split-label { cursor: default; }
+
+/* Route row slide-in indicator */
+.l-rr { position: relative; overflow: hidden; }
+.l-rr::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: #fff;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.2s ease;
+}
+.l-rr:hover::before { transform: scaleY(1); }
+
+/* Install tab click ripple */
+.l-itab { position: relative; overflow: hidden; }
+
+/* Pkg card border glow on hover */
+.l-pkg-card {
+  position: relative;
+}
+.l-pkg-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease;
+  pointer-events: none;
+}
+.l-pkg-card:hover::after { border-color: #222; }
+
+/* Hero install box glow */
+.l-hero-install {
+  transition: border-color 0.2s ease;
+}
+.l-hero-install:focus-within { border-color: #333; }
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* ── Integrations ticker ── */
+.l-ticker-section {
+  border-bottom: 1px solid #111;
+  overflow: hidden;
+  position: relative;
+}
+/* Left and right fade masks */
+.l-ticker-section::before,
+.l-ticker-section::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 120px;
+  z-index: 2;
+  pointer-events: none;
+}
+.l-ticker-section::before {
+  left: 0;
+  background: linear-gradient(to right, #000 0%, transparent 100%);
+}
+.l-ticker-section::after {
+  right: 0;
+  background: linear-gradient(to left, #000 0%, transparent 100%);
+}
+.l-ticker-row {
+  display: flex;
+  border-bottom: 1px solid #111;
+  position: relative;
+}
+.l-ticker-row:last-child { border-bottom: none; }
+.l-ticker-track {
+  display: flex;
+  gap: 0;
+  animation: l-ticker 80s linear infinite;
+  width: max-content;
+}
+.l-ticker-row:nth-child(2) .l-ticker-track { animation-direction: reverse; animation-duration: 70s; }
+.l-ticker-track:hover { animation-play-state: paused; }
+
+@keyframes l-ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.l-ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  border-right: 1px solid #111;
+  white-space: nowrap;
+  cursor: default;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+.l-ticker-item:hover { background: #080808; }
+.l-ticker-item:hover .l-ticker-icon { color: #888; }
+.l-ticker-item:hover .l-ticker-name { color: #e4e4e7; }
+
+.l-ticker-icon {
+  color: #2a2a2a;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.l-ticker-item:hover .l-ticker-icon { transform: scale(1.1); }
+.l-ticker-name {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 0.02em;
+  transition: color 0.15s ease;
+}
+.l-ticker-cat {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #2a2a2a;
 }

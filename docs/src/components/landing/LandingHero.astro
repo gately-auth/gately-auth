@@ -1,5 +1,6 @@
 ---
 import BrandIcon from './BrandIcon.astro';
+import Icon from './Icon.astro';
 ---
 <section class="l-hero bd">
   <div class="lc l-hero-inner">
@@ -21,9 +22,11 @@ import BrandIcon from './BrandIcon.astro';
         <span class="l-hero-tag">Plugins</span>
       </div>
       <div class="l-hero-install">
-        <span class="l-hero-install-num">1</span>
-        <code>npm create gately-auth@latest</code>
-        <button class="l-hero-install-copy" aria-label="copy" onclick="navigator.clipboard?.writeText('npm create gately-auth@latest')">&#x2398;</button>
+        <span class="l-hero-install-num">$</span>
+        <code>npx @gately/auth-cli init</code>
+        <button class="l-hero-install-copy" id="l-hero-copy-btn" aria-label="copy">
+          <Icon name="arrow-right-01" size={14} />
+        </button>
       </div>
       <div class="l-hero-actions">
         <a href="/article/quick-start" class="l-btn-primary">Get Started &rarr;</a>
@@ -49,7 +52,7 @@ import BrandIcon from './BrandIcon.astro';
           <span class="l-win-title">bash</span>
         </div>
         <div class="l-term-body">
-          <div><span class="tc-p">$</span> <span class="tc-w">npm create gately-auth@latest</span></div>
+          <div><span class="tc-p">$</span> <span class="tc-w">npx @gately/auth-cli init</span></div>
           <div class="tc-d">  Creating project...</div>
           <div class="tc-d">  Installing dependencies...</div>
           <div class="tc-d">  Setting up auth...</div>
@@ -98,3 +101,15 @@ import BrandIcon from './BrandIcon.astro';
 
   </div>
 </section>
+
+<script>
+(function() {
+  const btn = document.getElementById('l-hero-copy-btn');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    navigator.clipboard?.writeText('npx @gately/auth-cli init');
+    btn.style.color = '#4ade80';
+    setTimeout(() => { btn.style.color = ''; }, 1500);
+  });
+})();
+</script>

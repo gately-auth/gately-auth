@@ -1,0 +1,86 @@
+---
+import BrandIcon from './BrandIcon.astro';
+
+// Row 1 — Auth methods + frameworks
+const row1 = [
+  { name: 'Hono', cat: 'Framework', icon: 'hono' },
+  { name: 'Next.js', cat: 'Framework', icon: 'nextdotjs' },
+  { name: 'Astro', cat: 'Framework', icon: 'astro' },
+  { name: 'SvelteKit', cat: 'Framework', icon: 'svelte' },
+  { name: 'Remix', cat: 'Framework', icon: 'remix' },
+  { name: 'React', cat: 'Client', icon: 'react' },
+  { name: 'Google', cat: 'OAuth', icon: 'google' },
+  { name: 'GitHub', cat: 'OAuth', icon: 'github' },
+  { name: 'Discord', cat: 'OAuth', icon: 'discord' },
+  { name: 'Microsoft', cat: 'OAuth', icon: 'microsoft' },
+  { name: 'Apple', cat: 'OAuth', icon: 'apple' },
+  { name: 'Slack', cat: 'OAuth', icon: 'slack' },
+  { name: 'Twitter / X', cat: 'OAuth', icon: 'x' },
+  { name: 'LinkedIn', cat: 'OAuth', icon: 'linkedin' },
+  { name: 'Facebook', cat: 'OAuth', icon: 'facebook' },
+];
+
+// Row 2 — Infra + tools
+const row2 = [
+  { name: 'Cloudflare D1', cat: 'Database', icon: null },
+  { name: 'Cloudflare KV', cat: 'Storage', icon: null },
+  { name: 'Magic Link', cat: 'Authentication', icon: null },
+  { name: 'Email OTP', cat: 'Authentication', icon: null },
+  { name: 'Passkeys', cat: 'Authentication', icon: null },
+  { name: 'Cursor', cat: 'MCP', icon: null },
+  { name: 'Claude Code', cat: 'MCP', icon: null },
+  { name: 'Kiro', cat: 'MCP', icon: null },
+  { name: 'Resend', cat: 'Email', icon: null },
+  { name: 'Postmark', cat: 'Email', icon: null },
+  { name: 'GitLab', cat: 'OAuth', icon: 'gitlab' },
+  { name: 'Bitbucket', cat: 'OAuth', icon: 'bitbucket' },
+  { name: 'Spotify', cat: 'OAuth', icon: 'spotify' },
+  { name: 'Notion', cat: 'OAuth', icon: 'notion' },
+  { name: 'Drizzle', cat: 'Adapter', icon: null },
+  { name: 'Prisma', cat: 'Adapter', icon: null },
+];
+
+// Duplicate each row for seamless loop
+const r1 = [...row1, ...row1];
+const r2 = [...row2, ...row2];
+---
+
+<div class="l-ticker-section">
+
+  <!-- Row 1 -->
+  <div class="l-ticker-row">
+    <div class="l-ticker-track">
+      {r1.map(item => (
+        <div class="l-ticker-item">
+          <span class="l-ticker-icon">
+            {item.icon
+              ? <BrandIcon name={item.icon} size={14} />
+              : <span style="display:inline-block;width:14px;height:14px;border:1px solid #222;border-radius:2px"></span>
+            }
+          </span>
+          <span class="l-ticker-name">{item.name}</span>
+          <span class="l-ticker-cat">{item.cat}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Row 2 -->
+  <div class="l-ticker-row">
+    <div class="l-ticker-track">
+      {r2.map(item => (
+        <div class="l-ticker-item">
+          <span class="l-ticker-icon">
+            {item.icon
+              ? <BrandIcon name={item.icon} size={14} />
+              : <span style="display:inline-block;width:14px;height:14px;border:1px solid #222;border-radius:2px"></span>
+            }
+          </span>
+          <span class="l-ticker-name">{item.name}</span>
+          <span class="l-ticker-cat">{item.cat}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+</div>

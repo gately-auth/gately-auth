@@ -6,18 +6,23 @@
   "type": "module",
   "workspaces": [
     "packages/*",
-    "examples/*"
+    "examples/*",
+    "docs"
   ],
   "scripts": {
     "build": "pnpm --filter \"@gately/auth-*\" -r build",
     "dev": "pnpm --filter \"@gately/auth-*\" -r --parallel dev",
+    "dev:docs": "pnpm --filter docs dev",
     "typecheck": "pnpm --filter \"@gately/auth-*\" -r typecheck",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "changeset": "changeset",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "deploy:frontend": "pnpm --filter docs build && pnpm --filter docs run deploy",
+    "deploy:mcp": "pnpm --filter @gately/auth-mcp deploy",
+    "deploy:all": "pnpm deploy:frontend && pnpm deploy:mcp"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",

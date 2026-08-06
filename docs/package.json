@@ -9,7 +9,7 @@
     "check": "astro check",
     "preview": "astro preview",
     "astro": "astro",
-    "deploy": "pnpm build && wrangler pages deploy dist --project-name=gately-auth-docs"
+    "deploy": "wrangler pages deploy dist --project-name=gately-auth"
   },
   "dependencies": {
     "@astrojs/check": "0.9.6",

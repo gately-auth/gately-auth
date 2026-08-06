@@ -12,6 +12,7 @@ import LandingRoutes from '../components/landing/LandingRoutes.astro';
 import LandingPackages from '../components/landing/LandingPackages.astro';
 import LandingPlugins from '../components/landing/LandingPlugins.astro';
 import LandingProviders from '../components/landing/LandingProviders.astro';
+import LandingIntegrations from '../components/landing/LandingIntegrations.astro';
 import LandingDocs from '../components/landing/LandingDocs.astro';
 import LandingMCP from '../components/landing/LandingMCP.astro';
 import LandingRoadmap from '../components/landing/LandingRoadmap.astro';
@@ -56,6 +57,7 @@ import LandingFooter from '../components/landing/LandingFooter.astro';
     <LandingPlugins />
     <LandingProviders />
     <LandingDocs />
+    <LandingIntegrations />
     <LandingMCP />
     <LandingRoadmap />
     <LandingSteps />
@@ -145,6 +147,101 @@ document.querySelectorAll('.l-fg, .l-pkg-grid, .l-cs-grid, .l-steps-row').forEac
     child.classList.add('reveal');
     observer.observe(child);
   });
+});
+
+// ── Scramble text on hover ──────────────────────────────────────────────────
+const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+function scramble(el: HTMLElement) {
+  const original = el.getAttribute('data-scramble') || el.textContent?.trim() || '';
+  let iter = 0;
+  let interval: ReturnType<typeof setInterval>;
+  clearInterval((el as any)._scramble);
+  interval = setInterval(() => {
+    el.textContent = original.split('').map((ch, i) => {
+      if (ch === ' ') return ' ';
+      if (i < iter) return original[i];
+      return CHARS[Math.floor(Math.random() * CHARS.length)];
+    }).join('');
+    iter += 0.8;
+    if (iter >= original.length) {
+      el.textContent = original;
+      clearInterval(interval);
+    }
+  }, 28);
+  (el as any)._scramble = interval;
+}
+
+// Nav links
+document.querySelectorAll('[data-scramble]').forEach(el => {
+  el.addEventListener('mouseenter', () => scramble(el as HTMLElement));
+});
+
+// Section labels — scramble on scroll into view
+const labelObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      setTimeout(() => scramble(e.target as HTMLElement), 100);
+      labelObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.l-split-label, .stag').forEach(el => {
+  (el as HTMLElement).setAttribute('data-scramble', (el.textContent || '').trim().toUpperCase());
+  labelObserver.observe(el);
+});
+
+// ── Typed-text effect on hero headline ─────────────────────────────────────
+(function() {
+  const h1 = document.querySelector('.l-hero-left h1');
+  if (!h1) return;
+  const lines = h1.innerHTML.split('<br>');
+  h1.style.opacity = '1';
+})();
+
+// ── Number counter animations ───────────────────────────────────────────────
+function animateCount(el: HTMLElement, target: number, suffix = '') {
+  let start = 0;
+  const duration = 1200;
+  const step = (timestamp: number, startTime: number) => {
+    const progress = Math.min((timestamp - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.floor(ease * target) + suffix;
+    if (progress < 1) requestAnimationFrame(ts => step(ts, startTime));
+  };
+  requestAnimationFrame(ts => step(ts, ts));
+}
+const countObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target as HTMLElement;
+      const target = parseInt(el.getAttribute('data-count') || '0');
+      const suffix = el.getAttribute('data-suffix') || '';
+      animateCount(el, target, suffix);
+      countObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => countObserver.observe(el));
+
+// ── Stagger route rows ──────────────────────────────────────────────────────
+document.querySelectorAll('.l-rt').forEach(table => {
+  table.querySelectorAll('.l-rr').forEach((row, i) => {
+    (row as HTMLElement).style.opacity = '0';
+    (row as HTMLElement).style.transform = 'translateX(-8px)';
+    (row as HTMLElement).style.transition = `opacity 0.3s ease ${i * 0.03}s, transform 0.3s ease ${i * 0.03}s`;
+  });
+  const rtObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.l-rr').forEach((row) => {
+          (row as HTMLElement).style.opacity = '1';
+          (row as HTMLElement).style.transform = 'translateX(0)';
+        });
+        rtObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  rtObs.observe(table);
 });
 </script>
 
