@@ -4,7 +4,7 @@ import Icon from './Icon.astro';
 <nav class="l-nav">
   <div class="l-nav-i">
     <a href="/" class="l-nav-logo">
-      <img src="/Logo-nvc.png" alt="" width="22" height="22" class="l-nav-logo-img" />
+      <img src="/Logo-nvc.png" alt="Gately Auth" width="22" height="22" class="l-nav-logo-img" style="object-fit:contain" />
       <span class="l-nav-logo-text" data-scramble="GATELY AUTH">GATELY AUTH</span>
     </a>
     <div class="l-nav-links">
@@ -15,6 +15,10 @@ import Icon from './Icon.astro';
       <a href="https://mcp.auth.usegately.com" class="l-nav-link" data-scramble="MCP" target="_blank" rel="noopener">MCP</a>
     </div>
     <div class="l-nav-right">
+      <button class="l-theme-toggle" id="l-theme-btn" aria-label="Toggle theme" title="Toggle light/dark">
+        <svg id="l-theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg id="l-theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
       <a href="https://github.com/gately-auth/gately-auth" class="l-nav-star" target="_blank" rel="noopener">
         <Icon name="star" size={12} />
         Star
@@ -23,3 +27,28 @@ import Icon from './Icon.astro';
     </div>
   </div>
 </nav>
+
+<script>
+(function() {
+  const btn = document.getElementById('l-theme-btn');
+  const sunIcon = document.getElementById('l-theme-icon-dark');
+  const moonIcon = document.getElementById('l-theme-icon-light');
+  
+  // Check saved preference
+  const saved = localStorage.getItem('ga-theme');
+  if (saved === 'light') {
+    document.documentElement.classList.add('light');
+    if (sunIcon) sunIcon.style.display = 'none';
+    if (moonIcon) moonIcon.style.display = '';
+  }
+  
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const isLight = document.documentElement.classList.toggle('light');
+      localStorage.setItem('ga-theme', isLight ? 'light' : 'dark');
+      if (sunIcon) sunIcon.style.display = isLight ? 'none' : '';
+      if (moonIcon) moonIcon.style.display = isLight ? '' : 'none';
+    });
+  }
+})();
+</script>
